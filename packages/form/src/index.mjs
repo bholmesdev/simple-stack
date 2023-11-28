@@ -5,7 +5,7 @@ export default function integration() {
     hooks: {
       "astro:config:setup"({ addMiddleware }) {
         addMiddleware({
-          entrypoint: "@simple-stack/form/middleware",
+          entrypoint: "simple-stack-form/middleware",
           order: "pre",
         });
       },
