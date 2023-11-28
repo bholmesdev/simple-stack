@@ -1,0 +1,29 @@
+{
+  "name": "@simple-stack/form",
+  "version": "0.0.1",
+  "description": "A simple form library for Astro projects",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./middleware": "./src/middleware.ts",
+    "./components": "./components/index.ts",
+    "./types": "./types.d.ts"
+  },
+  "keywords": [
+    "withastro",
+    "integration"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bholmesdev/simple-stack.git",
+    "directory": "packages/form"
+  },
+  "author": "bholmesdev",
+  "license": "MIT",
+  "devDependencies": {
+    "astro": "^3.6.0"
+  },
+  "peerDependencies": {
+    "astro": "^3.6.0"
+  }
+}

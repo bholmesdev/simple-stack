@@ -1,0 +1,9 @@
+---
+type Props = {
+  value: string;
+};
+
+const { value } = Astro.props;
+---
+
+<input type="hidden" name="_formName" value={value} />
