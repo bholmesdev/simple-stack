@@ -30,8 +30,20 @@ function validate<T extends ZodRawShape>(formData: FormData, validator: T) {
   const result = z
     .preprocess((formData) => {
       if (!(formData instanceof FormData)) return formData;
+      let mappedObject = {};
+
       // TODO: map multiple form values of the same name
-      return Object.fromEntries(formData.entries());
+      for (const [key, value] of formData.entries()) {
+        const fieldValidator = validator[key];
+        if (fieldValidator instanceof z.ZodBoolean) {
+          mappedObject[key] = value === "true";
+        } else if (fieldValidator instanceof z.ZodNumber) {
+          mappedObject[key] = Number(value);
+        } else {
+          mappedObject[key] = value;
+        }
+      }
+      return mappedObject;
     }, z.object(validator))
     .safeParse(formData);
 
