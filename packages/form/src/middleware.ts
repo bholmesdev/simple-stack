@@ -53,6 +53,16 @@ function validate<T extends ZodRawShape>(formData: FormData, validator: T) {
 export const onRequest = defineMiddleware(({ request, locals }, next) => {
   locals.form = {
     // @ts-expect-error generics don't line up with `types.d.ts`
+    async parseRequest(form) {
+      if (!isFormRequest(request)) return undefined;
+
+      // TODO: hoist exceptions as `formErrors`
+      const formData = await request.clone().formData();
+
+      return validate(formData, form.validator);
+    },
+
+    // @ts-expect-error generics don't line up with `types.d.ts`
     async getData<T extends ZodRawShape>(validator: T) {
       if (!isFormRequest(request)) return undefined;
 
