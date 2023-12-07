@@ -1,6 +1,6 @@
 import { type SafeParseReturnType, type ZodRawShape } from "zod";
 import { createFormStore, validateForm } from "../create-form";
-import { createContext, useContext } from "react";
+import { createContext, useContext, type ComponentProps } from "react";
 import { useStore } from "@nanostores/react";
 
 const FormContext = createContext(createFormStore({}));
@@ -8,10 +8,11 @@ const FormContext = createContext(createFormStore({}));
 export function Form({
   children,
   validator,
+  ...formProps
 }: {
   children: React.ReactNode;
   validator: ZodRawShape;
-}) {
+} & Omit<ComponentProps<"form">, "method" | "onSubmit">) {
   const formStore = createFormStore(validator);
 
   return (
@@ -33,6 +34,7 @@ export function Form({
             });
           }
         }}
+        {...formProps}
         method="POST"
       >
         {children}
@@ -41,11 +43,17 @@ export function Form({
   );
 }
 
-export function Input({ ...inputProps }: { name: string }) {
+export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
   const store = useContext(FormContext);
   const $formState = useStore(store);
-  const { hasErrored, validationErrors, validator } =
-    $formState[inputProps.name];
+  const inputState = $formState[inputProps.name];
+  if (!inputState) {
+    throw new Error(
+      `Input "${inputProps.name}" not found in form. Did you forget to add it to the validator?`
+    );
+  }
+
+  const { hasErrored, validationErrors, validator } = inputState;
 
   function setValidation(parsed: SafeParseReturnType<unknown, unknown>) {
     if (parsed.success === false) {
