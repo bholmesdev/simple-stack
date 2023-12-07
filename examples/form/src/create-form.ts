@@ -1,5 +1,12 @@
 import { map, type MapStore } from "nanostores";
-import { z, ZodBoolean, ZodNumber, type ZodRawShape, type ZodType } from "zod";
+import {
+  z,
+  ZodBoolean,
+  ZodNumber,
+  ZodOptional,
+  type ZodRawShape,
+  type ZodType,
+} from "zod";
 
 export function createForm<T extends ZodRawShape>(validator: T) {
   let inputProps: Record<keyof T, any> = {} as any;
@@ -12,8 +19,23 @@ export function createForm<T extends ZodRawShape>(validator: T) {
 
   return {
     inputProps,
-    validator,
+    validator: preprocessValidators(validator),
   };
+}
+
+function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
+  return Object.fromEntries(
+    Object.entries(formValidator).map(([key, validator]) => {
+      const inputType = getInputType(validator);
+      if (inputType === "checkbox") {
+        return [key, z.preprocess((value) => value === "on", validator)];
+      } else if (inputType === "number") {
+        return [key, z.preprocess(Number, validator)];
+      }
+
+      return [key, validator];
+    })
+  ) as T;
 }
 
 export type FieldState = {
@@ -41,23 +63,29 @@ export function createFormStore<T extends ZodRawShape>(
 
 type InputProp = {
   name: string;
-  required: boolean;
+  "aria-required": boolean;
   type: "text" | "number" | "checkbox";
 };
 
 function getInputProp<T extends ZodType>(name: string, fieldValidator: T) {
   const inputProp: InputProp = {
     name,
-    required: !fieldValidator.isOptional() && !fieldValidator.isNullable(),
+    "aria-required":
+      !fieldValidator.isOptional() && !fieldValidator.isNullable(),
     type: getInputType<T>(fieldValidator),
   };
 
   return inputProp;
 }
 function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
-  if (fieldValidator instanceof ZodBoolean) {
+  const resolvedType =
+    fieldValidator instanceof ZodOptional
+      ? fieldValidator._def.innerType
+      : fieldValidator;
+
+  if (resolvedType instanceof ZodBoolean) {
     return "checkbox";
-  } else if (fieldValidator instanceof ZodNumber) {
+  } else if (resolvedType instanceof ZodNumber) {
     return "number";
   } else {
     return "text";
@@ -75,14 +103,7 @@ export function validateForm<T extends ZodRawShape>(
 
       // TODO: map multiple form values of the same name
       for (const [key, value] of formData.entries()) {
-        const fieldValidator = validator[key];
-        if (fieldValidator instanceof z.ZodBoolean) {
-          mappedObject[key] = value === "true";
-        } else if (fieldValidator instanceof z.ZodNumber) {
-          mappedObject[key] = Number(value);
-        } else {
-          mappedObject[key] = value;
-        }
+        mappedObject[key] = value;
       }
       return mappedObject;
     }, z.object(validator))
