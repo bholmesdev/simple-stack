@@ -10,6 +10,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^7.0.0",
     "@astrojs/react": "^3.0.7",
     "@nanostores/react": "^0.7.1",
     "@types/react": "^18.0.21",
