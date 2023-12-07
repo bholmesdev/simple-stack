@@ -27,13 +27,23 @@ function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
   return Object.fromEntries(
     Object.entries(formValidator).map(([key, validator]) => {
       const inputType = getInputType(validator);
-      if (inputType === "checkbox") {
-        return [key, z.preprocess((value) => value === "on", validator)];
-      } else if (inputType === "number") {
-        return [key, z.preprocess(Number, validator)];
+      switch (inputType) {
+        case "checkbox":
+          return [key, z.preprocess((value) => value === "on", validator)];
+        case "number":
+          return [key, z.preprocess(Number, validator)];
+        case "text":
+          return [
+            key,
+            z.preprocess(
+              // Consider empty input as "required"
+              (value) => (value === "" ? undefined : value),
+              validator
+            ),
+          ];
+        default:
+          return [key, validator];
       }
-
-      return [key, validator];
     })
   ) as T;
 }
