@@ -9,6 +9,7 @@
       "types": "./src/index.d.ts"
     },
     "./middleware": "./src/middleware.ts",
+    "./client": "./src/client.ts",
     "./components": "./components/index.ts",
     "./types": "./types.d.ts"
   },
@@ -24,9 +25,13 @@
   "author": "bholmesdev",
   "license": "MIT",
   "devDependencies": {
-    "astro": "^4.0.0"
+    "astro": "^4.0.0",
+    "nanostores": "^0.9.5",
+    "zod": "^3.22.4"
   },
   "peerDependencies": {
-    "astro": "^3.6.0 || ^4.0.0"
+    "astro": "^3.6.0 || ^4.0.0",
+    "nanostores": "^0.9.5",
+    "zod": "^3.22.4"
   }
 }
