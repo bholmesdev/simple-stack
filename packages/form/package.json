@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.mjs",
     "./middleware": "./src/middleware.ts",
+    "./client": "./src/client.ts",
     "./components": "./components/index.ts",
     "./types": "./types.d.ts"
   },
@@ -21,9 +22,13 @@
   "author": "bholmesdev",
   "license": "MIT",
   "devDependencies": {
-    "astro": "^3.6.0"
+    "astro": "^3.6.0",
+    "nanostores": "^0.9.5",
+    "zod": "^3.22.4"
   },
   "peerDependencies": {
-    "astro": "^3.6.0"
+    "astro": "^3.6.0",
+    "nanostores": "^0.9.5",
+    "zod": "^3.22.4"
   }
 }
