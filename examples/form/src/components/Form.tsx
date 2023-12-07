@@ -1,5 +1,5 @@
 import { type SafeParseReturnType, type ZodRawShape } from "zod";
-import { createFormStore, validateForm } from "../create-form";
+import { createFormStore, validateForm } from "simple-stack-form/client";
 import { createContext, useContext, type ComponentProps } from "react";
 import { useStore } from "@nanostores/react";
 

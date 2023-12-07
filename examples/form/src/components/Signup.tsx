@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { createForm } from "../create-form";
 import { Form, Input } from "./Form";
+import { createForm } from "simple-stack-form/client";
 
-export const signup = await createForm({
+export const signup = createForm({
   name: z.string(),
   optIn: z.boolean().optional(),
 });
