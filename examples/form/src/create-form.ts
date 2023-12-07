@@ -109,13 +109,9 @@ export function validateForm<T extends ZodRawShape>(
   const result = z
     .preprocess((formData) => {
       if (!(formData instanceof FormData)) return formData;
-      let mappedObject = {};
 
-      // TODO: map multiple form values of the same name
-      for (const [key, value] of formData.entries()) {
-        mappedObject[key] = value;
-      }
-      return mappedObject;
+      // TODO: handle multiple inputs with same key
+      return Object.fromEntries(formData);
     }, z.object(validator))
     .safeParse(formData);
 
