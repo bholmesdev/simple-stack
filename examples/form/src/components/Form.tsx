@@ -84,7 +84,9 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
         }}
       />
       {validationErrors.map((e) => (
-        <p key={e}>{e}</p>
+        <p className="text-red-400" key={e}>
+          {e}
+        </p>
       ))}
     </>
   );
