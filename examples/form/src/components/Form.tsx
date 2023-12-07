@@ -67,6 +67,7 @@ export function Input({ ...inputProps }: { name: string }) {
       <input
         {...inputProps}
         onBlur={(e) => {
+          if (e.target.value === "") return;
           setValidation(validator.safeParse(e.target.value));
         }}
         onChange={(e) => {
