@@ -21,7 +21,7 @@ if (formResult?.success) {
   </head>
   <body>
     <h1>Astro</h1>
-    <Signup client:load />
+    <Signup transition:persist client:load />
     <style>
       @import "open-props/style";
       @import "open-props/normalize";
