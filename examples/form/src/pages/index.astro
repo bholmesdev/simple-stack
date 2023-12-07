@@ -20,11 +20,28 @@ if (formResult?.success) {
     <title>Astro</title>
   </head>
   <body>
-    <h1>Astro</h1>
-    <Signup transition:persist client:load />
-    <style>
-      @import "open-props/style";
-      @import "open-props/normalize";
-    </style>
+    <main class="!m-auto max-w-prose">
+      <h1>Simple form</h1>
+      {
+        formResult?.success && (
+          <div
+            class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+            role="alert"
+          >
+            <strong class="font-bold">Success!</strong>
+            <span class="block sm:inline">
+              You have successfully submitted the form.
+            </span>
+          </div>
+        )
+      }
+      <div transition:name="form">
+        <Signup transition:persist client:load />
+      </div>
+      <style>
+        @import "open-props/style";
+        @import "open-props/normalize";
+      </style>
+    </main>
   </body>
 </html>
