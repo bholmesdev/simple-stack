@@ -4,7 +4,10 @@
   "description": "A simple form library for Astro projects",
   "type": "module",
   "exports": {
-    ".": "./src/index.mjs",
+    ".": {
+      "default": "./src/index.mjs",
+      "types": "./src/index.d.ts"
+    },
     "./middleware": "./src/middleware.ts",
     "./components": "./components/index.ts",
     "./types": "./types.d.ts"
