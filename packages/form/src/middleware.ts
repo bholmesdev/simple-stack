@@ -26,11 +26,11 @@ export type PartialRedirectPayload = {
   location: string;
 };
 
-function validate<T extends ZodRawShape>(formData: FormData, validator: T) {
+function validate(formData: FormData, validator: ZodRawShape) {
   const result = z
     .preprocess((formData) => {
       if (!(formData instanceof FormData)) return formData;
-      let mappedObject = {};
+      let mappedObject: Record<string, unknown> = {};
 
       // TODO: map multiple form values of the same name
       for (const [key, value] of formData.entries()) {
@@ -53,7 +53,7 @@ function validate<T extends ZodRawShape>(formData: FormData, validator: T) {
 export const onRequest = defineMiddleware(({ request, locals }, next) => {
   locals.form = {
     // @ts-expect-error generics don't line up with `types.d.ts`
-    async parseRequest(form) {
+    async getData(form) {
       if (!isFormRequest(request)) return undefined;
 
       // TODO: hoist exceptions as `formErrors`
@@ -61,18 +61,8 @@ export const onRequest = defineMiddleware(({ request, locals }, next) => {
 
       return validate(formData, form.validator);
     },
-
     // @ts-expect-error generics don't line up with `types.d.ts`
-    async getData<T extends ZodRawShape>(validator: T) {
-      if (!isFormRequest(request)) return undefined;
-
-      // TODO: hoist exceptions as `formErrors`
-      const formData = await request.clone().formData();
-
-      return validate<T>(formData, validator);
-    },
-    // @ts-expect-error generics don't line up with `types.d.ts`
-    async getDataByName<T extends ZodRawShape>(name: string, validator: T) {
+    async getDataByName(name, form) {
       if (!isFormRequest(request)) return undefined;
 
       // TODO: hoist exceptions as `formErrors`
@@ -80,7 +70,7 @@ export const onRequest = defineMiddleware(({ request, locals }, next) => {
 
       if (formData.get("_formName") === name) {
         formData.delete("_formName");
-        return validate<T>(formData, validator);
+        return validate(formData, form.validator);
       }
 
       return undefined;
