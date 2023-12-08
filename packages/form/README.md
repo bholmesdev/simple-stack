@@ -77,7 +77,7 @@ if (checkoutForm?.success) {
   <label for="quantity">Quantity</label>
   <input id="quantity" name="quantity" type="number" />
   {
-    !checkoutForm?.success && checkoutForm.errors.formErrors.fieldErrors.map(error => (
+    checkoutForm?.success === false && checkoutForm.errors.formErrors.fieldErrors.map(error => (
       <p class="error">{error}</p>
     ))
   }
