@@ -15,7 +15,6 @@ export function Form({
   validator,
   ...formProps
 }: {
-  children: React.ReactNode;
   validator: ZodRawShape;
 } & Omit<ComponentProps<"form">, "method" | "onSubmit">) {
   const formStore = map(formValidatorToState(validator));
