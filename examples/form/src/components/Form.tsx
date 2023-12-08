@@ -1,9 +1,14 @@
 import { type SafeParseReturnType, type ZodRawShape } from "zod";
-import { createFormStore, validateForm } from "simple-stack-form/client";
+import {
+  type FormState,
+  validateForm,
+  formValidatorToState,
+} from "simple-stack-form/client";
 import { createContext, useContext, type ComponentProps } from "react";
 import { useStore } from "@nanostores/react";
+import { type MapStore, map } from "nanostores";
 
-const FormContext = createContext(createFormStore({}));
+const FormContext = createContext<MapStore<FormState>>(map());
 
 export function Form({
   children,
@@ -13,7 +18,7 @@ export function Form({
   children: React.ReactNode;
   validator: ZodRawShape;
 } & Omit<ComponentProps<"form">, "method" | "onSubmit">) {
-  const formStore = createFormStore(validator);
+  const formStore = map(formValidatorToState(validator));
 
   return (
     <FormContext.Provider value={formStore}>
@@ -49,7 +54,7 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
   const inputState = $formState[inputProps.name];
   if (!inputState) {
     throw new Error(
-      `Input "${inputProps.name}" not found in form. Did you forget to add it to the validator?`
+      `Input "${inputProps.name}" not found in form. Did you use the <Form> component with your validator?`
     );
   }
 

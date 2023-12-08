@@ -54,21 +54,23 @@ export type FieldState = {
   validator: ZodType;
 };
 
-export function createFormStore<T extends ZodRawShape>(
-  formValidator: T
-): MapStore<Record<string, FieldState>> {
-  return map(
-    Object.fromEntries(
-      Object.entries(formValidator).map(([key, validator]) => [
-        key,
-        {
-          hasErrored: false,
-          validationErrors: [],
-          validator,
-        },
-      ])
-    )
-  );
+export type FormState<TKey extends string | number | symbol = string> = Record<
+  TKey,
+  FieldState
+>;
+
+export function formValidatorToState<T extends ZodRawShape>(formValidator: T) {
+  let formState: { [FieldName in keyof T]: FieldState } = {} as any;
+
+  for (const key in formValidator) {
+    formState[key] = {
+      hasErrored: false,
+      validationErrors: [],
+      validator: formValidator[key],
+    };
+  }
+
+  return formState;
 }
 
 type InputProp = {
