@@ -36,7 +36,7 @@ if (checkoutForm?.success) {
 Simple form is an Astro integration. You can install and configure this via the Astro CLI using `astro add`:
 
 ```bash
-npm astro add simple-stack-form
+npm run astro add simple-stack-form
 ```
 
 After installing, you'll need to add a type definition to your environment for editor hints. Add this reference to a new or existing `src/env.d.ts` file:
