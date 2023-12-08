@@ -1,3 +1,4 @@
+import { Atom, atom } from "nanostores";
 import {
   z,
   ZodBoolean,
@@ -53,24 +54,47 @@ export type FieldState = {
   validator: ZodType;
 };
 
-export type FormState<TKey extends string | number | symbol = string> = Record<
-  TKey,
-  FieldState
->;
+export type FormState<TKey extends string | number | symbol = string> = {
+  fields: Record<TKey, FieldState>;
+  containsErrors: boolean;
+};
 
 export function formValidatorToState<T extends ZodRawShape>(formValidator: T) {
-  let formState: { [FieldName in keyof T]: FieldState } = {} as any;
+  let fields: { [FieldName in keyof T]: FieldState } = {} as any;
 
   for (const key in formValidator) {
-    formState[key] = {
+    fields[key] = {
       hasErrored: false,
       validationErrors: [],
       validator: formValidator[key],
     };
   }
 
-  return formState;
+  return { fields, containsErrors: false };
 }
+
+export type FormStore<T extends ZodRawShape = ZodRawShape> = Atom<
+  FormState<keyof T>
+> & {
+  setFieldState(key: string, value: FieldState): void;
+};
+
+export const createFormStore = <T extends ZodRawShape>(
+  formValidator: T
+): FormStore<T> => {
+  const store = atom(formValidatorToState(formValidator));
+  return {
+    ...store,
+    setFieldState(key: string, value: FieldState) {
+      const $store = store.get();
+      const fields = { ...$store.fields, [key]: value };
+      const containsErrors = Object.values(fields).some(
+        (f) => f.validationErrors.length > 0
+      );
+      store.set({ ...$store, containsErrors, fields });
+    },
+  };
+};
 
 type InputProp = {
   name: string;

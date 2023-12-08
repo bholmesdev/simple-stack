@@ -1,14 +1,19 @@
 import { type SafeParseReturnType, type ZodRawShape } from "zod";
 import {
-  type FormState,
   validateForm,
-  formValidatorToState,
+  type FormStore,
+  createFormStore,
 } from "simple-stack-form/client";
 import { createContext, useContext, type ComponentProps } from "react";
 import { useStore } from "@nanostores/react";
-import { type MapStore, map } from "nanostores";
 
-const FormContext = createContext<MapStore<FormState>>(map());
+const FormContext = createContext<FormStore>(createFormStore({}));
+
+export function useFormStore() {
+  const formStore = useContext(FormContext);
+  const value = useStore(formStore);
+  return { ...formStore, value };
+}
 
 export function Form({
   children,
@@ -17,7 +22,7 @@ export function Form({
 }: {
   validator: ZodRawShape;
 } & Omit<ComponentProps<"form">, "method" | "onSubmit">) {
-  const formStore = map(formValidatorToState(validator));
+  const formStore = createFormStore(validator);
 
   return (
     <FormContext.Provider value={formStore}>
@@ -30,7 +35,7 @@ export function Form({
 
           e.stopPropagation();
           for (const error of parsed.error.errors) {
-            formStore.setKey(error.path.join("."), {
+            formStore.setFieldState(error.path.join("."), {
               hasErrored: true,
               validationErrors: [error.message],
               // TODO: support nested paths
@@ -48,9 +53,8 @@ export function Form({
 }
 
 export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
-  const store = useContext(FormContext);
-  const $formState = useStore(store);
-  const inputState = $formState[inputProps.name];
+  const store = useFormStore();
+  const inputState = store.value.fields[inputProps.name];
   if (!inputState) {
     throw new Error(
       `Input "${inputProps.name}" not found in form. Did you use the <Form> component with your validator?`
@@ -61,13 +65,13 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 
   function setValidation(parsed: SafeParseReturnType<unknown, unknown>) {
     if (parsed.success === false) {
-      return store.setKey(inputProps.name, {
+      return store.setFieldState(inputProps.name, {
         hasErrored: true,
         validationErrors: parsed.error.errors.map((e) => e.message),
         validator,
       });
     }
-    store.setKey(inputProps.name, {
+    store.setFieldState(inputProps.name, {
       validationErrors: [],
       hasErrored,
       validator,

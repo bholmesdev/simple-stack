@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { Form, Input } from "./Form";
+import { Form, Input, useFormStore } from "./Form";
 import { createForm } from "simple-stack-form/client";
+import { useStore } from "@nanostores/react";
 
 export const signup = createForm({
   username: z.string().min(2),
@@ -21,8 +22,21 @@ export default function Signup() {
         <label htmlFor="optIn">Opt in</label>
         <Input id="optIn" {...signup.inputProps.optIn} />
       </FormGroup>
-      <button className="bg-purple-700 rounded px-5 py-2">Submit</button>
+      <Button>Submit</Button>
     </Form>
+  );
+}
+
+function Button({ children }: { children: React.ReactNode }) {
+  const form = useFormStore();
+
+  return (
+    <button
+      disabled={form.value.containsErrors}
+      className="bg-purple-700 rounded px-5 py-2"
+    >
+      {children}
+    </button>
   );
 }
 
