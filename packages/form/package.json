@@ -21,9 +21,9 @@
   "author": "bholmesdev",
   "license": "MIT",
   "devDependencies": {
-    "astro": "^3.6.0"
+    "astro": "^4.0.0"
   },
   "peerDependencies": {
-    "astro": "^3.6.0"
+    "astro": "^3.6.0 || ^4.0.0"
   }
 }
