@@ -69,7 +69,7 @@ export function Form({
         method="POST"
         onSubmit={(e) => {
           e.preventDefault();
-          const formData = new FormData(e.target as HTMLFormElement);
+          const formData = new FormData(e.currentTarget);
           const parsed = validateForm(formData, validator);
           if (parsed.data) return;
 
