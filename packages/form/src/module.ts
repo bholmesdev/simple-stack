@@ -20,8 +20,8 @@ export type InputProp = {
 
 export type FieldState = {
   hasErrored: boolean;
-  validationErrors: string[];
   validator: ZodType;
+  validationErrors: string[] | undefined;
 };
 
 export type FormState<TKey extends string | number | symbol = string> = {
@@ -92,7 +92,7 @@ export function toSetFieldState<T extends FormState>(
       typeof formState === "function" ? formState() : formState;
     const fields = { ...$formState.fields, [key]: value };
     const hasFieldErrors = Object.values(fields).some(
-      (f) => f.validationErrors.length > 0
+      (f) => f.validationErrors?.length
     );
     setFormState({ ...$formState, hasFieldErrors, fields });
   };
@@ -103,21 +103,20 @@ export function toSetValidationErrors<T extends FormState>(
   setFormState: (formState: T) => void
 ) {
   const setFieldState = toSetFieldState(formState, setFormState);
-  return (error: ZodError<unknown>) => {
+  return (
+    fieldErrors: ZodError<Record<string, unknown>>["formErrors"]["fieldErrors"]
+  ) => {
     const $formState =
       typeof formState === "function" ? formState() : formState;
 
-    for (const { path: errorPath } of error.errors) {
-      // TODO: support nested paths
-      const key = errorPath[0]?.toString();
-      if (!key) continue;
+    for (const [key, validationErrors] of Object.entries(fieldErrors)) {
       const fieldValidator = $formState.fields[key];
       if (!fieldValidator) continue;
 
       setFieldState(key, {
         ...fieldValidator,
         hasErrored: true,
-        validationErrors: [error.message],
+        validationErrors,
       });
     }
   };
@@ -162,5 +161,11 @@ export function validateForm<T extends ZodRawShape>(
     }, z.object(validator))
     .safeParse(formData);
 
-  return result;
+  if (result.success) {
+    return { data: result.data, fieldErrors: undefined };
+  }
+  return {
+    data: undefined,
+    fieldErrors: result.error.formErrors.fieldErrors,
+  };
 }

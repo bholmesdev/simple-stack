@@ -7,6 +7,7 @@ import {
   toSetValidationErrors,
   toSetFieldState,
   validateForm,
+  type FormState,
 } from "simple:form";
 import {
   type ComponentProps,
@@ -15,12 +16,12 @@ import {
   useState,
 } from "react";
 
-function getInitialFormState(formValidator: FormValidator) {
+function getInitialFormState(formValidator: FormValidator): FormState {
   return {
     hasFieldErrors: false,
     fields: mapObject(formValidator, (_, validator) => ({
       hasErrored: false,
-      validationErrors: [],
+      validationErrors: undefined,
       validator,
     })),
   };
@@ -70,10 +71,10 @@ export function Form({
           e.preventDefault();
           const formData = new FormData(e.target as HTMLFormElement);
           const parsed = validateForm(formData, validator);
-          if (parsed.success === true) return;
+          if (parsed.data) return;
 
           e.stopPropagation();
-          formContext.setValidationErrors(parsed.error);
+          formContext.setValidationErrors(parsed.fieldErrors);
         }}
       >
         {children}
@@ -102,7 +103,7 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
       });
     }
     formContext.setFieldState(inputProps.name, {
-      validationErrors: [],
+      validationErrors: undefined,
       hasErrored,
       validator,
     });
@@ -121,7 +122,7 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
           setValidation(validator.safeParse(e.target.value));
         }}
       />
-      {validationErrors.map((e) => (
+      {validationErrors?.map((e) => (
         <p className="text-red-400" key={e}>
           {e}
         </p>

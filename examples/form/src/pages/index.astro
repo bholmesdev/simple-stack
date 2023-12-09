@@ -5,7 +5,7 @@ import { ViewTransitions } from "astro:transitions";
 const { form } = Astro.locals;
 const formResult = await form.getData(signup);
 
-if (formResult?.success) {
+if (formResult?.data) {
   console.log(formResult.data);
 }
 ---
@@ -23,7 +23,7 @@ if (formResult?.success) {
     <main class="!m-auto max-w-prose">
       <h1>Simple form</h1>
       {
-        formResult?.success && (
+        formResult?.data && (
           <div
             class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
             role="alert"
@@ -37,6 +37,7 @@ if (formResult?.success) {
       }
       <div transition:name="form">
         <Signup transition:persist client:load />
+        {formResult?.fieldErrors?.username?.map((e) => <p>{e}</p>)}
       </div>
       <style>
         @import "open-props/style";
