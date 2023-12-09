@@ -1,13 +1,37 @@
-import { type Atom, atom } from "nanostores";
+import { atom } from "nanostores";
 import {
   z,
   ZodBoolean,
-  ZodError,
   ZodNumber,
   ZodOptional,
   type ZodRawShape,
   type ZodType,
 } from "zod";
+
+export type FormValidator = import("zod").ZodRawShape;
+
+export type InputProp = {
+  "aria-required": boolean;
+  name: string;
+  type: "text" | "number" | "checkbox";
+};
+
+export type FieldState = {
+  hasErrored: boolean;
+  validationErrors: string[];
+  validator: import("zod").ZodType;
+};
+
+export type FormState<TKey extends string | number | symbol = string> = {
+  fields: Record<TKey, FieldState>;
+  containsErrors: boolean;
+};
+
+export type FormStore<T extends FormValidator = FormValidator> =
+  import("nanostores").Atom<FormState<keyof T>> & {
+    setFieldState(key: string, value: FieldState): void;
+    setValidationErrors(error: import("zod").ZodError<unknown>): void;
+  };
 
 export function createForm<T extends ZodRawShape>(validator: T) {
   let inputProps: Record<keyof T, any> = {} as any;
@@ -49,17 +73,6 @@ function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
   ) as T;
 }
 
-export type FieldState = {
-  hasErrored: boolean;
-  validationErrors: string[];
-  validator: ZodType;
-};
-
-export type FormState<TKey extends string | number | symbol = string> = {
-  fields: Record<TKey, FieldState>;
-  containsErrors: boolean;
-};
-
 export function formValidatorToState<T extends ZodRawShape>(formValidator: T) {
   let fields: { [FieldName in keyof T]: FieldState } = {} as any;
 
@@ -67,19 +80,12 @@ export function formValidatorToState<T extends ZodRawShape>(formValidator: T) {
     fields[key] = {
       hasErrored: false,
       validationErrors: [],
-      validator: formValidator[key],
+      validator: formValidator[key]!,
     };
   }
 
   return { fields, containsErrors: false };
 }
-
-export type FormStore<T extends ZodRawShape = ZodRawShape> = Atom<
-  FormState<keyof T>
-> & {
-  setFieldState(key: string, value: FieldState): void;
-  setValidationErrors(error: ZodError<unknown>): void;
-};
 
 export const createFormStore = <T extends ZodRawShape>(
   formValidator: T
@@ -115,12 +121,6 @@ export const createFormStore = <T extends ZodRawShape>(
   };
 };
 
-type InputProp = {
-  name: string;
-  "aria-required": boolean;
-  type: "text" | "number" | "checkbox";
-};
-
 function getInputProp<T extends ZodType>(name: string, fieldValidator: T) {
   const inputProp: InputProp = {
     name,
@@ -131,6 +131,7 @@ function getInputProp<T extends ZodType>(name: string, fieldValidator: T) {
 
   return inputProp;
 }
+
 function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
   const resolvedType =
     fieldValidator instanceof ZodOptional

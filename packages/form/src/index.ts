@@ -1,5 +1,6 @@
-/** @return {import('astro').AstroIntegration} */
-export default function integration() {
+import type { AstroIntegration } from "astro";
+
+export default function integration(): AstroIntegration {
   return {
     name: "simple-form",
     hooks: {
