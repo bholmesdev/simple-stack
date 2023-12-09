@@ -4,17 +4,13 @@
   "description": "A simple form library for Astro projects",
   "type": "module",
   "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "dev": "tsc --project tsconfig.json --watch"
+    "build": "tsc",
+    "dev": "tsc --watch"
   },
   "exports": {
-    ".": {
-      "default": "./src/index.mjs",
-      "types": "./src/index.d.ts"
-    },
-    "./internal/*": "./dist/*",
-    "./middleware": "./src/middleware.ts",
-    "./client": "./src/client.ts",
+    ".": "./dist/index.js",
+    "./module": "./dist/module.js",
+    "./middleware": "./dist/middleware.js",
     "./components": "./components/index.ts",
     "./types": "./types.d.ts"
   },

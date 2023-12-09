@@ -1,5 +1,5 @@
 declare module "simple:form" {
-  export * from "simple-stack-form/internal/module.js";
+  export * from "simple-stack-form/module";
 }
 
 declare namespace App {
