@@ -52,8 +52,7 @@ function validate(formData: FormData, validator: ZodRawShape) {
 
 export const onRequest = defineMiddleware(({ request, locals }, next) => {
   locals.form = {
-    // @ts-expect-error generics don't line up with `types.d.ts`
-    async getData(form) {
+    async getData(form: { validator: ZodRawShape }) {
       if (!isFormRequest(request)) return undefined;
 
       // TODO: hoist exceptions as `formErrors`
@@ -61,8 +60,7 @@ export const onRequest = defineMiddleware(({ request, locals }, next) => {
 
       return validate(formData, form.validator);
     },
-    // @ts-expect-error generics don't line up with `types.d.ts`
-    async getDataByName(name, form) {
+    async getDataByName(name: string, form: { validator: ZodRawShape }) {
       if (!isFormRequest(request)) return undefined;
 
       // TODO: hoist exceptions as `formErrors`

@@ -4,11 +4,12 @@ import {
   ZodBoolean,
   ZodNumber,
   ZodOptional,
+  type ZodError,
   type ZodRawShape,
   type ZodType,
 } from "zod";
 
-export type FormValidator = import("zod").ZodRawShape;
+export type FormValidator = ZodRawShape;
 
 export type InputProp = {
   "aria-required": boolean;
@@ -19,7 +20,7 @@ export type InputProp = {
 export type FieldState = {
   hasErrored: boolean;
   validationErrors: string[];
-  validator: import("zod").ZodType;
+  validator: ZodType;
 };
 
 export type FormState<TKey extends string | number | symbol = string> = {
@@ -30,7 +31,7 @@ export type FormState<TKey extends string | number | symbol = string> = {
 export type FormStore<T extends FormValidator = FormValidator> =
   import("nanostores").Atom<FormState<keyof T>> & {
     setFieldState(key: string, value: FieldState): void;
-    setValidationErrors(error: import("zod").ZodError<unknown>): void;
+    setValidationErrors(error: ZodError<unknown>): void;
   };
 
 export function createForm<T extends ZodRawShape>(validator: T) {
