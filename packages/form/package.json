@@ -48,5 +48,8 @@
     "nanostores": {
       "optional": true
     }
+  },
+  "dependencies": {
+    "just-map-object": "^2.3.0"
   }
 }

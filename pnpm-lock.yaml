@@ -54,6 +54,10 @@ importers:
         version: 3.22.4
 
   packages/form:
+    dependencies:
+      just-map-object:
+        specifier: ^2.3.0
+        version: 2.3.0
     devDependencies:
       '@nanostores/react':
         specifier: ^0.7.1
@@ -2476,6 +2480,10 @@ packages:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
     hasBin: true
+
+  /just-map-object@2.3.0:
+    resolution: {integrity: sha512-702xzYHUSFKdnN4844avAytynTAYBJvPoaGKrw4QKkyy1UkW44zWsrITV1KUFFCvDn7YQpzHffCRKdsa0szoLA==}
+    dev: false
 
   /kind-of@6.0.3:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
