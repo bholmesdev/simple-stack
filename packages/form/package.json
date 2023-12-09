@@ -26,18 +26,15 @@
   "author": "bholmesdev",
   "license": "MIT",
   "devDependencies": {
-    "@nanostores/react": "^0.7.1",
     "@types/node": "^20.10.4",
     "@types/react": "^18.0.21",
     "astro": "^4.0.0",
-    "nanostores": "^0.9.5",
     "react": "^18.0.0",
     "typescript": "^5.3.3",
     "zod": "^3.22.4"
   },
   "peerDependencies": {
     "astro": "^3.6.0 || ^4.0.0",
-    "nanostores": "^0.9.5",
     "zod": "^3.22.4"
   },
   "peerDependenciesMeta": {
