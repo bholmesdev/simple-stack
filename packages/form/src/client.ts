@@ -1,7 +1,8 @@
-import { Atom, atom } from "nanostores";
+import { type Atom, atom } from "nanostores";
 import {
   z,
   ZodBoolean,
+  ZodError,
   ZodNumber,
   ZodOptional,
   type ZodRawShape,
@@ -77,6 +78,7 @@ export type FormStore<T extends ZodRawShape = ZodRawShape> = Atom<
   FormState<keyof T>
 > & {
   setFieldState(key: string, value: FieldState): void;
+  setValidationErrors(error: ZodError<unknown>): void;
 };
 
 export const createFormStore = <T extends ZodRawShape>(
@@ -85,13 +87,30 @@ export const createFormStore = <T extends ZodRawShape>(
   const store = atom(formValidatorToState(formValidator));
   return {
     ...store,
-    setFieldState(key: string, value: FieldState) {
+    setFieldState(key, value) {
       const $store = store.get();
       const fields = { ...$store.fields, [key]: value };
       const containsErrors = Object.values(fields).some(
         (f) => f.validationErrors.length > 0
       );
       store.set({ ...$store, containsErrors, fields });
+    },
+    setValidationErrors(error) {
+      const $store = store.get();
+
+      for (const { path: errorPath } of error.errors) {
+        // TODO: support nested paths
+        const key = errorPath[0]?.toString();
+        if (!key) continue;
+        const fieldValidator = $store.fields[key];
+        if (!fieldValidator) continue;
+
+        this.setFieldState(key, {
+          ...fieldValidator,
+          hasErrored: true,
+          validationErrors: [error.message],
+        });
+      }
     },
   };
 };
