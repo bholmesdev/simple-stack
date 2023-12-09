@@ -1,24 +1,18 @@
 {
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
-    "allowJs": true,
-    "checkJs": false,
     "composite": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "preserveWatchOutput": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "target": "ESNext"
   }
 }
