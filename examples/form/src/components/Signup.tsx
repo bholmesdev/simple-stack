@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { Form, Input, useFormStore } from "./Form";
-import { createForm } from "simple-stack-form/client";
-import { useStore } from "@nanostores/react";
+import { Form, Input, useCreateFormContext } from "./Form";
+import { createForm } from "simple:form";
 
 export const signup = createForm({
   username: z.string().min(2),
@@ -9,9 +8,12 @@ export const signup = createForm({
 });
 
 export default function Signup() {
+  const context = useCreateFormContext(signup.validator);
+
   return (
     <Form
       className="flex flex-col gap-2 items-start"
+      context={context}
       validator={signup.validator}
     >
       <FormGroup>
@@ -22,21 +24,13 @@ export default function Signup() {
         <label htmlFor="optIn">Opt in</label>
         <Input id="optIn" {...signup.inputProps.optIn} />
       </FormGroup>
-      <Button>Submit</Button>
+      <button
+        disabled={context.value.hasFieldErrors}
+        className="bg-purple-700 rounded px-5 py-2 disabled:bg-purple-900"
+      >
+        Submit
+      </button>
     </Form>
-  );
-}
-
-function Button({ children }: { children: React.ReactNode }) {
-  const form = useFormStore();
-
-  return (
-    <button
-      disabled={form.value.containsErrors}
-      className="bg-purple-700 rounded px-5 py-2"
-    >
-      {children}
-    </button>
   );
 }
 

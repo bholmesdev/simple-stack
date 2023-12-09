@@ -1,4 +1,3 @@
-import { atom } from "nanostores";
 import {
   z,
   ZodBoolean,
@@ -8,6 +7,8 @@ import {
   type ZodRawShape,
   type ZodType,
 } from "zod";
+
+export { default as mapObject } from "just-map-object";
 
 export type FormValidator = ZodRawShape;
 
@@ -25,14 +26,8 @@ export type FieldState = {
 
 export type FormState<TKey extends string | number | symbol = string> = {
   fields: Record<TKey, FieldState>;
-  containsErrors: boolean;
+  hasFieldErrors: boolean;
 };
-
-export type FormStore<T extends FormValidator = FormValidator> =
-  import("nanostores").Atom<FormState<keyof T>> & {
-    setFieldState(key: string, value: FieldState): void;
-    setValidationErrors(error: ZodError<unknown>): void;
-  };
 
 export function createForm<T extends ZodRawShape>(validator: T) {
   let inputProps: Record<keyof T, any> = {} as any;
@@ -85,42 +80,48 @@ export function formValidatorToState<T extends ZodRawShape>(formValidator: T) {
     };
   }
 
-  return { fields, containsErrors: false };
+  return { fields, hasFieldErrors: false };
 }
 
-export const createFormStore = <T extends ZodRawShape>(
-  formValidator: T
-): FormStore<T> => {
-  const store = atom(formValidatorToState(formValidator));
-  return {
-    ...store,
-    setFieldState(key, value) {
-      const $store = store.get();
-      const fields = { ...$store.fields, [key]: value };
-      const containsErrors = Object.values(fields).some(
-        (f) => f.validationErrors.length > 0
-      );
-      store.set({ ...$store, containsErrors, fields });
-    },
-    setValidationErrors(error) {
-      const $store = store.get();
-
-      for (const { path: errorPath } of error.errors) {
-        // TODO: support nested paths
-        const key = errorPath[0]?.toString();
-        if (!key) continue;
-        const fieldValidator = $store.fields[key];
-        if (!fieldValidator) continue;
-
-        this.setFieldState(key, {
-          ...fieldValidator,
-          hasErrored: true,
-          validationErrors: [error.message],
-        });
-      }
-    },
+export function toSetFieldState<T extends FormState>(
+  formState: T | (() => T),
+  setFormState: (formState: T) => void
+) {
+  return (key: string, value: FieldState) => {
+    const $formState =
+      typeof formState === "function" ? formState() : formState;
+    const fields = { ...$formState.fields, [key]: value };
+    const hasFieldErrors = Object.values(fields).some(
+      (f) => f.validationErrors.length > 0
+    );
+    setFormState({ ...$formState, hasFieldErrors, fields });
   };
-};
+}
+
+export function toSetValidationErrors<T extends FormState>(
+  formState: T | (() => T),
+  setFormState: (formState: T) => void
+) {
+  const setFieldState = toSetFieldState(formState, setFormState);
+  return (error: ZodError<unknown>) => {
+    const $formState =
+      typeof formState === "function" ? formState() : formState;
+
+    for (const { path: errorPath } of error.errors) {
+      // TODO: support nested paths
+      const key = errorPath[0]?.toString();
+      if (!key) continue;
+      const fieldValidator = $formState.fields[key];
+      if (!fieldValidator) continue;
+
+      setFieldState(key, {
+        ...fieldValidator,
+        hasErrored: true,
+        validationErrors: [error.message],
+      });
+    }
+  };
+}
 
 function getInputProp<T extends ZodType>(name: string, fieldValidator: T) {
   const inputProp: InputProp = {
