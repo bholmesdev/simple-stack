@@ -3,6 +3,9 @@
   "version": "0.0.6",
   "description": "A simple form library for Astro projects",
   "type": "module",
+  "bin": {
+    "simple-form": "./dist/cli.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch"
@@ -38,6 +41,8 @@
     "zod": "^3.22.4"
   },
   "dependencies": {
-    "just-map-object": "^2.3.0"
+    "@clack/prompts": "^0.7.0",
+    "just-map-object": "^2.3.0",
+    "kleur": "^4.1.5"
   }
 }
