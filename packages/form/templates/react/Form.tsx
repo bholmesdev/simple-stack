@@ -104,7 +104,6 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 	return (
 		<>
 			<input
-				{...inputProps}
 				onBlur={async (e) => {
 					const value = e.target.value;
 					if (value === "") return;
@@ -115,6 +114,7 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 					const value = e.target.value;
 					formContext.validateField(inputProps.name, value, validator);
 				}}
+				{...inputProps}
 			/>
 			{validationErrors?.map((e) => (
 				<p className="text-red-400" key={e}>
