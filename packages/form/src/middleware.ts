@@ -35,7 +35,7 @@ export const onRequest = defineMiddleware(({ request, locals }, next) => {
 			// TODO: hoist exceptions as `formErrors`
 			const formData = await request.clone().formData();
 
-			return validateForm(formData, form.validator);
+			return validateForm({ formData, validator: form.validator });
 		},
 		async getDataByName(name: string, form: { validator: ZodRawShape }) {
 			if (!isFormRequest(request)) return undefined;
@@ -45,7 +45,7 @@ export const onRequest = defineMiddleware(({ request, locals }, next) => {
 
 			if (formData.get("_formName") === name) {
 				formData.delete("_formName");
-				return validateForm(formData, form.validator);
+				return validateForm({ formData, validator: form.validator });
 			}
 
 			return undefined;

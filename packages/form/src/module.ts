@@ -49,19 +49,19 @@ export function createForm<T extends ZodRawShape>(validator: T) {
 	};
 }
 
-export function getInitialFormState(
-	formValidator: FormValidator,
-	serverErrors?: FieldErrors,
-) {
+export function getInitialFormState({
+	validator,
+	fieldErrors,
+}: { validator: FormValidator; fieldErrors: FieldErrors | undefined }) {
 	return {
 		hasFieldErrors: false,
 		submitStatus: "idle",
 		isSubmitPending: false,
-		fields: mapObject(formValidator, (name, validator) => {
-			const matchingServerErrors = serverErrors?.[name];
+		fields: mapObject(validator, (name, validator) => {
+			const fieldError = fieldErrors?.[name];
 			return {
-				hasErroredOnce: !!matchingServerErrors?.length,
-				validationErrors: matchingServerErrors,
+				hasErroredOnce: !!fieldError?.length,
+				validationErrors: fieldError,
 				isValidating: false,
 				validator,
 			};
@@ -203,10 +203,10 @@ function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
 	}
 }
 
-export async function validateForm<T extends ZodRawShape>(
-	formData: FormData,
-	validator: T,
-) {
+export async function validateForm<T extends ZodRawShape>({
+	formData,
+	validator,
+}: { formData: FormData; validator: T }) {
 	const result = await z
 		.preprocess((formData) => {
 			if (!(formData instanceof FormData)) return formData;

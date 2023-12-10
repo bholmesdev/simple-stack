@@ -20,9 +20,9 @@ import {
 
 export function useCreateFormContext(
 	validator: FormValidator,
-	serverErrors?: FieldErrors,
+	fieldErrors?: FieldErrors,
 ) {
-	const initial = getInitialFormState(validator, serverErrors);
+	const initial = getInitialFormState({ validator, fieldErrors });
 	const [formState, setFormState] = useState<FormState>(initial);
 	return {
 		value: formState,
@@ -51,15 +51,15 @@ export function Form({
 	children,
 	validator,
 	context,
-	serverErrors,
+	fieldErrors,
 	name,
 	...formProps
 }: {
 	validator: FormValidator;
 	context?: FormContextType;
-	serverErrors?: FieldErrors;
+	fieldErrors?: FieldErrors;
 } & Omit<ComponentProps<"form">, "method" | "onSubmit">) {
-	const formContext = context ?? useCreateFormContext(validator, serverErrors);
+	const formContext = context ?? useCreateFormContext(validator, fieldErrors);
 
 	return (
 		<FormContext.Provider value={formContext}>
@@ -74,7 +74,7 @@ export function Form({
 						isSubmitPending: true,
 						submitStatus: "validating",
 					}));
-					const parsed = await validateForm(formData, validator);
+					const parsed = await validateForm({ formData, validator });
 					if (parsed.data) {
 						return formContext.trackAstroSubmitStatus();
 					}

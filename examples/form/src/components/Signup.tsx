@@ -21,7 +21,7 @@ export default function Signup({
 	return (
 		<Form
 			className="flex flex-col gap-2 items-start"
-			serverErrors={serverErrors}
+			fieldErrors={serverErrors}
 			validator={signup.validator}
 			name="signup"
 		>
