@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Form, Input, useCreateFormContext } from "./Form";
-import { createForm } from "simple:form";
+import { createForm, type FieldErrors } from "simple:form";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -15,8 +15,10 @@ export const signup = createForm({
 	optIn: z.boolean().optional(),
 });
 
-export default function Signup() {
-	const context = useCreateFormContext(signup.validator);
+export default function Signup({
+	serverErrors,
+}: { serverErrors?: FieldErrors<typeof signup> }) {
+	const context = useCreateFormContext(signup.validator, serverErrors);
 
 	return (
 		<Form

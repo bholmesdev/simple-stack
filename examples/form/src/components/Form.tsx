@@ -6,6 +6,7 @@ import {
 	toSetFieldState,
 	validateForm,
 	getInitialFormState,
+	type FieldErrors,
 } from "simple:form";
 import {
 	type ComponentProps,
@@ -14,8 +15,12 @@ import {
 	useState,
 } from "react";
 
-export function useCreateFormContext(validator: FormValidator) {
-	const [formState, setFormState] = useState(getInitialFormState(validator));
+export function useCreateFormContext(
+	validator: FormValidator,
+	serverErrors?: FieldErrors,
+) {
+	const initial = getInitialFormState(validator, serverErrors);
+	const [formState, setFormState] = useState(initial);
 	return {
 		value: formState,
 		set: setFormState,
@@ -42,12 +47,14 @@ export function Form({
 	children,
 	validator,
 	context,
+	serverErrors,
 	...formProps
 }: {
-	context?: FormContextType;
 	validator: FormValidator;
+	context?: FormContextType;
+	serverErrors?: FieldErrors;
 } & Omit<ComponentProps<"form">, "method" | "onSubmit">) {
-	const formContext = context ?? useCreateFormContext(validator);
+	const formContext = context ?? useCreateFormContext(validator, serverErrors);
 
 	return (
 		<FormContext.Provider value={formContext}>

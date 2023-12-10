@@ -6,12 +6,16 @@ import {
 	type ZodError,
 	type ZodRawShape,
 	type ZodType,
+	ZodObject,
 } from "zod";
 import mapObject from "just-map-object";
 
 export { mapObject };
 
 export type FormValidator = ZodRawShape;
+export type FieldErrors<
+	T extends { validator: FormValidator } = { validator: FormValidator },
+> = ZodError<z.output<ZodObject<T["validator"]>>>["formErrors"]["fieldErrors"];
 
 export type InputProp = {
 	"aria-required": boolean;
@@ -37,14 +41,20 @@ export function createForm<T extends ZodRawShape>(validator: T) {
 	};
 }
 
-export function getInitialFormState(formValidator: FormValidator): FormState {
+export function getInitialFormState(
+	formValidator: FormValidator,
+	serverErrors?: FieldErrors,
+): FormState {
 	return {
 		hasFieldErrors: false,
-		fields: mapObject(formValidator, (_, validator) => ({
-			hasErrored: false,
-			validationErrors: undefined,
-			validator,
-		})),
+		fields: mapObject(formValidator, (name, validator) => {
+			const matchingServerErrors = serverErrors?.[name];
+			return {
+				hasErrored: !!matchingServerErrors?.length,
+				validationErrors: matchingServerErrors,
+				validator,
+			};
+		}),
 	};
 }
 

@@ -36,8 +36,7 @@ if (formResult?.data) {
         )
       }
       <div transition:name="form">
-        <Signup transition:persist client:load />
-        {formResult?.fieldErrors?.username?.map((e) => <p>{e}</p>)}
+        <Signup serverErrors={formResult?.fieldErrors} client:load />
       </div>
       <style>
         @import "open-props/style";
