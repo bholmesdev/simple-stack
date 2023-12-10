@@ -21,9 +21,8 @@ export function useCreateFormContext(
 	validator: FormValidator,
 	serverErrors?: FieldErrors,
 ) {
-	const [formState, setFormState] = useState<FormState>(() =>
-		getInitialFormState(validator, serverErrors),
-	);
+	const initial = getInitialFormState(validator, serverErrors);
+	const [formState, setFormState] = useState<FormState>(initial);
 	return {
 		value: formState,
 		set: setFormState,
