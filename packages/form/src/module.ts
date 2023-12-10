@@ -31,13 +31,20 @@ export type FormState<TKey extends string | number | symbol = string> = {
 };
 
 export function createForm<T extends ZodRawShape>(validator: T) {
-	const inputProps = mapObject(validator, (name, fieldValidator) =>
-		getInputProp(name, fieldValidator),
-	);
-
 	return {
-		inputProps,
+		inputProps: mapObject(validator, getInputProp),
 		validator: preprocessValidators(validator),
+	};
+}
+
+export function getInitialFormState(formValidator: FormValidator): FormState {
+	return {
+		hasFieldErrors: false,
+		fields: mapObject(formValidator, (_, validator) => ({
+			hasErrored: false,
+			validationErrors: undefined,
+			validator,
+		})),
 	};
 }
 
@@ -64,20 +71,6 @@ function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
 			}
 		}),
 	) as T;
-}
-
-export function formValidatorToState<T extends ZodRawShape>(formValidator: T) {
-	let fields: { [FieldName in keyof T]: FieldState } = {} as any;
-
-	for (const key in formValidator) {
-		fields[key] = {
-			hasErrored: false,
-			validationErrors: [],
-			validator: formValidator[key]!,
-		};
-	}
-
-	return { fields, hasFieldErrors: false };
 }
 
 export function toSetFieldState<T extends FormState>(

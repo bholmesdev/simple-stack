@@ -2,11 +2,10 @@
 
 import {
 	type FormValidator,
-	mapObject,
 	toSetValidationErrors,
 	toSetFieldState,
 	validateForm,
-	type FormState,
+	getInitialFormState,
 } from "simple:form";
 import {
 	type ComponentProps,
@@ -14,17 +13,6 @@ import {
 	useContext,
 	useState,
 } from "react";
-
-function getInitialFormState(formValidator: FormValidator): FormState {
-	return {
-		hasFieldErrors: false,
-		fields: mapObject(formValidator, (_, validator) => ({
-			hasErrored: false,
-			validationErrors: undefined,
-			validator,
-		})),
-	};
-}
 
 export function useCreateFormContext(validator: FormValidator) {
 	const [formState, setFormState] = useState(getInitialFormState(validator));
