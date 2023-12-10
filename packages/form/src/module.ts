@@ -7,8 +7,9 @@ import {
 	type ZodRawShape,
 	type ZodType,
 } from "zod";
+import mapObject from "just-map-object";
 
-export { default as mapObject } from "just-map-object";
+export { mapObject };
 
 export type FormValidator = ZodRawShape;
 
@@ -30,13 +31,9 @@ export type FormState<TKey extends string | number | symbol = string> = {
 };
 
 export function createForm<T extends ZodRawShape>(validator: T) {
-	let inputProps: Record<keyof T, any> = {} as any;
-	for (const [name, fieldValidator] of Object.entries(validator)) {
-		inputProps[name as keyof typeof validator] = getInputProp(
-			name,
-			fieldValidator,
-		);
-	}
+	const inputProps = mapObject(validator, (name, fieldValidator) =>
+		getInputProp(name, fieldValidator),
+	);
 
 	return {
 		inputProps,
