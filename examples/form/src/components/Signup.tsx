@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Form, Input, useFormContext } from "./Form";
-import { createForm, type FieldErrors } from "simple:form";
+import { type FieldErrors, createForm } from "simple:form";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
