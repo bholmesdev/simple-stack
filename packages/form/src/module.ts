@@ -29,7 +29,7 @@ export const formNameInputProps = {
 } as const;
 
 export type FieldState = {
-	hasErrored: boolean;
+	hasErroredOnce: boolean;
 	isValidating: boolean;
 	validator: ZodType;
 	validationErrors: string[] | undefined;
@@ -60,7 +60,7 @@ export function getInitialFormState(
 		fields: mapObject(formValidator, (name, validator) => {
 			const matchingServerErrors = serverErrors?.[name];
 			return {
-				hasErrored: !!matchingServerErrors?.length,
+				hasErroredOnce: !!matchingServerErrors?.length,
 				validationErrors: matchingServerErrors,
 				isValidating: false,
 				validator,
@@ -147,7 +147,7 @@ export function toValidateField<T extends FormState>(setFormState: Setter<T>) {
 		if (parsed.success === false) {
 			return setFieldState(fieldName, (fieldState) => ({
 				...fieldState,
-				hasErrored: true,
+				hasErroredOnce: true,
 				isValidating: false,
 				validationErrors: parsed.error.errors.map((e) => e.message),
 			}));
@@ -170,7 +170,7 @@ export function toSetValidationErrors<T extends FormState>(
 		for (const [key, validationErrors] of Object.entries(fieldErrors)) {
 			setFieldState(key, (fieldState) => ({
 				...fieldState,
-				hasErrored: true,
+				hasErroredOnce: true,
 				validationErrors,
 			}));
 		}

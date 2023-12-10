@@ -99,7 +99,7 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 		);
 	}
 
-	const { hasErrored, validationErrors, validator } = fieldState;
+	const { hasErroredOnce, validationErrors, validator } = fieldState;
 	return (
 		<>
 			<input
@@ -109,7 +109,7 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 					formContext.validateField(inputProps.name, value, validator);
 				}}
 				onChange={async (e) => {
-					if (!hasErrored) return;
+					if (!hasErroredOnce) return;
 					const value = e.target.value;
 					formContext.validateField(inputProps.name, value, validator);
 				}}
