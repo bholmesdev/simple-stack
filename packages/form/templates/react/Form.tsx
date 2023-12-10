@@ -96,7 +96,7 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 	const fieldState = formContext.value.fields[inputProps.name];
 	if (!fieldState) {
 		throw new Error(
-			`Input "${inputProps.name}" not found in form. Did you use the <Form> component with your validator?`,
+			`Input "${inputProps.name}" not found in form. Did you use the <Form> component?`,
 		);
 	}
 
