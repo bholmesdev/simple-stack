@@ -58,7 +58,6 @@ export function Form({
 	validator: FormValidator;
 	context?: FormContextType;
 	serverErrors?: FieldErrors;
-	name?: string;
 } & Omit<ComponentProps<"form">, "method" | "onSubmit">) {
 	const formContext = context ?? useCreateFormContext(validator, serverErrors);
 
