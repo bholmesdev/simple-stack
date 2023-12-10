@@ -8,6 +8,8 @@ const formResult = await form.getData(signup);
 if (formResult?.data) {
   console.log(formResult.data);
 }
+
+await new Promise((resolve) => setTimeout(resolve, 400));
 ---
 
 <html lang="en">

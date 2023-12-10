@@ -25,13 +25,16 @@ export type InputProp = {
 
 export type FieldState = {
 	hasErrored: boolean;
+	isValidating: boolean;
 	validator: ZodType;
 	validationErrors: string[] | undefined;
 };
 
 export type FormState<TKey extends string | number | symbol = string> = {
-	fields: Record<TKey, FieldState>;
+	isSubmitPending: boolean;
+	submitStatus: "idle" | "validating" | "submitting";
 	hasFieldErrors: boolean;
+	fields: Record<TKey, FieldState>;
 };
 
 export function createForm<T extends ZodRawShape>(validator: T) {
@@ -47,15 +50,24 @@ export function getInitialFormState(
 ) {
 	return {
 		hasFieldErrors: false,
+		submitStatus: "idle",
+		isSubmitPending: false,
 		fields: mapObject(formValidator, (name, validator) => {
 			const matchingServerErrors = serverErrors?.[name];
 			return {
 				hasErrored: !!matchingServerErrors?.length,
 				validationErrors: matchingServerErrors,
+				isValidating: false,
 				validator,
 			};
 		}),
 	} satisfies FormState;
+}
+
+export function onPageLoaded(callback: () => void) {
+	document.addEventListener("astro:after-preparation", () => callback(), {
+		once: true,
+	});
 }
 
 function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
@@ -83,41 +95,80 @@ function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
 	) as T;
 }
 
-export function toSetFieldState<T extends FormState>(
-	formState: T | (() => T),
-	setFormState: (formState: T) => void,
+type Setter<T> = (callback: (previous: T) => T) => void;
+
+function toSetFieldState<T extends FormState>(setFormState: Setter<T>) {
+	return (key: string, getValue: (previous: FieldState) => FieldState) => {
+		setFormState((formState) => {
+			const fieldState = formState.fields[key];
+			if (!fieldState) return formState;
+
+			const fields = { ...formState.fields, [key]: getValue(fieldState) };
+			const hasFieldErrors = Object.values(fields).some(
+				(f) => f.validationErrors?.length,
+			);
+			return { ...formState, hasFieldErrors, fields };
+		});
+	};
+}
+
+export function toTrackSubmitStatus<T extends FormState>(
+	setFormState: Setter<T>,
 ) {
-	return (key: string, value: FieldState) => {
-		const $formState =
-			typeof formState === "function" ? formState() : formState;
-		const fields = { ...$formState.fields, [key]: value };
-		const hasFieldErrors = Object.values(fields).some(
-			(f) => f.validationErrors?.length,
-		);
-		setFormState({ ...$formState, hasFieldErrors, fields });
+	return () => {
+		setFormState((value) => ({
+			...value,
+			isSubmitPending: true,
+			submitStatus: "submitting",
+		}));
+		onPageLoaded(() => {
+			setFormState((value) => ({
+				...value,
+				isSubmitPending: false,
+				submitStatus: "idle",
+			}));
+		});
+	};
+}
+
+export function toValidateField<T extends FormState>(setFormState: Setter<T>) {
+	const setFieldState = toSetFieldState(setFormState);
+
+	return async (fieldName: string, inputValue: unknown, validator: ZodType) => {
+		setFieldState(fieldName, (fieldState) => ({
+			...fieldState,
+			isValidating: true,
+		}));
+		const parsed = await validator.safeParseAsync(inputValue);
+		if (parsed.success === false) {
+			return setFieldState(fieldName, (fieldState) => ({
+				...fieldState,
+				hasErrored: true,
+				isValidating: false,
+				validationErrors: parsed.error.errors.map((e) => e.message),
+			}));
+		}
+		setFieldState(fieldName, (fieldState) => ({
+			...fieldState,
+			isValidating: false,
+			validationErrors: undefined,
+		}));
 	};
 }
 
 export function toSetValidationErrors<T extends FormState>(
-	formState: T | (() => T),
-	setFormState: (formState: T) => void,
+	setFormState: Setter<T>,
 ) {
-	const setFieldState = toSetFieldState(formState, setFormState);
+	const setFieldState = toSetFieldState(setFormState);
 	return (
 		fieldErrors: ZodError<Record<string, unknown>>["formErrors"]["fieldErrors"],
 	) => {
-		const $formState =
-			typeof formState === "function" ? formState() : formState;
-
 		for (const [key, validationErrors] of Object.entries(fieldErrors)) {
-			const fieldValidator = $formState.fields[key];
-			if (!fieldValidator) continue;
-
-			setFieldState(key, {
-				...fieldValidator,
+			setFieldState(key, (fieldState) => ({
+				...fieldState,
 				hasErrored: true,
 				validationErrors,
-			});
+			}));
 		}
 	};
 }

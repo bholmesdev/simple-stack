@@ -3,7 +3,8 @@
 import {
 	type FormValidator,
 	toSetValidationErrors,
-	toSetFieldState,
+	toTrackSubmitStatus,
+	toValidateField,
 	validateForm,
 	getInitialFormState,
 	type FieldErrors,
@@ -20,13 +21,15 @@ export function useCreateFormContext(
 	validator: FormValidator,
 	serverErrors?: FieldErrors,
 ) {
-	const initial = getInitialFormState(validator, serverErrors);
-	const [formState, setFormState] = useState<FormState>(initial);
+	const [formState, setFormState] = useState<FormState>(() =>
+		getInitialFormState(validator, serverErrors),
+	);
 	return {
 		value: formState,
 		set: setFormState,
-		setValidationErrors: toSetValidationErrors(formState, setFormState),
-		setFieldState: toSetFieldState(formState, setFormState),
+		setValidationErrors: toSetValidationErrors(setFormState),
+		validateField: toValidateField(setFormState),
+		trackSubmitStatus: toTrackSubmitStatus(setFormState),
 	};
 }
 
@@ -65,8 +68,15 @@ export function Form({
 				onSubmit={async (e) => {
 					e.preventDefault();
 					const formData = new FormData(e.currentTarget);
+					formContext.set((formState) => ({
+						...formState,
+						isSubmitPending: true,
+						submitStatus: "validating",
+					}));
 					const parsed = await validateForm(formData, validator);
-					if (parsed.data) return;
+					if (parsed.data) {
+						return formContext.trackSubmitStatus();
+					}
 
 					e.stopPropagation();
 					formContext.setValidationErrors(parsed.fieldErrors);
@@ -80,42 +90,27 @@ export function Form({
 
 export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 	const formContext = useFormContext();
-	const inputState = formContext.value.fields[inputProps.name];
-	if (!inputState) {
+	const fieldState = formContext.value.fields[inputProps.name];
+	if (!fieldState) {
 		throw new Error(
 			`Input "${inputProps.name}" not found in form. Did you use the <Form> component with your validator?`,
 		);
 	}
 
-	const { hasErrored, validationErrors, validator } = inputState;
-
-	async function setValidation(inputValue: string) {
-		const parsed = await validator.safeParseAsync(inputValue);
-		if (parsed.success === false) {
-			return formContext.setFieldState(inputProps.name, {
-				hasErrored: true,
-				validationErrors: parsed.error.errors.map((e) => e.message),
-				validator,
-			});
-		}
-		formContext.setFieldState(inputProps.name, {
-			validationErrors: undefined,
-			hasErrored,
-			validator,
-		});
-	}
-
+	const { hasErrored, validationErrors, validator } = fieldState;
 	return (
 		<>
 			<input
 				{...inputProps}
 				onBlur={async (e) => {
-					if (e.target.value === "") return;
-					await setValidation(e.target.value);
+					const value = e.target.value;
+					if (value === "") return;
+					formContext.validateField(inputProps.name, value, validator);
 				}}
 				onChange={async (e) => {
 					if (!hasErrored) return;
-					await setValidation(e.target.value);
+					const value = e.target.value;
+					formContext.validateField(inputProps.name, value, validator);
 				}}
 			/>
 			{validationErrors?.map((e) => (
