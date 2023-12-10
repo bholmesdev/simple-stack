@@ -2,8 +2,16 @@ import { z } from "zod";
 import { Form, Input, useCreateFormContext } from "./Form";
 import { createForm } from "simple:form";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const signup = createForm({
-	username: z.string().min(2),
+	username: z
+		.string()
+		.min(2)
+		.refine(async (s) => {
+			await sleep(400);
+			return s !== "admin";
+		}),
 	optIn: z.boolean().optional(),
 });
 

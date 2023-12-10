@@ -148,18 +148,18 @@ function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
 	}
 }
 
-export function validateForm<T extends ZodRawShape>(
+export async function validateForm<T extends ZodRawShape>(
 	formData: FormData,
 	validator: T,
 ) {
-	const result = z
+	const result = await z
 		.preprocess((formData) => {
 			if (!(formData instanceof FormData)) return formData;
 
 			// TODO: handle multiple inputs with same key
 			return Object.fromEntries(formData);
 		}, z.object(validator))
-		.safeParse(formData);
+		.safeParseAsync(formData);
 
 	if (result.success) {
 		return { data: result.data, fieldErrors: undefined };

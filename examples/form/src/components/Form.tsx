@@ -66,10 +66,10 @@ export function Form({
 			<form
 				{...formProps}
 				method="POST"
-				onSubmit={(e) => {
+				onSubmit={async (e) => {
 					e.preventDefault();
 					const formData = new FormData(e.currentTarget);
-					const parsed = validateForm(formData, validator);
+					const parsed = await validateForm(formData, validator);
 					if (parsed.data) return;
 
 					e.stopPropagation();
@@ -93,8 +93,8 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 
 	const { hasErrored, validationErrors, validator } = inputState;
 
-	function setValidation(inputValue: string) {
-		const parsed = validator.safeParse(inputValue);
+	async function setValidation(inputValue: string) {
+		const parsed = await validator.safeParseAsync(inputValue);
 		if (parsed.success === false) {
 			return formContext.setFieldState(inputProps.name, {
 				hasErrored: true,
@@ -113,13 +113,13 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 		<>
 			<input
 				{...inputProps}
-				onBlur={(e) => {
+				onBlur={async (e) => {
 					if (e.target.value === "") return;
-					setValidation(e.target.value);
+					await setValidation(e.target.value);
 				}}
-				onChange={(e) => {
+				onChange={async (e) => {
 					if (!hasErrored) return;
-					setValidation(e.target.value);
+					await setValidation(e.target.value);
 				}}
 			/>
 			{validationErrors?.map((e) => (
