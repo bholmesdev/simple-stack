@@ -15,6 +15,7 @@ import {
 	toTrackSubmitStatus,
 	toValidateField,
 	validateForm,
+	formNameInputProps,
 } from "simple:form";
 
 export function useCreateFormContext(
@@ -51,11 +52,13 @@ export function Form({
 	validator,
 	context,
 	serverErrors,
+	name,
 	...formProps
 }: {
 	validator: FormValidator;
 	context?: FormContextType;
 	serverErrors?: FieldErrors;
+	name?: string;
 } & Omit<ComponentProps<"form">, "method" | "onSubmit">) {
 	const formContext = context ?? useCreateFormContext(validator, serverErrors);
 
@@ -81,6 +84,7 @@ export function Form({
 					formContext.setValidationErrors(parsed.fieldErrors);
 				}}
 			>
+				{name ? <input {...formNameInputProps} value={name} /> : null}
 				{children}
 			</form>
 		</FormContext.Provider>

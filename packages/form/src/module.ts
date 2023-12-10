@@ -23,6 +23,11 @@ export type InputProp = {
 	type: "text" | "number" | "checkbox";
 };
 
+export const formNameInputProps = {
+	type: "hidden",
+	name: "_formName",
+} as const;
+
 export type FieldState = {
 	hasErrored: boolean;
 	isValidating: boolean;

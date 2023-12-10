@@ -3,7 +3,7 @@ import Signup, { signup } from "../components/Signup";
 import { ViewTransitions } from "astro:transitions";
 
 const { form } = Astro.locals;
-const formResult = await form.getData(signup);
+const formResult = await form.getDataByName("signup", signup);
 
 if (formResult?.data) {
   console.log(formResult.data);
