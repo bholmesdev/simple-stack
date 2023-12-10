@@ -69,12 +69,6 @@ export function getInitialFormState(
 	} satisfies FormState;
 }
 
-export function onPageLoaded(callback: () => void) {
-	document.addEventListener("astro:after-preparation", () => callback(), {
-		once: true,
-	});
-}
-
 function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
 	return Object.fromEntries(
 		Object.entries(formValidator).map(([key, validator]) => {
@@ -117,7 +111,7 @@ function toSetFieldState<T extends FormState>(setFormState: Setter<T>) {
 	};
 }
 
-export function toTrackSubmitStatus<T extends FormState>(
+export function toTrackAstroSubmitStatus<T extends FormState>(
 	setFormState: Setter<T>,
 ) {
 	return () => {
@@ -126,13 +120,18 @@ export function toTrackSubmitStatus<T extends FormState>(
 			isSubmitPending: true,
 			submitStatus: "submitting",
 		}));
-		onPageLoaded(() => {
-			setFormState((value) => ({
-				...value,
-				isSubmitPending: false,
-				submitStatus: "idle",
-			}));
-		});
+		document.addEventListener(
+			"astro:after-preparation",
+			() =>
+				setFormState((value) => ({
+					...value,
+					isSubmitPending: false,
+					submitStatus: "idle",
+				})),
+			{
+				once: true,
+			},
+		);
 	};
 }
 

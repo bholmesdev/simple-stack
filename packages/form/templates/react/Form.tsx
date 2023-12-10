@@ -12,7 +12,7 @@ import {
 	type FormValidator,
 	getInitialFormState,
 	toSetValidationErrors,
-	toTrackSubmitStatus,
+	toTrackAstroSubmitStatus,
 	toValidateField,
 	validateForm,
 	formNameInputProps,
@@ -29,7 +29,7 @@ export function useCreateFormContext(
 		set: setFormState,
 		setValidationErrors: toSetValidationErrors(setFormState),
 		validateField: toValidateField(setFormState),
-		trackSubmitStatus: toTrackSubmitStatus(setFormState),
+		trackAstroSubmitStatus: toTrackAstroSubmitStatus(setFormState),
 	};
 }
 
@@ -77,7 +77,7 @@ export function Form({
 					}));
 					const parsed = await validateForm(formData, validator);
 					if (parsed.data) {
-						return formContext.trackSubmitStatus();
+						return formContext.trackAstroSubmitStatus();
 					}
 
 					e.stopPropagation();
