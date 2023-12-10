@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "biome lint . --diagnostic-level=error",
-    "format": "biome format packages/*",
-    "format:write": "biome format packages/* --write"
+    "check": "biome check packages/*",
+    "check:apply": "biome check packages/* --apply",
+    "lint": "biome lint packages/*",
+    "lint:apply": "biome lint packages/* --apply",
+    "format": "biome format",
+    "format:write": "biome format --write"
   },
   "keywords": [],
   "author": "",
