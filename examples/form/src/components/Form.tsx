@@ -7,6 +7,7 @@ import {
 	validateForm,
 	getInitialFormState,
 	type FieldErrors,
+	type FormState,
 } from "simple:form";
 import {
 	type ComponentProps,
@@ -20,7 +21,7 @@ export function useCreateFormContext(
 	serverErrors?: FieldErrors,
 ) {
 	const initial = getInitialFormState(validator, serverErrors);
-	const [formState, setFormState] = useState(initial);
+	const [formState, setFormState] = useState<FormState>(initial);
 	return {
 		value: formState,
 		set: setFormState,

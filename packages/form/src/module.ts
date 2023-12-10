@@ -44,7 +44,7 @@ export function createForm<T extends ZodRawShape>(validator: T) {
 export function getInitialFormState(
 	formValidator: FormValidator,
 	serverErrors?: FieldErrors,
-): FormState {
+) {
 	return {
 		hasFieldErrors: false,
 		fields: mapObject(formValidator, (name, validator) => {
@@ -55,7 +55,7 @@ export function getInitialFormState(
 				validator,
 			};
 		}),
-	};
+	} satisfies FormState;
 }
 
 function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
