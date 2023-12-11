@@ -42,7 +42,7 @@ importers:
         specifier: ^18.0.0
         version: 18.2.0(react@18.2.0)
       simple-stack-form:
-        specifier: workspace:*
+        specifier: ^0.1.0
         version: link:../../packages/form
       tailwindcss:
         specifier: ^3.0.24
@@ -141,7 +141,7 @@ packages:
       astro: ^4.0.0-beta.0
     dependencies:
       '@astrojs/prism': 3.0.0
-      astro: 4.0.3(@types/node@20.10.4)(typescript@5.3.3)
+      astro: 4.0.3
       github-slugger: 2.0.0
       import-meta-resolve: 4.0.0
       mdast-util-definitions: 6.0.0
@@ -1466,7 +1466,6 @@ packages:
       - supports-color
       - terser
       - typescript
-    dev: false
 
   /astro@4.0.3(@types/node@20.10.4)(typescript@5.3.3):
     resolution: {integrity: sha512-hrwe7CIVhSKW8/iibDs1hpqzZAtvx6Qu8TFFxjaGbooEWF720M9L+ZZtyTgrcy6K/ZHJ0xwFvZV3/X2Vvbf/LQ==}
@@ -1546,6 +1545,7 @@ packages:
       - supports-color
       - terser
       - typescript
+    dev: true
 
   /autoprefixer@10.4.16(postcss@8.4.32):
     resolution: {integrity: sha512-7vd3UC6xKp0HLfua5IjZlcXvGAGy7cBAXTg2lyQ/8WpNhd6SiZ8Be+xm3FyBSYJx5GKcpRCzBh7RH4/0dnY+uQ==}
@@ -4487,6 +4487,7 @@ packages:
         optional: true
     dependencies:
       typescript: 5.3.3
+    dev: true
 
   /tunnel-agent@0.6.0:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
@@ -4508,6 +4509,7 @@ packages:
     resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
     engines: {node: '>=14.17'}
     hasBin: true
+    dev: true
 
   /ultrahtml@1.5.2:
     resolution: {integrity: sha512-qh4mBffhlkiXwDAOxvSGxhL0QEQsTbnP9BozOK3OYPEGvPvdWzvAUaXNtUSMdNsKDtuyjEbyVUPFZ52SSLhLqw==}
