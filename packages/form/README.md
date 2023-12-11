@@ -185,7 +185,7 @@ npx simple-form create
 pnpm dlx simple-form create
 ```
 
-This will output a form component in your directory of choice. An example using  ReactJS can be found in our `examples` directory.
+This will output a form component in your directory of choice.
 
 <details>
 <summary><strong>🙋‍♀️ Why code generation?</strong></summary>
@@ -196,3 +196,9 @@ So, we decided to take a hint from the popular [shadcn/ui](https://ui.shadcn.com
 
 </details>
 
+### Usage
+
+An demo using ReactJS can be found in our repository `examples`:
+
+- [StackBlitz playground](https://stackblitz.com/github/bholmesdev/simple-stack/tree/main/examples/form)
+- [GitHub](https://github.com/bholmesdev/simple-stack/tree/main/examples/form)
