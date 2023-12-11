@@ -5,7 +5,7 @@
 
 ```astro
 ---
-import { z } from "astro/zod";
+import { z } from "zod";
 import { createForm } from "simple:form";
 
 const checkout = createForm({
@@ -104,7 +104,7 @@ If successful, `result.data` will contain the parsed result. Otherwise, `result.
 
 ```astro
 ---
-import { z } from 'astro/zod';
+import { z } from 'zod';
 import { createForm } from 'simple:form';
 
 const checkout = createForm({
@@ -139,7 +139,7 @@ You may have multiple forms on the page you want to parse separately. You can de
 
 ```astro
 ---
-import { z } from 'astro/zod';
+import { z } from 'zod';
 import { createForm } from 'simple:form';
 
 const checkout = createForm({
