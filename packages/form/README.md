@@ -166,3 +166,33 @@ if (result?.data) {
   <!--<input type="hidden" name="_formName" value="checkout" />-->
 </form>
 ```
+
+## Client validation
+
+Astro is full-stack with support for any UI component framework. To take advantage of this, simple form helps generate a client-validated form in your framework of choice.
+
+> Okay, we only support ReactJS today. But the rest are on the way 😉
+
+### Create a form with the `simple-form` CLI
+
+You can generate a client form component with the `simple-form create` command:
+
+```bash
+# npm
+npx simple-form create
+
+# pnpm 
+pnpm dlx simple-form create
+```
+
+This will output a form component in your directory of choice. An example using  ReactJS can be found in our `examples` directory.
+
+<details>
+<summary><strong>🙋‍♀️ Why code generation?</strong></summary>
+
+We know form libraries have [come](https://react-hook-form.com/) and [gone](https://formik.org/) over the years. We think the reason is _ahem_ simple: **forms are just hard.** There's countless pieces to tweak, from debounced inputs to live vs. delayed validation to styling your components.
+
+So, we decided to take a hint from the popular [shadcn/ui](https://ui.shadcn.com/docs/theming) library and pass the code off to you. We still provide helpers to manage your form state and handle both synchronous and asynchronous validation. From here, we invite you to take our defaults and run with them!
+
+</details>
+
