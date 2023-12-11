@@ -4,3 +4,7 @@ node_modules/
 # npm
 npm-debug.log*
 *.tgz
+
+# typescript build
+*.tsbuildinfo
+dist/

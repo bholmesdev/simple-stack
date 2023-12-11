@@ -1,0 +1,49 @@
+---
+import Signup, { signup } from "../components/Signup";
+import { ViewTransitions } from "astro:transitions";
+
+const { form } = Astro.locals;
+const formResult = await form.getDataByName("signup", signup);
+
+if (formResult?.data) {
+  console.log(formResult.data);
+}
+
+await new Promise((resolve) => setTimeout(resolve, 400));
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <ViewTransitions />
+    <title>Astro</title>
+  </head>
+  <body>
+    <main class="!m-auto max-w-prose">
+      <h1>Simple form</h1>
+      {
+        formResult?.data && (
+          <div
+            class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+            role="alert"
+          >
+            <strong class="font-bold">Success!</strong>
+            <span class="block sm:inline">
+              You have successfully submitted the form.
+            </span>
+          </div>
+        )
+      }
+      <div transition:name="form">
+        <Signup serverErrors={formResult?.fieldErrors} client:load />
+      </div>
+      <style>
+        @import "open-props/style";
+        @import "open-props/normalize";
+      </style>
+    </main>
+  </body>
+</html>

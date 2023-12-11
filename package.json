@@ -4,9 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "check": "biome check packages/*",
+    "check:apply": "biome check packages/* --apply",
+    "lint": "biome lint packages/*",
+    "lint:apply": "biome lint packages/* --apply",
+    "format": "biome format",
+    "format:write": "biome format --write"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@biomejs/biome": "^1.4.1"
+  }
 }

@@ -1,14 +1,19 @@
 {
   "name": "simple-stack-form",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "A simple form library for Astro projects",
   "type": "module",
+  "bin": {
+    "simple-form": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
   "exports": {
-    ".": {
-      "default": "./src/index.mjs",
-      "types": "./src/index.d.ts"
-    },
-    "./middleware": "./src/middleware.ts",
+    ".": "./dist/index.js",
+    "./module": "./dist/module.js",
+    "./middleware": "./dist/middleware.js",
     "./components": "./components/index.ts",
     "./types": "./types.d.ts"
   },
@@ -24,9 +29,20 @@
   "author": "bholmesdev",
   "license": "MIT",
   "devDependencies": {
-    "astro": "^4.0.0"
+    "@types/node": "^20.10.4",
+    "@types/react": "^18.0.21",
+    "astro": "^4.0.0",
+    "react": "^18.0.0",
+    "typescript": "^5.3.3",
+    "zod": "^3.22.4"
   },
   "peerDependencies": {
-    "astro": "^3.6.0 || ^4.0.0"
+    "astro": "^3.6.0 || ^4.0.0",
+    "zod": "^3.22.4"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "just-map-object": "^2.3.0",
+    "kleur": "^4.1.5"
   }
 }
