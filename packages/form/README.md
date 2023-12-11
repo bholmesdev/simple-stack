@@ -94,35 +94,36 @@ signupForm.inputProps
 
 You can parse form requests from your Astro template frontmatter. Simple form exposes helpers to parse and validate these requests with the [`Astro.locals.form`](https://docs.astro.build/en/reference/api-reference/#astrolocals) object.
 
-### `form.getData()`
+#### `getData()`
 
-**Type:** `getData({ validator: FormValidator }): undefined | SafeParseReturnType<typeof validator>`
+**Type:** `getData<T extends { validator: FormValidator }>(form: T): Promise<GetDataResult<T["validator"]> | undefined>`
 
-`Astro.locals.form.getData()` parses any incoming form request with the method POST. This will return `undefined` if no form request was sent, or return form data when present parsed by your [Zod validator](https://github.com/colinhacks/zod#safeparse).
+`Astro.locals.form.getData()` parses any incoming form request with the method POST. This will return `undefined` if no form request was sent, or return any form data parsed by your [Zod validator](https://github.com/colinhacks/zod#safeparse).
 
-The result will include a `success` flag for whether or not validation succeeded. If so, `result.data` will contain the parsed result. If not, `result.errors.formErrors.fieldErrors` will contain all error messages by field name:
+If successful, `result.data` will contain the parsed result. Otherwise, `result.errors.fieldErrors` will contain validation error messages by field name:
 
 ```astro
 ---
-import { z } from "astro/zod";
+import { z } from 'astro/zod';
+import { createForm } from 'simple:form';
 
-const checkoutForm = await Astro.locals.form.getData({
+const checkout = createForm({
   quantity: z.number(),
-  email: z.string().email(),
-  allowAlerts: z.boolean(),
 });
 
-if (checkoutForm?.success) {
-  console.log(checkoutForm.data);
-  // { quantity: number, email: string, allowAlerts: boolean }
+const result = await Astro.locals.form.getData(checkout);
+
+if (result?.data) {
+  console.log(result.data);
+  // { quantity: number }
 }
 ---
 
 <form method="POST">
   <label for="quantity">Quantity</label>
-  <input id="quantity" name="quantity" type="number" />
+  <input id="quantity" {...checkout.inputProps.quantity} />
   {
-    checkoutForm?.success === false && checkoutForm.errors.formErrors.fieldErrors.map(error => (
+    result?.fieldErrors?.quantity?.map(error => (
       <p class="error">{error}</p>
     ))
   }
@@ -130,28 +131,35 @@ if (checkoutForm?.success) {
 </form>
 ```
 
-### `form.getDataByName()`
+#### `getDataByName()`
 
-**Type:** `getDataByName(name: string, { validator: FormValidator }): undefined | SafeParseReturnType<typeof validator>`
+**Type:** `getDataByName<T extends { validator: FormValidator }>(name: string, form: T): Promise<GetDataResult<T["validator"]> | undefined>`
 
 You may have multiple forms on the page you want to parse separately. You can define a unique form name in this case, and pass the name as a hidden input within the form using `<FormName>`:
 
 ```astro
 ---
-import { z } from "astro/zod";
-import { FormName } from "simple-stack-form/components";
+import { z } from 'astro/zod';
+import { createForm } from 'simple:form';
 
-// will only return for forms with the hidden input `checkout`
-const checkoutForm = await Astro.locals.form.getDataByName("checkout", {
+const checkout = createForm({
   quantity: z.number(),
-  email: z.string().email(),
-  allowAlerts: z.boolean(),
 });
+
+const result = await Astro.locals.form.getDataByName(
+  'checkout',
+  checkout,
+);
+
+if (result?.data) {
+  console.log(result.data);
+  // { quantity: number }
+}
 ---
 
 <form method="POST">
   <label for="quantity">Quantity</label>
-  <input id="quantity" name="quantity" type="number" />
+  <input id="quantity" {...checkout.inputProps.quantity} />
 
   <FormName value="checkout" />
   <!--Renders the following hidden input-->
