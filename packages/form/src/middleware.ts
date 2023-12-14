@@ -52,5 +52,5 @@ export const onRequest = defineMiddleware(({ request, locals }, next) => {
 		},
 	};
 
-	next();
+	return next();
 });
