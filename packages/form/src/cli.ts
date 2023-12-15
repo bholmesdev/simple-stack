@@ -6,8 +6,8 @@ import {
 	confirm,
 	intro,
 	isCancel,
-	note,
 	outro,
+	select,
 	text,
 } from "@clack/prompts";
 import { bgGreen, bgWhite, black, bold, cyan, dim, green } from "kleur/colors";
@@ -26,16 +26,69 @@ switch (cmd) {
 async function create() {
 	intro(`Create a new form component`);
 	// Do stuff
-	const useReact = handleCancel(
-		await confirm({
-			message: "Do you want to use React?",
-			initialValue: true,
-		}),
-	);
+	const frameworks = [
+		// ? this code should be here?
+		{
+			value: "react",
+			label: "React",
+			templatePath: "react/Form.tsx",
+			componentName: "Form.tsx",
+		},
+		{
+			value: "preact",
+			label: "Preact",
+			templatePath: "preact/Form.tsx",
+			componentName: "Form.tsx",
+		},
+	] as const;
 
-	if (!useReact) {
-		note("Well, sorry. We only support React right now ;)");
+	type Framework = (typeof frameworks)[number];
+
+	let foundFramework: Framework | null = null;
+	const packageJsonPath = resolve(process.cwd(), "package.json");
+	if (existsSync(packageJsonPath)) {
+		const {
+			dependencies = {},
+			devDependencies = {},
+			peerDependencies = {},
+		} = JSON.parse(await readFile(packageJsonPath, { encoding: "utf-8" }));
+
+		for (const framework of frameworks) {
+			if (
+				Object.keys(dependencies).includes(framework.value) ||
+				Object.keys(devDependencies).includes(framework.value) || // ? should we check this?
+				Object.keys(peerDependencies).includes(framework.value) // ? should we check this?
+			) {
+				foundFramework = framework;
+				break;
+			}
+		}
 	}
+
+	const useFoundFramework =
+		!!foundFramework &&
+		handleCancel(
+			await confirm({
+				message: `Do you want to use ${foundFramework.label}?`, // ? What would be a better message?
+				initialValue: true,
+			}),
+		);
+
+	const toUseFramework = await (async () => {
+		if (useFoundFramework) {
+			return foundFramework!;
+		}
+
+		const selected = (await select({
+			message: "Pick a framework.", // ? What would be a better message?
+			options: frameworks.map(({ value, label }) => ({
+				value: value,
+				label: label,
+			})),
+		})) as Framework["value"];
+
+		return frameworks.find((framework) => framework.value === selected)!;
+	})();
 
 	const relativeOutputDir = handleCancel(
 		await text({
@@ -45,8 +98,12 @@ async function create() {
 				if (!value) {
 					return "Please enter a path.";
 				}
-				if (existsSync(resolve(process.cwd(), value, "Form.tsx"))) {
-					return "A Form.tsx component already exists here.";
+				if (
+					existsSync(
+						resolve(process.cwd(), value, toUseFramework.componentName),
+					)
+				) {
+					return `A ${toUseFramework.componentName} component already exists here.`;
 				}
 			},
 		}),
@@ -58,11 +115,14 @@ async function create() {
 		});
 	}
 
-	const relativeOutputPath = join(relativeOutputDir, "Form.tsx");
+	const relativeOutputPath = join(
+		relativeOutputDir,
+		toUseFramework.componentName,
+	);
 	const outputPath = resolve(process.cwd(), relativeOutputPath);
 
 	const reactFormTemplate = await readFile(
-		new URL("../templates/react/Form.tsx", import.meta.url),
+		new URL(`../templates/${toUseFramework.templatePath}`, import.meta.url),
 	);
 
 	await writeFile(outputPath, reactFormTemplate);
