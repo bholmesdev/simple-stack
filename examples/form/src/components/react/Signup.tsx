@@ -23,7 +23,7 @@ export default function Signup({
 			className="flex flex-col gap-2 items-start"
 			fieldErrors={serverErrors}
 			validator={signup.validator}
-			name="signup"
+			name="signupReact"
 		>
 			<FormGroup>
 				<label htmlFor="name">Name</label>
