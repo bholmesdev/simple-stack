@@ -102,15 +102,13 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 		<>
 			<input
 				onBlur={async (e) => {
-					// @ts-ignore
-					const value: string = e.target.value; // ? this is saying that e.target can be null, and value doesn't exist on EventTarget
+					const value = e.currentTarget.value;
 					if (value === "") return;
 					formContext.validateField(inputProps.name, value, validator);
 				}}
 				onInput={async (e) => {
 					if (!hasErroredOnce) return;
-					// @ts-ignore
-					const value: string = e.target.value; // ? this is saying that e.target can be null, and value doesn't exist on EventTarget
+					const value = e.currentTarget.value;
 					formContext.validateField(inputProps.name, value, validator);
 				}}
 				{...inputProps}
