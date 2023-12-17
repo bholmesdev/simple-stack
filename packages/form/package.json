@@ -29,6 +29,7 @@
   "author": "bholmesdev",
   "license": "MIT",
   "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.10.4",
     "@types/react": "^18.0.21",
     "astro": "^4.0.0",
@@ -43,6 +44,7 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.7.0",
+    "fs-extra": "^11.2.0",
     "just-map-object": "^2.3.0",
     "kleur": "^4.1.5"
   }
