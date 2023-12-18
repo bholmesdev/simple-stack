@@ -2,7 +2,6 @@
 
 > The simple way to handle forms in your Astro project 🧘‍♂️
 
-
 ```astro
 ---
 import { z } from "zod";
@@ -57,8 +56,8 @@ After installing, you'll need to add a type definition to your environment for e
 You can create a simple form with the `createForm()` function. This lets you specify a validation schema using [Zod](https://zod.dev/), where each input corresponds to an object key. Simple form supports string, number, or boolean (checkbox) fields.
 
 ```ts
-import { createForm } from 'simple:form';
-import z from 'zod';
+import { createForm } from "simple:form";
+import z from "zod";
 
 const signupForm = createForm({
   name: z.string(),
@@ -82,7 +81,7 @@ const signupForm = createForm({
   newsletterOptIn: z.boolean(),
 });
 
-signupForm.inputProps
+signupForm.inputProps;
 /*
   name: { name: 'name', type: 'text', 'aria-required': true }
   age: { name: 'age', type: 'number', 'aria-required': false }
@@ -181,7 +180,7 @@ You can generate a client form component with the `simple-form create` command:
 # npm
 npx simple-form create
 
-# pnpm 
+# pnpm
 pnpm dlx simple-form create
 ```
 
@@ -204,3 +203,33 @@ An demo using ReactJS can be found in our repository `examples`:
 
 - [StackBlitz playground](https://stackblitz.com/github/bholmesdev/simple-stack/tree/main/examples/form)
 - [GitHub](https://github.com/bholmesdev/simple-stack/tree/main/examples/form)
+
+## Sanitizing User Input
+
+To enhance the security of your application, it's crucial to sanitize user input to prevent Cross-Site Scripting (XSS) attacks. This process ensures that any potentially malicious scripts or code entered by users are neutralized before rendering on the webpage. Here, we'll guide you through using Zod `validation` in combination with the [sanitize-html](https://www.npmjs.com/package/sanitize-html) library for effective sanitization.
+
+### Install the sanitize-html library
+
+Before implementing sanitization, install the sanitize-html library along with its type definitions for TypeScript:
+
+```bash
+npm install --save sanitize-html
+npm install --save-dev @types/sanitize-html
+```
+
+### Use sanitize-html with Zod
+
+Next, incorporate `sanitize-html` into your Zod validation process by using the `transform` method. This method allows you to apply custom transformations to the data during the validation process.
+
+```diff
++ import sanitizeHtml from "sanitize-html";
+
+const signupForm = createForm({
+-  name: z.string(),
++  name: z.string().transform(sanitizeHtml),
+  age: z.number().min(18).optional(),
+  newsletterOptIn: z.boolean(),
+});
+```
+
+> In the example above, the name field is configured to use the sanitizeHtml transformation. This ensures that any HTML or script tags entered by users will be safely removed, preventing XSS vulnerabilities.
