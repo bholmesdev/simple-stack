@@ -233,3 +233,7 @@ const signupForm = createForm({
 ```
 
 > In the example above, the name field is configured to use the sanitizeHtml transformation. This ensures that any HTML or script tags entered by users will be safely removed, preventing XSS vulnerabilities.
+
+### Examples
+
+You can find a sanitization implementation example on our [`examples`](https://github.com/bholmesdev/simple-stack/tree/main/examples/form/src/components/Sanitize.tsx)
