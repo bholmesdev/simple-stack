@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { mkdir, readFile, writeFile, readdir } from "node:fs/promises";
+import { mkdir, readFile, readdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { copy } from "fs-extra/esm";
 import {
@@ -131,9 +131,7 @@ async function create() {
 	);
 	const outputPath = resolve(process.cwd(), relativeOutputPath);
 
-	const templatePath = import.meta
-		.resolve(`../templates/${toUseFramework.templateDir}`)
-		.replace("file://", "");
+	const templatePath = resolve(`./templates/${toUseFramework.templateDir}`);
 
 	await copy(templatePath, outputPath, {
 		filter: (src) => {
