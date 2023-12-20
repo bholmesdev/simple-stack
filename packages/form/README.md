@@ -226,7 +226,7 @@ Next, incorporate `sanitize-html` into your Zod validation process by using the 
 
 const signupForm = createForm({
 -  name: z.string(),
-+  name: z.string().transform(sanitizeHtml),
++  name: z.string().transform((dirty) => sanitizeHtml(dirty)),
   age: z.number().min(18).optional(),
   newsletterOptIn: z.boolean(),
 });
