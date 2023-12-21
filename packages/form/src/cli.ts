@@ -103,14 +103,7 @@ async function create() {
 				}
 				if (
 					fileNamesToCreate.some((fileName) =>
-						existsSync(
-							resolve(
-								process.cwd(),
-								value,
-								toUseFramework.templateDir,
-								fileName,
-							),
-						),
+						existsSync(resolve(process.cwd(), value, fileName)),
 					)
 				) {
 					return `Cannot copy files without name conflicts. Choose a different directory.`;
@@ -125,13 +118,11 @@ async function create() {
 		});
 	}
 
-	const relativeOutputPath = join(
-		relativeOutputDir,
-		toUseFramework.templateDir,
-	);
-	const outputPath = resolve(process.cwd(), relativeOutputPath);
+	const outputPath = resolve(process.cwd(), relativeOutputDir);
 
-	const templatePath = resolve(`./templates/${toUseFramework.templateDir}`);
+	const templatePath = fileURLToPath(
+		new URL(`../templates/${toUseFramework.templateDir}`, import.meta.url),
+	);
 
 	await copy(templatePath, outputPath, {
 		filter: (src) => {
@@ -140,7 +131,7 @@ async function create() {
 		},
 	});
 
-	outro(`${bold(cyan(relativeOutputPath))} created. You're all set!`);
+	outro(`Form created. You're all set!`);
 }
 
 function help() {
