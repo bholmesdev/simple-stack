@@ -102,12 +102,13 @@ async function create() {
 				if (!value) {
 					return "Please enter a path.";
 				}
-				if (
-					fileNamesToCreate.some((fileName) =>
-						existsSync(resolve(process.cwd(), value, fileName)),
-					)
-				) {
-					return `Cannot copy files without name conflicts. Choose a different directory.`;
+				const conflict = fileNamesToCreate.find((fileName) =>
+					existsSync(resolve(process.cwd(), value, fileName)),
+				);
+				if (conflict) {
+					return `${bold(
+						conflict,
+					)} already exists here. Choose a different directory.`;
 				}
 			},
 		}),
