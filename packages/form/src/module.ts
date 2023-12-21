@@ -167,6 +167,11 @@ export function toSetValidationErrors<T extends FormState>(
 	return (
 		fieldErrors: ZodError<Record<string, unknown>>["formErrors"]["fieldErrors"],
 	) => {
+		setFormState((formState) => ({
+			...formState,
+			hasFieldErrors: false,
+			submitStatus: "idle",
+		}));
 		for (const [key, validationErrors] of Object.entries(fieldErrors)) {
 			setFieldState(key, (fieldState) => ({
 				...fieldState,
