@@ -3,6 +3,7 @@ import SignupReact, { signup as signupReact } from "../components/react/Signup";
 import SignupPreact, {
   signup as signupPreact,
 } from "../components/preact/Signup";
+import Sanitize, { sanitize } from "../components/Sanitize";
 import { ViewTransitions } from "astro:transitions";
 
 const { form } = Astro.locals;
@@ -15,6 +16,12 @@ if (formResultReact?.data) {
 
 if (formResultPreact?.data) {
   console.log(formResultPreact.data);
+}
+
+const sanitizeFormResult = await form.getDataByName("sanitize", sanitize);
+
+if (sanitizeFormResult?.data) {
+  console.log(sanitizeFormResult.data);
 }
 
 await new Promise((resolve) => setTimeout(resolve, 400));
@@ -72,6 +79,31 @@ await new Promise((resolve) => setTimeout(resolve, 400));
           client:load
         />
       </div>
+      <hr />
+      <h2>Sanitize</h2>
+      <div class="pb-2">
+        Try pasting this code snippet into each field once and submit
+        <code>
+          {`<script>alert('test')</script>`}
+        </code>
+      </div>
+      <div transition:name="sanitize-form">
+        <Sanitize serverErrors={sanitizeFormResult?.fieldErrors} client:load />
+      </div>
+      {
+        sanitizeFormResult?.data && (
+          <>
+            <div>
+              Sanitized result:{" "}
+              <span set:html={sanitizeFormResult.data.sanitized} />
+            </div>
+            <div>
+              Unsanitized result:{" "}
+              <span set:html={sanitizeFormResult.data.unsanitized} />
+            </div>
+          </>
+        )
+      }
       <style>
         @import "open-props/style";
         @import "open-props/normalize";
