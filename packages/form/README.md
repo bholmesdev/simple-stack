@@ -206,20 +206,14 @@ An demo using ReactJS can be found in our repository `examples`:
 
 ## Sanitizing User Input
 
-To enhance the security of your application, it's crucial to sanitize user input to prevent Cross-Site Scripting (XSS) attacks. This process ensures that any potentially malicious scripts or code entered by users are neutralized before rendering on the webpage. Here, we'll guide you through using Zod `validation` in combination with the [sanitize-html](https://www.npmjs.com/package/sanitize-html) library for effective sanitization.
-
-### Install the sanitize-html library
-
-Before implementing sanitization, install the sanitize-html library along with its type definitions for TypeScript:
+You may need to sanitize user input with rich text content. This is important for any text rendered as HTML to prevent Cross-Site Scripting (XSS) attacks. You can use the [sanitize-html](https://www.npmjs.com/package/sanitize-html) library for this:
 
 ```bash
 npm install --save sanitize-html
 npm install --save-dev @types/sanitize-html
 ```
 
-### Use sanitize-html with Zod
-
-Next, incorporate `sanitize-html` into your Zod validation process by using the `transform` method. This method allows you to apply custom transformations to the data during the validation process.
+Next, call `sanitize-html` from your text validator [with a Zod `transform()`](https://zod.dev/?id=transform):
 
 ```diff
 + import sanitizeHtml from "sanitize-html";
@@ -232,7 +226,6 @@ const signupForm = createForm({
 });
 ```
 
-> In the example above, the name field is configured to use the sanitizeHtml transformation. This ensures that any HTML or script tags entered by users will be safely removed, preventing XSS vulnerabilities.
 
 ### Examples
 
