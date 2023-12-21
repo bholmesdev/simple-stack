@@ -67,7 +67,6 @@ export function Form({
 				{...formProps}
 				method="POST"
 				onSubmit={async (e) => {
-					e.preventDefault();
 					const formData = new FormData(e.currentTarget);
 					formContext.set((formState) => ({
 						...formState,
