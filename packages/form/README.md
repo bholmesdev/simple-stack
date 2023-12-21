@@ -2,7 +2,6 @@
 
 > The simple way to handle forms in your Astro project 🧘‍♂️
 
-
 ```astro
 ---
 import { z } from "zod";
@@ -57,8 +56,8 @@ After installing, you'll need to add a type definition to your environment for e
 You can create a simple form with the `createForm()` function. This lets you specify a validation schema using [Zod](https://zod.dev/), where each input corresponds to an object key. Simple form supports string, number, or boolean (checkbox) fields.
 
 ```ts
-import { createForm } from 'simple:form';
-import z from 'zod';
+import { createForm } from "simple:form";
+import z from "zod";
 
 const signupForm = createForm({
   name: z.string(),
@@ -82,7 +81,7 @@ const signupForm = createForm({
   newsletterOptIn: z.boolean(),
 });
 
-signupForm.inputProps
+signupForm.inputProps;
 /*
   name: { name: 'name', type: 'text', 'aria-required': true }
   age: { name: 'age', type: 'number', 'aria-required': false }
@@ -181,7 +180,7 @@ You can generate a client form component with the `simple-form create` command:
 # npm
 npx simple-form create
 
-# pnpm 
+# pnpm
 pnpm dlx simple-form create
 ```
 
@@ -204,3 +203,30 @@ An demo using ReactJS can be found in our repository `examples`:
 
 - [StackBlitz playground](https://stackblitz.com/github/bholmesdev/simple-stack/tree/main/examples/form)
 - [GitHub](https://github.com/bholmesdev/simple-stack/tree/main/examples/form)
+
+## Sanitizing User Input
+
+You may need to sanitize user input with rich text content. This is important for any text rendered as HTML to prevent Cross-Site Scripting (XSS) attacks. You can use the [sanitize-html](https://www.npmjs.com/package/sanitize-html) library for this:
+
+```bash
+npm install --save sanitize-html
+npm install --save-dev @types/sanitize-html
+```
+
+Next, call `sanitize-html` from your text validator [with a Zod `transform()`](https://zod.dev/?id=transform):
+
+```diff
++ import sanitizeHtml from "sanitize-html";
+
+const signupForm = createForm({
+-  name: z.string(),
++  name: z.string().transform((dirty) => sanitizeHtml(dirty)),
+  age: z.number().min(18).optional(),
+  newsletterOptIn: z.boolean(),
+});
+```
+
+
+### Examples
+
+You can find a sanitization implementation example on our [`examples`](https://github.com/bholmesdev/simple-stack/tree/main/examples/form/src/components/Sanitize.tsx)
