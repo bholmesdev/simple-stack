@@ -53,7 +53,7 @@ await new Promise((resolve) => setTimeout(resolve, 400));
           </div>
         )
       }
-      <div transition:name="form">
+      <div transition:name="react-form">
         <SignupReact serverErrors={formResultReact?.fieldErrors} client:load />
       </div>
 
@@ -73,7 +73,7 @@ await new Promise((resolve) => setTimeout(resolve, 400));
           </div>
         )
       }
-      <div transition:name="form">
+      <div transition:name="preact-form">
         <SignupPreact
           serverErrors={formResultPreact?.fieldErrors}
           client:load
