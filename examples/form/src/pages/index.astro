@@ -1,13 +1,21 @@
 ---
-import Signup, { signup } from "../components/Signup";
+import SignupReact, { signup as signupReact } from "../components/react/Signup";
+import SignupPreact, {
+  signup as signupPreact,
+} from "../components/preact/Signup";
 import Sanitize, { sanitize } from "../components/Sanitize";
 import { ViewTransitions } from "astro:transitions";
 
 const { form } = Astro.locals;
-const formResult = await form.getDataByName("signup", signup);
+const formResultReact = await form.getDataByName("signupReact", signupReact);
+const formResultPreact = await form.getDataByName("signupPreact", signupPreact);
 
-if (formResult?.data) {
-  console.log(formResult.data);
+if (formResultReact?.data) {
+  console.log(formResultReact.data);
+}
+
+if (formResultPreact?.data) {
+  console.log(formResultPreact.data);
 }
 
 const sanitizeFormResult = await form.getDataByName("sanitize", sanitize);
@@ -33,7 +41,7 @@ await new Promise((resolve) => setTimeout(resolve, 400));
       <h1>Simple form</h1>
       <h2>React</h2>
       {
-        formResult?.data && (
+        formResultReact?.data && (
           <div
             class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
             role="alert"
@@ -46,7 +54,30 @@ await new Promise((resolve) => setTimeout(resolve, 400));
         )
       }
       <div transition:name="form">
-        <Signup serverErrors={formResult?.fieldErrors} client:load />
+        <SignupReact serverErrors={formResultReact?.fieldErrors} client:load />
+      </div>
+
+      <hr />
+
+      <h2>Preact</h2>
+      {
+        formResultPreact?.data && (
+          <div
+            class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+            role="alert"
+          >
+            <strong class="font-bold">Success!</strong>
+            <span class="block sm:inline">
+              You have successfully submitted the form.
+            </span>
+          </div>
+        )
+      }
+      <div transition:name="form">
+        <SignupPreact
+          serverErrors={formResultPreact?.fieldErrors}
+          client:load
+        />
       </div>
       <hr />
       <h2>Sanitize</h2>

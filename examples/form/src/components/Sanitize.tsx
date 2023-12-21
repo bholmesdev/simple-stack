@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Form, Input, useFormContext } from "./Form";
+import { Form, Input, useFormContext } from "./react/Form";
 import { type FieldErrors, createForm } from "simple:form";
 import sanitizeHtml from 'sanitize-html';
 

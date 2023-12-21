@@ -1,16 +1,35 @@
 import { existsSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { mkdir, readFile, readdir } from "node:fs/promises";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { copy } from "fs-extra/esm";
 import {
 	cancel,
 	confirm,
 	intro,
 	isCancel,
-	note,
 	outro,
+	select,
 	text,
 } from "@clack/prompts";
-import { bgGreen, bgWhite, black, bold, cyan, dim, green } from "kleur/colors";
+import { bgGreen, bgWhite, black, bold, dim, green } from "kleur/colors";
+
+const frameworks = [
+	{
+		value: "react",
+		label: "React",
+		templateDir: "react",
+	},
+	{
+		value: "preact",
+		label: "Preact",
+		templateDir: "preact",
+	},
+] as const;
+
+type Framework = (typeof frameworks)[number];
+
+const internalFiles = ["env.d.ts", "tsconfig.json"];
 
 const cmd = process.argv[2];
 
@@ -26,16 +45,54 @@ switch (cmd) {
 async function create() {
 	intro(`Create a new form component`);
 	// Do stuff
-	const useReact = handleCancel(
-		await confirm({
-			message: "Do you want to use React?",
-			initialValue: true,
-		}),
-	);
+	let foundFramework: Framework | null = null;
+	const packageJsonPath = resolve(process.cwd(), "package.json");
+	if (existsSync(packageJsonPath)) {
+		const { dependencies = {}, devDependencies = {} } = JSON.parse(
+			await readFile(packageJsonPath, { encoding: "utf-8" }),
+		);
 
-	if (!useReact) {
-		note("Well, sorry. We only support React right now ;)");
+		for (const framework of frameworks) {
+			if (
+				Object.keys(dependencies).includes(framework.value) ||
+				Object.keys(devDependencies).includes(framework.value)
+			) {
+				foundFramework = framework;
+				break;
+			}
+		}
 	}
+
+	const useFoundFramework =
+		!!foundFramework &&
+		handleCancel(
+			await confirm({
+				message: `Do you want to use ${foundFramework.label}?`,
+				initialValue: true,
+			}),
+		);
+
+	const toUseFramework = await (async () => {
+		if (useFoundFramework) {
+			return foundFramework!;
+		}
+
+		const selected = (await select({
+			message: "What framework should we use?",
+			options: frameworks.map(({ value, label }) => ({
+				value: value,
+				label: label,
+			})),
+		})) as Framework["value"];
+
+		return frameworks.find((framework) => framework.value === selected)!;
+	})();
+
+	const fileNamesToCreate = (
+		await readdir(
+			new URL(`../templates/${toUseFramework.templateDir}`, import.meta.url),
+		)
+	).filter((fileName) => !internalFiles.includes(fileName));
 
 	const relativeOutputDir = handleCancel(
 		await text({
@@ -45,8 +102,13 @@ async function create() {
 				if (!value) {
 					return "Please enter a path.";
 				}
-				if (existsSync(resolve(process.cwd(), value, "Form.tsx"))) {
-					return "A Form.tsx component already exists here.";
+				const conflict = fileNamesToCreate.find((fileName) =>
+					existsSync(resolve(process.cwd(), value, fileName)),
+				);
+				if (conflict) {
+					return `${bold(
+						conflict,
+					)} already exists here. Choose a different directory.`;
 				}
 			},
 		}),
@@ -58,16 +120,20 @@ async function create() {
 		});
 	}
 
-	const relativeOutputPath = join(relativeOutputDir, "Form.tsx");
-	const outputPath = resolve(process.cwd(), relativeOutputPath);
+	const outputPath = resolve(process.cwd(), relativeOutputDir);
 
-	const reactFormTemplate = await readFile(
-		new URL("../templates/react/Form.tsx", import.meta.url),
+	const templatePath = fileURLToPath(
+		new URL(`../templates/${toUseFramework.templateDir}`, import.meta.url),
 	);
 
-	await writeFile(outputPath, reactFormTemplate);
+	await copy(templatePath, outputPath, {
+		filter: (src) => {
+			const fileName = src.split("/").at(-1);
+			return !!fileName && !internalFiles.includes(fileName);
+		},
+	});
 
-	outro(`${bold(cyan(relativeOutputPath))} created. You're all set!`);
+	outro(`Form created. You're all set!`);
 }
 
 function help() {
