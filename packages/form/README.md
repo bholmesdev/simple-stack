@@ -170,7 +170,7 @@ if (result?.data) {
 
 Astro supports any UI component framework. To take advantage of this, simple form helps generate a client-validated form in your framework of choice.
 
-> Okay, we only support ReactJS today. But the rest are on the way 😉
+> ⚠️ Client validation relies on Astro view transitions. Ensure [view transitions are enabled](https://docs.astro.build/en/guides/view-transitions/#adding-view-transitions-to-a-page) on your page.
 
 ### Create a form with the `simple-form` CLI
 
