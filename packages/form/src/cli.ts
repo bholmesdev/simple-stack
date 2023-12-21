@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { copy } from "fs-extra/esm";
 import {
 	cancel,
@@ -11,7 +12,7 @@ import {
 	select,
 	text,
 } from "@clack/prompts";
-import { bgGreen, bgWhite, black, bold, cyan, dim, green } from "kleur/colors";
+import { bgGreen, bgWhite, black, bold, dim, green } from "kleur/colors";
 
 const frameworks = [
 	{
