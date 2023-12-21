@@ -200,7 +200,7 @@ We expose internal functions to manage your form state and handle both synchrono
 
 ### Usage
 
-An demo using ReactJS can be found in our repository `examples`:
+An demo can be found in our repository `examples`:
 
 - [StackBlitz playground](https://stackblitz.com/github/bholmesdev/simple-stack/tree/main/examples/form)
 - [GitHub](https://github.com/bholmesdev/simple-stack/tree/main/examples/form)
