@@ -9,6 +9,7 @@ import {
 	type ZodType,
 	z,
 	ZodNullable,
+	ZodArray,
 } from "zod";
 
 export { mapObject };
@@ -76,24 +77,35 @@ export function getInitialFormState({
 function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
 	return Object.fromEntries(
 		Object.entries(formValidator).map(([key, validator]) => {
-			const inputType = getInputType(validator);
-			switch (inputType) {
+			const inputType = getInputInfo(validator);
+
+			let value = validator;
+
+			switch (inputType.type) {
 				case "checkbox":
-					return [key, z.preprocess((value) => value === "on", validator)];
+					value = z.preprocess((value) => value === "on", validator);
+					break;
 				case "number":
-					return [key, z.preprocess(Number, validator)];
+					value = z.preprocess(Number, validator);
+					break;
 				case "text":
-					return [
-						key,
-						z.preprocess(
-							// Consider empty input as "required"
-							(value) => (value === "" ? undefined : value),
-							validator,
-						),
-					];
-				default:
-					return [key, validator];
+					value = z.preprocess(
+						// Consider empty input as "required"
+						(value) => (value === "" ? undefined : value),
+						validator,
+					);
+					break;
 			}
+
+			if (inputType.isArray) {
+				value = z.preprocess((v) => {
+					// Support validating a single input against an array validator
+					// Use case: input validation on blur
+					return Array.isArray(v) ? v : [v];
+				}, validator);
+			}
+
+			return [key, value];
 		}),
 	) as T;
 }
@@ -191,26 +203,46 @@ function getInputProp<T extends ZodType>(name: string, fieldValidator: T) {
 		name,
 		"aria-required":
 			!fieldValidator.isOptional() && !fieldValidator.isNullable(),
-		type: getInputType<T>(fieldValidator),
+		type: getInputInfo<T>(fieldValidator).type,
 	};
 
 	return inputProp;
 }
 
-function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
-	const resolvedType =
+function getInputInfo<T extends ZodType>(fieldValidator: T): {
+	type: InputProp["type"];
+	isArray: boolean;
+	isOptional: boolean;
+} {
+	let resolvedType = fieldValidator;
+	let isArray = false;
+	let isOptional = false;
+	if (
 		fieldValidator instanceof ZodOptional ||
 		fieldValidator instanceof ZodNullable
-			? fieldValidator._def.innerType
-			: fieldValidator;
+	) {
+		resolvedType = fieldValidator._def.innerType;
+		isOptional = true;
+	}
+
+	if (fieldValidator instanceof ZodArray) {
+		resolvedType = fieldValidator._def.type;
+		isArray = true;
+	}
+
+	// TODO: respect preprocess() wrappers
+
+	let type: InputProp["type"];
 
 	if (resolvedType instanceof ZodBoolean) {
-		return "checkbox";
+		type = "checkbox";
 	} else if (resolvedType instanceof ZodNumber) {
-		return "number";
+		type = "number";
 	} else {
-		return "text";
+		type = "text";
 	}
+
+	return { type, isArray, isOptional };
 }
 
 export async function validateForm<T extends ZodRawShape>({
@@ -224,8 +256,10 @@ export async function validateForm<T extends ZodRawShape>({
 		.preprocess((formData) => {
 			if (!(formData instanceof FormData)) return formData;
 
-			// TODO: handle multiple inputs with same key
-			return Object.fromEntries(formData);
+			return mapObject(Object.fromEntries(formData), (key, value) => {
+				const all = formData.getAll(key);
+				return all.length > 1 ? all : value;
+			});
 		}, z.object(validator))
 		.safeParseAsync(formData);
 
