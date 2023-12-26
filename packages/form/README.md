@@ -89,6 +89,49 @@ signupForm.inputProps;
 */
 ```
 
+### Handle array values
+
+You may want to submit multiple form values under the same name. This is common for multi-select file inputs, or generated inputs like "add a second contact."
+
+You can aggregate values under the same name using `z.array()` in your validator:
+
+```ts
+import { createForm } from "simple:form";
+import z from "zod";
+
+const contact = createForm({
+  contactNames: z.array(z.string()),
+});
+```
+
+Now, all inputs with the name `contactNames` will be aggregated. This [uses `FormData.getAll()`](https://developer.mozilla.org/en-US/docs/Web/API/FormData/getAll) behind the scenes:
+
+```astro
+---
+import { createForm } from "simple:form";
+import z from "zod";
+
+const contact = createForm({
+  contactNames: z.array(z.string()),
+});
+
+const res = await Astro.locals.form.getData(contact);
+console.log(res?.data);
+// contactNames: ["Ben", "George"]
+---
+
+<form method="POST">
+  <label for="contact-1">Contact 1</label>
+  <input id="contact-1" {...contact.inputProps.contactNames} />
+  {res.fieldErrors?.contactNames?.[0]}
+  <label for="contact-2">Contact 2</label>
+  <input id="contact-2" {...contact.inputProps.contactNames} />
+  {res.fieldErrors?.contactNames?.[1]}
+</form>
+```
+
+Note that `fieldErrors` can be retrieved by index. For example, to get parse errors for the second input, use `fieldErrors.contactNames[1]`.
+
 ### Parse form requests
 
 You can parse form requests from your Astro component frontmatter. Simple form exposes helpers to parse and validate these requests with the [`Astro.locals.form`](https://docs.astro.build/en/reference/api-reference/#astrolocals) object.
