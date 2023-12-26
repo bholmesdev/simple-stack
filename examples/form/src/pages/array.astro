@@ -1,0 +1,67 @@
+---
+import { createForm } from "simple:form";
+import { z } from "zod";
+import { ViewTransitions } from "astro:transitions";
+
+const fileUpload = createForm({
+  hexCodes: z.array(z.string().length(6)),
+});
+
+const req = await Astro.locals.form.getData(fileUpload);
+
+if (req?.data) {
+  console.log(req.data.hexCodes);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color gradient builder</title>
+    <ViewTransitions />
+  </head>
+  <body>
+    <form method="POST" class="flex flex-col gap-2">
+      <template>
+        <label for="hex-code">Hex code</label>
+        <input
+          class="rounded border border-gray-200"
+          id="hex-code"
+          {...fileUpload.inputProps.hexCodes}
+        />
+      </template>
+      <button data-add-color type="button">Add color</button>
+      {
+        req?.fieldErrors?.hexCodes?.[0] && (
+          <p class="text-red-500">{req.fieldErrors.hexCodes[0]}</p>
+        )
+      }
+      <button>Submit</button>
+    </form>
+    <style>
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+    </style>
+
+    <script>
+      document.addEventListener("astro:page-load", () => {
+        const form = document.querySelector("form")!;
+        const button = form.querySelector("button[data-add-color]")!;
+        const template = form.querySelector("template")!;
+
+        const clone = document.importNode(template.content, true);
+        button.before(clone);
+        button.addEventListener("click", () => {
+          console.log("click");
+          const clone = document.importNode(template.content, true);
+          button.before(clone);
+        });
+      });
+    </script>
+  </body>
+</html>
