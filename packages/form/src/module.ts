@@ -8,6 +8,7 @@ import {
 	type ZodRawShape,
 	type ZodType,
 	z,
+	ZodNullable,
 } from "zod";
 
 export { mapObject };
@@ -52,7 +53,10 @@ export function createForm<T extends ZodRawShape>(validator: T) {
 export function getInitialFormState({
 	validator,
 	fieldErrors,
-}: { validator: FormValidator; fieldErrors: FieldErrors | undefined }) {
+}: {
+	validator: FormValidator;
+	fieldErrors: FieldErrors | undefined;
+}) {
 	return {
 		hasFieldErrors: false,
 		submitStatus: "idle",
@@ -195,7 +199,8 @@ function getInputProp<T extends ZodType>(name: string, fieldValidator: T) {
 
 function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
 	const resolvedType =
-		fieldValidator instanceof ZodOptional
+		fieldValidator instanceof ZodOptional ||
+		fieldValidator instanceof ZodNullable
 			? fieldValidator._def.innerType
 			: fieldValidator;
 
@@ -211,7 +216,10 @@ function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
 export async function validateForm<T extends ZodRawShape>({
 	formData,
 	validator,
-}: { formData: FormData; validator: T }) {
+}: {
+	formData: FormData;
+	validator: T;
+}) {
 	const result = await z
 		.preprocess((formData) => {
 			if (!(formData instanceof FormData)) return formData;
