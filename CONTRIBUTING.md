@@ -21,7 +21,7 @@ Before submitting a pull request, we suggest asking:
 
 1. **Have I checked the community discord and existing issue logs first?** We use GitHub issues and [discord discussions](https://wtw.dev/chat) to collaborate on changes. By opening an issue or starting a Discord thread, you can get early feedback on your problem before diving into a solution.
 
-2. **Have I reviewed the existing documentation?** You may find an answer to your request in the package README. In fact, you might find room to improve our docs for future users with a similar problem!
+2. **Have I reviewed the existing documentation?** You may find an answer to your request in the package README. In fact, you might find room to improve our docs for future users with a similar problem.
 
 If the answer is **yes** to both and you have a PR to contribute, get to it!
 
@@ -30,7 +30,7 @@ If the answer is **yes** to both and you have a PR to contribute, get to it!
 New contributors need the following tools:
 
 - [Node 18.14+](https://nodejs.org/en/download) for building packages and example sites.
-- [pnpm](https://pnpm.io/) to install dependencies. This repository is a monorepo, containing multiple packages that may depend on one another. pnpm offers a [robust workspace feature](https://pnpm.io/workspaces) to manage these dependencies. 
+- [pnpm](https://pnpm.io/) to install dependencies. We prefer pnpm since it runs quickly and offers a [robust workspace feature](https://pnpm.io/workspaces) to manage monorepo dependencies. 
 
 ## Initial setup
 
@@ -68,7 +68,9 @@ You may want live compilation for your TypeScript code while working. We use [tu
 pnpm dev
 ```
 
-This will build all `packages/*` entries and listen for changes. To test your code, you can run any one of our Astro projects under `examples/*`. First open a second terminal, navigate to that example, and run the same `pnpm dev` command. You may need to kill and restart this server to see your package edits take effect.
+This will build all `packages/*` entries and listen for changes.
+
+To test your code, you can run any one of our Astro projects under `examples/*`. First open a second terminal, navigate to that example, and run the same `pnpm dev` command. You may need to kill and restart this server to see your package edits take effect.
 
 You can also run packages _and_ examples simultaneously:
 
