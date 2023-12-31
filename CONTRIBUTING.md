@@ -2,6 +2,19 @@
 
 Hey contributor 👋 Welcome to simple stack! We're a young project open to contributions of any kind, from fixes to features to documentation and tooling. 
 
+## Repository overview
+
+Simple stack is a **monorepo** containing a suite of packages built for Astro. These are the most important directories:
+
+```bash
+# packages including `simple-stack-form`, `simple-stack-partial`, etc
+packages/*
+# Astro projects that use and test these packages
+examples/*
+```
+
+All source code is written in TypeScript, and components may use a variety of frameworks (Astro, React, Vue, Svelte, etc).
+
 ## What to ask before making a PR
 
 Before submitting a pull request, we suggest asking:
@@ -46,3 +59,21 @@ pnpm lint:apply
 pnpm format
 pnpm format:apply
 ```
+
+## Development
+
+You may want live compilation for your TypeScript code while working. We use [turborepo](https://turbo.build/) to build packages for development and production. For live reloading, run the following at the project root:
+
+```bash
+pnpm dev
+```
+
+This will build all `packages/*` entries and listen for changes. To test your code, you can run any one of our Astro projects under `examples/*`. First open a second terminal, navigate to that example, and run the same `pnpm dev` command. You may need to kill and restart this server to see your package edits take effect.
+
+You can also run packages _and_ examples simultaneously:
+
+```bash
+pnpm dev:all
+```
+
+However, we've found console logs are harder to read using this approach. Use whichever you prefer!
