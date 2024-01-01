@@ -1,8 +1,7 @@
 {
 	"name": "simple-stack",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
+	"version": "0.0.0",
+	"description": "Astro for apps",
 	"scripts": {
 		"dev": "turbo dev --filter='./packages/*'",
 		"dev:all": "turbo dev",
@@ -15,9 +14,9 @@
 		"format": "biome format",
 		"format:write": "biome format --write"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
+	"keywords": ["withastro"],
+	"author": "@bholmesdev",
+	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "^1.4.1",
 		"turbo": "^1.11.2"
