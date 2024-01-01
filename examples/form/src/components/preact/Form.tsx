@@ -76,6 +76,7 @@ export function Form({
 						return formContext.trackAstroSubmitStatus();
 					}
 
+					e.preventDefault();
 					e.stopPropagation();
 					formContext.setValidationErrors(parsed.fieldErrors);
 				}}
