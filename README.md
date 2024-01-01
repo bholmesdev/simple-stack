@@ -8,7 +8,8 @@ Simple stack is a suite of tools built for [Astro](https://astro.build) to simpl
 
 Simple stack offers a growing collection of packages:
 
-- **[Simple form](https://github.com/bholmesdev/simple-stack/tree/main/packages/form):** A full stack solution to validate forms with your client framework of choice.
+- **[🧘‍♂️ Simple form](https://github.com/bholmesdev/simple-stack/tree/main/packages/form):** A full stack solution to validate forms with your client framework of choice.
+- **[🔎 Simple scope](https://github.com/bholmesdev/simple-stack/tree/main/packages/scope):** Get a scoped ID for any file you're in. Perfect for form label IDs and query selectors.
 - **[⏳ WIP: Simple partial](https://github.com/bholmesdev/simple-stack/tree/main/packages/partial):** Re-render just the parts that change in your Astro app.
 
 ## Get involved
