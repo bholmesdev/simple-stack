@@ -15,7 +15,7 @@
 		"format:write": "biome format --write"
 	},
 	"keywords": ["withastro"],
-	"author": "",
+	"author": "@bholmesdev",
 	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "^1.4.1",
