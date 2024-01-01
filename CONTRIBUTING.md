@@ -79,3 +79,11 @@ pnpm dev:all
 ```
 
 However, we've found console logs are harder to read using this approach. Use whichever you prefer!
+
+## Making a Pull Request
+
+When making a pull request, be sure to add a changeset when a package has changed. Non-packages (`examples/*`) do not need changesets.
+
+```bash
+pnpm exec changeset
+```
