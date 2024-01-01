@@ -1,20 +1,25 @@
 {
-  "name": "simple-stack",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "check": "biome check packages/*",
-    "check:apply": "biome check packages/* --apply",
-    "lint": "biome lint packages/*",
-    "lint:apply": "biome lint packages/* --apply",
-    "format": "biome format",
-    "format:write": "biome format --write"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@biomejs/biome": "^1.4.1"
-  }
+	"name": "simple-stack",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "turbo dev --filter='./packages/*'",
+		"dev:all": "turbo dev",
+		"build": "turbo build --filter='./packages/*'",
+		"build:all": "turbo build",
+		"check": "biome check packages/*",
+		"check:apply": "biome check packages/* --apply",
+		"lint": "biome lint packages/*",
+		"lint:apply": "biome lint packages/* --apply",
+		"format": "biome format",
+		"format:write": "biome format --write"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@biomejs/biome": "^1.4.1",
+		"turbo": "^1.11.2"
+	}
 }

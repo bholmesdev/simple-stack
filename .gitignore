@@ -8,3 +8,6 @@ npm-debug.log*
 # typescript build
 *.tsbuildinfo
 dist/
+
+# turborepo
+.turbo
