@@ -1,14 +1,16 @@
 {
 	"name": "vite-plugin-simple-scope",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "Get a scoped ID for whatever file you're in. Zero client-side JS.",
 	"type": "module",
 	"exports": {
 		".": "./index.js",
 		"./types": "./types.d.ts"
 	},
-	"files": ["types.d.ts", "index.js"],
-
+	"files": [
+		"types.d.ts",
+		"index.js"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/bholmesdev/simple-stack.git",
