@@ -1,6 +1,6 @@
-import { nanoid } from 'nanoid';
+import { nanoid } from "nanoid";
 
-const virtualMod = 'simple:scope';
+const virtualMod = "simple:scope";
 
 /** @returns {import('vite').Plugin} */
 export default function simpleScope() {
@@ -8,7 +8,7 @@ export default function simpleScope() {
 	const scopeIdByImporter = {};
 
 	return {
-		name: 'vite-plugin-simple-scope',
+		name: "vite-plugin-simple-scope",
 		resolveId(id, rawImporter) {
 			if (id !== virtualMod || !rawImporter) return;
 
@@ -19,7 +19,7 @@ export default function simpleScope() {
 			return `${virtualMod}/${scopeIdByImporter[importer]}`;
 		},
 		async load(id) {
-			const [maybeVirtualMod, scopeId] = id.split('/');
+			const [maybeVirtualMod, scopeId] = id.split("/");
 			if (maybeVirtualMod !== virtualMod || !scopeId) return;
 
 			return `const scopeId = ${JSON.stringify(scopeId)};
@@ -28,7 +28,7 @@ export function scope(id) {
 
     return id + '-' + scopeId;
 }`;
-		}
+		},
 	};
 }
 
@@ -40,5 +40,5 @@ export function scope(id) {
  * @returns {string}
  */
 function getBaseFilePath(filePath) {
-	return filePath.replace(/\?.*$/, '');
+	return filePath.replace(/\?.*$/, "");
 }
