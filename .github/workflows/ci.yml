@@ -25,5 +25,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Biome check
+      - name: Lint check
         run: pnpm check
