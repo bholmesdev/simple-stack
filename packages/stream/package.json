@@ -7,6 +7,11 @@
 		"build": "tsc",
 		"dev": "tsc --watch"
 	},
+	"exports": {
+		"./components": "./components/index.ts",
+		"./middleware": "./dist/middleware.js",
+		".": "./dist/index.js"
+	},
 	"keywords": ["withastro", "astro-integration"],
 	"repository": {
 		"type": "git",
@@ -14,12 +19,15 @@
 		"directory": "packages/form"
 	},
 	"devDependencies": {
-		"typescript": "^5.3.3",
-		"astro": "^4.0.7"
+		"astro": "^4.0.7",
+		"typescript": "^5.3.3"
 	},
 	"peerDependencies": {
 		"astro": "^3.6.0 || ^4.0.0"
 	},
 	"author": "bholmesdev",
-	"license": "MIT"
+	"license": "MIT",
+	"dependencies": {
+		"nanoid": "^5.0.3"
+	}
 }

@@ -62,6 +62,9 @@ importers:
       simple-stack-form:
         specifier: ^0.1.0
         version: link:../../packages/form
+      simple-stack-stream:
+        specifier: workspace:^
+        version: link:../../packages/stream
       tailwindcss:
         specifier: ^3.0.24
         version: 3.3.6
@@ -136,6 +139,10 @@ importers:
         version: 4.5.1
 
   packages/stream:
+    dependencies:
+      nanoid:
+        specifier: ^5.0.3
+        version: 5.0.4
     devDependencies:
       astro:
         specifier: ^4.0.7
