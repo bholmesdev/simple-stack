@@ -63,7 +63,7 @@ importers:
         specifier: ^0.1.0
         version: link:../../packages/form
       simple-stack-stream:
-        specifier: workspace:^
+        specifier: ^0.0.1
         version: link:../../packages/stream
       tailwindcss:
         specifier: ^3.0.24
