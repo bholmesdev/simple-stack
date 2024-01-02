@@ -1,6 +1,6 @@
 {
 	"name": "simple-stack-stream",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Suspend your Astro components with fallback content.",
 	"type": "module",
 	"scripts": {
@@ -12,7 +12,10 @@
 		"./middleware": "./dist/middleware.js",
 		".": "./dist/index.js"
 	},
-	"keywords": ["withastro", "astro-integration"],
+	"keywords": [
+		"withastro",
+		"astro-integration"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/bholmesdev/simple-stack.git",
