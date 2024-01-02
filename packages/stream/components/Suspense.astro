@@ -1,0 +1,16 @@
+---
+import { customAlphabet, urlAlphabet } from "nanoid";
+import type { LocalsWithStreamInternals } from "./types";
+
+const safeId = customAlphabet(urlAlphabet, 10);
+
+const slotPromise = Astro.slots.render('default');
+const id = safeId();
+
+const { stream } =  Astro.locals as LocalsWithStreamInternals;
+stream._internal.components.set(id, slotPromise);
+---
+
+<simple-suspense id={id}>
+  <slot name="fallback" />
+</simple-suspense>

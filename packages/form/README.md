@@ -244,8 +244,8 @@ We expose internal functions to manage your form state and handle both synchrono
 
 An demo can be found in our repository `examples`:
 
-- [StackBlitz playground](https://stackblitz.com/github/bholmesdev/simple-stack/tree/main/examples/form)
-- [GitHub](https://github.com/bholmesdev/simple-stack/tree/main/examples/form)
+- [StackBlitz playground](https://stackblitz.com/github/bholmesdev/simple-stack/tree/main/examples/playground)
+- [GitHub](https://github.com/bholmesdev/simple-stack/tree/main/examples/playground)
 
 ## Sanitizing User Input
 
@@ -272,4 +272,4 @@ const signupForm = createForm({
 
 ### Examples
 
-You can find a sanitization implementation example on our [`examples`](https://github.com/bholmesdev/simple-stack/tree/main/examples/form/src/components/Sanitize.tsx)
+You can find a sanitization implementation example on our [`examples`](https://github.com/bholmesdev/simple-stack/tree/main/examples/playground/src/components/Sanitize.tsx)

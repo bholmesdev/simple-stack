@@ -1,0 +1,35 @@
+---
+import Wait from "../components/Wait.astro";
+import { Suspense, ResolveSuspended } from 'simple-stack-stream/components'
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suspense</title>
+</head>
+<body>
+ <h1>Out of order streaming</h1> 
+ <!-- out-of-order streaming: fallback,
+  JS to swap content -->
+  <Suspense>
+    <Wait ms={2000}>
+      <p class="font-bold text-xl">Content</p>
+    </Wait>
+    <p slot="fallback">Loading...</p>
+  </Suspense>
+
+  <!-- in-order HTML streaming (no client JS) -->
+  <Wait class="fixed bottom-0 left-0 right-0" ms={500}>
+    <footer>
+      <p>Follow us</p>
+      <p>Join the newsletter</p>
+    </footer>
+  </Wait>
+
+  <!-- render all suspended content -->
+  <ResolveSuspended />
+</body>
+</html>

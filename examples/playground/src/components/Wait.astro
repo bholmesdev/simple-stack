@@ -1,0 +1,14 @@
+---
+type Props = {
+  ms: number,
+  class?: string,
+}
+
+const {ms, class: cls} = Astro.props;
+
+await new Promise(resolve => setTimeout(resolve, ms));
+---
+<div class:list={["rounded p-2 border-gray-300 border-2", cls]}>
+<slot />
+<p class="italic text-gray-600 text-sm">Loaded in {ms}ms</p>
+</div>

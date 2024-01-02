@@ -1,0 +1,33 @@
+{
+	"name": "simple-stack-stream",
+	"version": "0.0.1",
+	"description": "Suspend your Astro components with fallback content.",
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch"
+	},
+	"exports": {
+		"./components": "./components/index.ts",
+		"./middleware": "./dist/middleware.js",
+		".": "./dist/index.js"
+	},
+	"keywords": ["withastro", "astro-integration"],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/bholmesdev/simple-stack.git",
+		"directory": "packages/form"
+	},
+	"devDependencies": {
+		"astro": "^4.0.7",
+		"typescript": "^5.3.3"
+	},
+	"peerDependencies": {
+		"astro": "^3.6.0 || ^4.0.0"
+	},
+	"author": "bholmesdev",
+	"license": "MIT",
+	"dependencies": {
+		"nanoid": "^5.0.3"
+	}
+}
