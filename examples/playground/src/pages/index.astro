@@ -3,26 +3,29 @@ import SignupReact, { signup as signupReact } from "../components/react/Signup";
 import SignupPreact, {
   signup as signupPreact,
 } from "../components/preact/Signup";
+import SignupSolid, {
+  signup as signupSolid,
+} from "../components/solid-js/Signup";
 import Sanitize, { sanitize } from "../components/Sanitize";
 import { ViewTransitions } from "astro:transitions";
 
 const { form } = Astro.locals;
+
 const formResultReact = await form.getDataByName("signupReact", signupReact);
 const formResultPreact = await form.getDataByName("signupPreact", signupPreact);
-
-if (formResultReact?.data) {
-  console.log(formResultReact.data);
-}
-
-if (formResultPreact?.data) {
-  console.log(formResultPreact.data);
-}
-
+const formResultSolid = await form.getDataByName("signupSolid", signupSolid);
 const sanitizeFormResult = await form.getDataByName("sanitize", sanitize);
 
-if (sanitizeFormResult?.data) {
-  console.log(sanitizeFormResult.data);
-}
+[
+  formResultReact,
+  formResultPreact,
+  formResultSolid,
+  sanitizeFormResult
+].forEach((formResult) => {
+  if (formResult?.data) {
+    console.log(formResult.data);
+  }
+});
 
 await new Promise((resolve) => setTimeout(resolve, 400));
 ---
@@ -79,7 +82,32 @@ await new Promise((resolve) => setTimeout(resolve, 400));
           client:load
         />
       </div>
+      
       <hr />
+
+      <h2>Solid</h2>
+      {
+        formResultSolid?.data && (
+          <div
+            class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+            role="alert"
+          >
+            <strong class="font-bold">Success!</strong>
+            <span class="block sm:inline">
+              You have successfully submitted the form.
+            </span>
+          </div>
+        )
+      }
+      <div transition:name="solid-form">
+        <SignupSolid
+          serverErrors={formResultSolid?.fieldErrors}
+          client:load
+        />
+      </div>
+      
+      <hr />
+
       <h2>Sanitize</h2>
       <div class="pb-2">
         Try pasting this code snippet into each field once and submit
