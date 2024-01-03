@@ -25,6 +25,11 @@ const frameworks = [
 		label: "Preact",
 		templateDir: "preact",
 	},
+	{
+		value: "solid-js",
+		label: "SolidJS",
+		templateDir: "solid-js",
+	},
 ] as const;
 
 type Framework = (typeof frameworks)[number];
