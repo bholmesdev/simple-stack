@@ -2,4 +2,4 @@
 "vite-plugin-simple-scope": patch
 ---
 
-Generate scope id from file name
+Generate Scope IDs deterministically. This means IDs will match between development and production builds.
