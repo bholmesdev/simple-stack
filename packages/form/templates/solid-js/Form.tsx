@@ -95,41 +95,39 @@ export function Form(
 
 export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 	const formContext = useFormContext();
-	const fieldState = () => formContext.value().fields[inputProps.name];
-	if (!fieldState()) {
-		throw new Error(
-			`Input "${inputProps.name}" not found in form. Did you use the <Form> component?`,
-		);
-	}
-
+	const fieldState = () => {
+		const value = formContext.value().fields[inputProps.name];
+		if (!value) {
+			throw new Error(
+				`Input "${inputProps.name}" not found in form. Did you use the <Form> component?`,
+			);
+		}
+		return value;
+	};
 	return (
-		<Show when={fieldState()}>
-			{(state) => (
-				<>
-					<input
-						onBlur={(e) => {
-							const value = e.target.value;
-							if (value === "") return;
-							formContext.validateField(
-								inputProps.name,
-								value,
-								state().validator,
-							);
-						}}
-						onInput={(e) => {
-							if (!state().hasErroredOnce) return;
-							const value = e.target.value;
-							formContext.validateField(
-								inputProps.name,
-								value,
-								state().validator,
-							);
-						}}
-						{...inputProps}
-					/>
-					<For each={state().validationErrors}>{(e) => <p>{e}</p>}</For>
-				</>
-			)}
-		</Show>
+		<>
+			<input
+				onBlur={(e) => {
+					const value = e.target.value;
+					if (value === "") return;
+					formContext.validateField(
+						inputProps.name,
+						value,
+						fieldState().validator,
+					);
+				}}
+				onInput={(e) => {
+					if (!fieldState().hasErroredOnce) return;
+					const value = e.target.value;
+					formContext.validateField(
+						inputProps.name,
+						value,
+						fieldState().validator,
+					);
+				}}
+				{...inputProps}
+			/>
+			<For each={fieldState().validationErrors}>{(e) => <p>{e}</p>}</For>
+		</>
 	);
 }
