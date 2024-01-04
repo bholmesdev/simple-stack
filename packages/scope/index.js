@@ -1,4 +1,5 @@
-import { nanoid } from "nanoid";
+import { createHash } from "node:crypto";
+import { normalizePath } from "vite";
 
 const virtualMod = "simple:scope";
 
@@ -14,7 +15,7 @@ export default function simpleScope() {
 
 			const importer = getBaseFilePath(rawImporter);
 			if (!scopeIdByImporter[importer]) {
-				scopeIdByImporter[importer] = nanoid(8);
+				scopeIdByImporter[importer] = createScopeHash(importer);
 			}
 			return `${virtualMod}/${scopeIdByImporter[importer]}`;
 		},
@@ -30,6 +31,28 @@ export function scope(id) {
 }`;
 		},
 	};
+}
+
+/**
+ * @param {string} filename
+ * @returns {string}
+ */
+function createScopeHash(filename) {
+	return createHash("sha1").update(normalizeFilename(filename)).digest("hex");
+}
+
+/**
+ * @param {string} filename
+ * @returns {string}
+ */
+function normalizeFilename(filename) {
+	const normalizedFilename = normalizePath(filename);
+	const normalizedRoot = normalizePath(process.cwd());
+	if (normalizedFilename.startsWith(normalizedRoot)) {
+		return normalizedFilename.slice(normalizedRoot.length - 1);
+	}
+
+	return normalizedFilename;
 }
 
 /**
