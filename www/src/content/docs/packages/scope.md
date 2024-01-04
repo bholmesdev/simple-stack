@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-> Get a scoped ID for whatever file you're in. Resolved at build-time with zero client JS.
+Get a scoped ID for whatever file you're in. Resolved at build-time with zero client JS.
 
 ```jsx
 import { scope } from 'simple:scope';

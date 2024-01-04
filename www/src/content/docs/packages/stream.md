@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-> Suspend Astro components with fallback content. Like React Server Components, but Just HTML ™️
+Suspend Astro components with fallback content. Like React Server Components, but Just HTML ™️
 
 <video controls width="100%" style="aspect-ratio:1.65/1" src="/assets/simple-stream-intro.mov"></video>
 

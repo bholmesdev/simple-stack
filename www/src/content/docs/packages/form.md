@@ -4,7 +4,7 @@ description: The simple way to handle forms in your Astro project
 sidebar:
   order: 1
 ---
-> The simple way to handle forms in your Astro project
+The simple way to handle forms in your Astro project.
 
 ```astro
 ---
