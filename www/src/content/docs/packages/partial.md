@@ -8,4 +8,6 @@ sidebar:
   order: 4
 ---
 
-> Work in progress
+Package coming soon! Here's a sneak peak at the APIs we're exploring.
+
+<video controls width="100%" style="aspect-ratio:1.65/1" src="/assets/astro-partial-rendering-demo.mp4"></video>
