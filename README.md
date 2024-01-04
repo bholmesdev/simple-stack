@@ -16,3 +16,5 @@ Simple stack offers a growing collection of packages:
 ## Get involved
 
 Simple stack is open to contributors! You can [join the discord](https://wtw.dev/chat) to share ideas, and [read the contributing guide](https://github.com/bholmesdev/simple-stack/blob/main/CONTRIBUTING.md) to make your first pull request.
+
+📚 Visit [the docs](/) for more information
