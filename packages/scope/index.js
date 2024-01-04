@@ -38,7 +38,9 @@ export function scope(id) {
  * @returns {string}
  */
 function createScopeHash(filename) {
-	return createHash("sha1").update(normalizeFilename(filename)).digest("hex");
+	return createHash("shake256", { outputLength: 4 })
+		.update(normalizeFilename(filename))
+		.digest("hex");
 }
 
 /**
