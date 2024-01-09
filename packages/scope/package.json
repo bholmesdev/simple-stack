@@ -1,6 +1,6 @@
 {
 	"name": "vite-plugin-simple-scope",
-	"version": "1.0.4",
+	"version": "2.0.0",
 	"description": "Get a scoped ID for whatever file you're in. Zero client-side JS.",
 	"type": "module",
 	"exports": {
