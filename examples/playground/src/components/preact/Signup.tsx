@@ -4,6 +4,7 @@ import type { ComponentChild } from "preact";
 import { z } from "zod";
 import { Form, Input, useFormContext } from "./Form";
 import { type FieldErrors, createForm } from "simple:form";
+import { scope } from "simple:scope";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -29,12 +30,12 @@ export default function Signup({
 			name="signupPreact"
 		>
 			<FormGroup>
-				<label htmlFor="name">Name</label>
-				<Input id="name" {...signup.inputProps.username} />
+				<label htmlFor={scope("name")}>Name</label>
+				<Input id={scope("name")} {...signup.inputProps.username} />
 			</FormGroup>
 			<FormGroup>
-				<label htmlFor="optIn">Opt in</label>
-				<Input id="optIn" {...signup.inputProps.optIn} />
+				<label htmlFor={scope("optIn")}>Opt in</label>
+				<Input id={scope("optIn")} {...signup.inputProps.optIn} />
 			</FormGroup>
 			<button
 				type="submit"

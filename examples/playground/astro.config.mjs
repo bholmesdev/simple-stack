@@ -6,6 +6,7 @@ import node from "@astrojs/node";
 import preact from "@astrojs/preact";
 import solidJs from "@astrojs/solid-js";
 import tailwind from "@astrojs/tailwind";
+import simpleScope from "vite-plugin-simple-scope";
 
 // https://astro.build/config
 export default defineConfig({
@@ -18,6 +19,9 @@ export default defineConfig({
 		solidJs({ include: ["**/solid-js/*"] }),
 		tailwind(),
 	],
+	vite: {
+		plugins: [simpleScope()],
+	},
 	adapter: node({
 		mode: "standalone",
 	}),
