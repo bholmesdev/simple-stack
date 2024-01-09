@@ -93,9 +93,9 @@ importers:
       fs-extra:
         specifier: ^11.2.0
         version: 11.2.0
-      just-map-object:
-        specifier: ^2.3.0
-        version: 2.3.0
+      just-map-values:
+        specifier: ^3.2.0
+        version: 3.2.0
       kleur:
         specifier: ^4.1.5
         version: 4.1.5
@@ -3825,8 +3825,8 @@ packages:
       graceful-fs: 4.2.11
     dev: false
 
-  /just-map-object@2.3.0:
-    resolution: {integrity: sha512-702xzYHUSFKdnN4844avAytynTAYBJvPoaGKrw4QKkyy1UkW44zWsrITV1KUFFCvDn7YQpzHffCRKdsa0szoLA==}
+  /just-map-values@3.2.0:
+    resolution: {integrity: sha512-TyqCKtK3NxiUgOjRYMIKURvBTHesi3XzomDY0QVPZ3rYzLCF+nNq5rSi0B/L5aOd/WMTZo6ukzA4wih4HUbrDg==}
     dev: false
 
   /kind-of@6.0.3:

@@ -46,7 +46,7 @@
   "dependencies": {
     "@clack/prompts": "^0.7.0",
     "fs-extra": "^11.2.0",
-    "just-map-object": "^2.3.0",
+    "just-map-values": "^3.2.0",
     "kleur": "^4.1.5"
   }
 }
