@@ -1,4 +1,4 @@
-import mapObject from "just-map-object";
+import mapValues from "just-map-values";
 import {
 	ZodArray,
 	ZodBoolean,
@@ -11,8 +11,6 @@ import {
 	type ZodType,
 	z,
 } from "zod";
-
-export { mapObject };
 
 export type FormValidator = ZodRawShape;
 export type FieldErrors<
@@ -46,7 +44,10 @@ export type FormState<TKey extends string | number | symbol = string> = {
 
 export function createForm<T extends ZodRawShape>(validator: T) {
 	return {
-		inputProps: mapObject(validator, getInputProp),
+		inputProps: mapValues(validator, getInputProp) as Record<
+			keyof T,
+			InputProp
+		>,
 		validator: preprocessValidators(validator),
 	};
 }
@@ -62,7 +63,7 @@ export function getInitialFormState({
 		hasFieldErrors: false,
 		submitStatus: "idle",
 		isSubmitPending: false,
-		fields: mapObject(validator, (name, validator) => {
+		fields: mapValues(validator, (validator, name) => {
 			const fieldError = fieldErrors?.[name];
 			return {
 				hasErroredOnce: !!fieldError?.length,
@@ -198,9 +199,12 @@ export function toSetValidationErrors<T extends FormState>(
 	};
 }
 
-function getInputProp<T extends ZodType>(name: string, fieldValidator: T) {
+function getInputProp<T extends ZodType>(
+	fieldValidator: T,
+	name: string | number | symbol,
+) {
 	const inputProp: InputProp = {
-		name,
+		name: String(name),
 		"aria-required":
 			!fieldValidator.isOptional() && !fieldValidator.isNullable(),
 		type: getInputInfo<T>(fieldValidator).type,
@@ -256,8 +260,8 @@ export async function validateForm<T extends ZodRawShape>({
 		.preprocess((formData) => {
 			if (!(formData instanceof FormData)) return formData;
 
-			return mapObject(Object.fromEntries(formData), (key, value) => {
-				const all = formData.getAll(key);
+			return mapValues(Object.fromEntries(formData), (value, key) => {
+				const all = formData.getAll(String(key));
 				return all.length > 1 ? all : value;
 			});
 		}, z.object(validator))
