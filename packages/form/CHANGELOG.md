@@ -1,5 +1,11 @@
 # simple-stack-form
 
+## 0.1.8
+
+### Patch Changes
+
+- [#29](https://github.com/bholmesdev/simple-stack/pull/29) [`79d5cc5`](https://github.com/bholmesdev/simple-stack/commit/79d5cc53fe1f6bb108e5ecb13b089d730b6c73c1) Thanks [@dsnjunior](https://github.com/dsnjunior)! - Make `inputProps` keys from created forms typed. This way will be easier to identify what inputs are available for the each form.
+
 ## 0.1.7
 
 ### Patch Changes
