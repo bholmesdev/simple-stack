@@ -6,6 +6,7 @@ import {
 	useContext,
 	useState,
 } from "react";
+import { navigate } from "astro:transitions/client";
 import {
 	type FieldErrors,
 	type FormState,
@@ -67,6 +68,8 @@ export function Form({
 				{...formProps}
 				method="POST"
 				onSubmit={async (e) => {
+					e.preventDefault();
+					e.stopPropagation();
 					const formData = new FormData(e.currentTarget);
 					formContext.set((formState) => ({
 						...formState,
@@ -75,11 +78,10 @@ export function Form({
 					}));
 					const parsed = await validateForm({ formData, validator });
 					if (parsed.data) {
+						navigate(formProps.action ?? "", { formData });
 						return formContext.trackAstroSubmitStatus();
 					}
 
-					e.preventDefault();
-					e.stopPropagation();
 					formContext.setValidationErrors(parsed.fieldErrors);
 				}}
 			>
