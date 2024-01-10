@@ -1,5 +1,15 @@
 # @examples/playground
 
+## 0.0.3
+
+### Patch Changes
+
+- [`3405d5b`](https://github.com/bholmesdev/simple-stack/commit/3405d5baa881460aaa98e03dc096b9f720824ae9) Thanks [@dsnjunior](https://github.com/dsnjunior)! - Add Solid JS template
+
+- Updated dependencies [[`3405d5b`](https://github.com/bholmesdev/simple-stack/commit/3405d5baa881460aaa98e03dc096b9f720824ae9), [`054fe3c`](https://github.com/bholmesdev/simple-stack/commit/054fe3cfa8c5640359b6ce7e29ec11e910aa9d36)]:
+  - simple-stack-form@0.1.7
+  - vite-plugin-simple-scope@2.0.0
+
 ## 0.0.2
 
 ### Patch Changes
