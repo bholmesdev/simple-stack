@@ -44,7 +44,10 @@ export type FormState<TKey extends string | number | symbol = string> = {
 
 export function createForm<T extends ZodRawShape>(validator: T) {
 	return {
-		inputProps: mapValues<T, InputProp>(validator, getInputProp),
+		inputProps: mapValues(validator, getInputProp) as Record<
+			keyof T,
+			InputProp
+		>,
 		validator: preprocessValidators(validator),
 	};
 }
