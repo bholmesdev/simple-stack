@@ -2,6 +2,7 @@
 
 import { type ComponentProps, createContext } from "preact";
 import { useContext, useState } from "preact/hooks";
+import { navigate } from "astro:transitions/client";
 import {
 	type FieldErrors,
 	type FormState,
@@ -63,6 +64,8 @@ export function Form({
 				{...formProps}
 				method="POST"
 				onSubmit={async (e) => {
+					e.preventDefault();
+					e.stopPropagation();
 					const formData = new FormData(e.currentTarget);
 					formContext.set((formState) => ({
 						...formState,
@@ -71,11 +74,15 @@ export function Form({
 					}));
 					const parsed = await validateForm({ formData, validator });
 					if (parsed.data) {
+						const action =
+							typeof formProps.action === "string"
+								? formProps.action
+								: // Check for Preact signals
+								  formProps.action?.value ?? "";
+						navigate(action, { formData });
 						return formContext.trackAstroSubmitStatus();
 					}
 
-					e.preventDefault();
-					e.stopPropagation();
 					formContext.setValidationErrors(parsed.fieldErrors);
 				}}
 			>

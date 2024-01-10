@@ -8,6 +8,7 @@ import {
 	createSignal,
 	useContext,
 } from "solid-js";
+import { navigate } from "astro:transitions/client";
 import {
 	type FieldErrors,
 	type FormState,
@@ -65,6 +66,8 @@ export function Form(
 				{...props}
 				method="post"
 				onSubmit={async (e) => {
+					e.preventDefault();
+					e.stopPropagation();
 					const formData = new FormData(e.currentTarget);
 					formContext.set((formState) => ({
 						...formState,
@@ -76,11 +79,10 @@ export function Form(
 						validator: props.validator,
 					});
 					if (parsed.data) {
+						navigate(props.action?.toString() ?? "", { formData });
 						return formContext.trackAstroSubmitStatus();
 					}
 
-					e.preventDefault();
-					e.stopPropagation();
 					formContext.setValidationErrors(parsed.fieldErrors);
 				}}
 			>
