@@ -1,5 +1,11 @@
 # simple-stack-form
 
+## 0.1.9
+
+### Patch Changes
+
+- [#31](https://github.com/bholmesdev/simple-stack/pull/31) [`0d489e5`](https://github.com/bholmesdev/simple-stack/commit/0d489e5f356e607a97a06766f9549666c599dae0) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Async validation would cause the form to submit even when form errors are present. This fix updates all form templates to call Astro's submit method manually.
+
 ## 0.1.8
 
 ### Patch Changes
