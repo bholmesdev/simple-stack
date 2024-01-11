@@ -16,6 +16,7 @@ import {
 	toValidateField,
 	validateForm,
 } from "simple-stack-form/module";
+import { twMerge } from "tailwind-merge";
 
 export function useCreateFormContext(
 	validator: FormValidator,
@@ -101,6 +102,7 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 	return (
 		<>
 			<input
+				className={twMerge("bg-gray-800", inputProps.className)}
 				onBlur={async (e) => {
 					const value = e.target.value;
 					if (value === "") return;
