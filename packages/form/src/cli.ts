@@ -88,10 +88,9 @@ async function create() {
 			});
 			return outro(`Form created. You're all set!`);
 		}
-		return text({
-			message:
-				"Sorry, simple:form is only supported in Astro or other React-based frameworks.",
-		});
+		return log.error(
+			"Sorry, simple:form is only supported in Astro or other React-based frameworks.",
+		);
 	}
 
 	const useFoundFramework =
