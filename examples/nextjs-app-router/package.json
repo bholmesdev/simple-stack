@@ -13,6 +13,7 @@
     "react": "^18",
     "react-dom": "^18",
     "simple-stack-form": "workspace:^0.1.7",
+    "tailwind-merge": "^2.2.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
