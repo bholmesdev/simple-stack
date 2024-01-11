@@ -10,7 +10,7 @@ import {
 	outro,
 	select,
 	text,
-	note,
+	log,
 } from "@clack/prompts";
 import { copy } from "fs-extra/esm";
 import { bgGreen, bgWhite, black, bold, dim, green } from "kleur/colors";
@@ -76,8 +76,10 @@ async function create() {
 
 	if (!isUsingAstro) {
 		if (foundFramework?.value === "react") {
-			note(
-				`Looks like you're using simple:form outside of Astro. Using our generic React template.`,
+			log.warn(
+				`${bold(
+					`Looks like you're using simple:form outside of Astro.`,
+				)} Using our generic React template.`,
 			);
 
 			await handleFormTemplate({
