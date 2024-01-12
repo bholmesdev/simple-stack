@@ -17,15 +17,29 @@ import {
 	validateForm,
 } from "simple-stack-form/module";
 import { twMerge } from "tailwind-merge";
+import { useFormState as useForStateBase } from "react-dom";
+
+type ValidateFormResult = Awaited<ReturnType<typeof validateForm>> | null;
+
+export function useFormState(
+	action: (formData: FormData) => Promise<ValidateFormResult>,
+) {
+	return useForStateBase(
+		async (_: ValidateFormResult, formData: FormData) => action(formData),
+		null,
+	);
+}
 
 export function useCreateFormContext(
 	validator: FormValidator,
 	fieldErrors?: FieldErrors,
+	submitted?: boolean,
 ) {
 	const initial = getInitialFormState({ validator, fieldErrors });
 	const [formState, setFormState] = useState<FormState>(initial);
+
 	return {
-		value: formState,
+		value: submitted ? { ...formState, submitStatus: "submitted" } : formState,
 		set: setFormState,
 		setValidationErrors: toSetValidationErrors(setFormState),
 		validateField: toValidateField(setFormState),
@@ -52,13 +66,15 @@ export function Form({
 	fieldErrors,
 	name,
 	action,
+	submitted,
 	...formProps
 }: {
 	validator: FormValidator;
 	fieldErrors?: FieldErrors;
 	action: (formData: FormData) => void;
+	submitted: boolean;
 } & Omit<ComponentProps<"form">, "method" | "onSubmit">) {
-	const formContext = useCreateFormContext(validator, fieldErrors);
+	const formContext = useCreateFormContext(validator, fieldErrors, submitted);
 
 	return (
 		<FormContext.Provider value={formContext}>
@@ -76,6 +92,11 @@ export function Form({
 					}));
 					const parsed = await validateForm({ formData, validator });
 					if (parsed.data) {
+						formContext.set((formState) => ({
+							...formState,
+							isSubmitPending: false,
+							submitStatus: "submitting",
+						}));
 						return action(formData);
 					}
 
@@ -102,7 +123,7 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 	return (
 		<>
 			<input
-				className={twMerge("bg-gray-800", inputProps.className)}
+				className={twMerge("", inputProps.className)}
 				onBlur={async (e) => {
 					const value = e.target.value;
 					if (value === "") return;

@@ -37,7 +37,7 @@ export type FieldState = {
 
 export type FormState<TKey extends string | number | symbol = string> = {
 	isSubmitPending: boolean;
-	submitStatus: "idle" | "validating" | "submitting";
+	submitStatus: "idle" | "validating" | "submitting" | "submitted";
 	hasFieldErrors: boolean;
 	fields: Record<TKey, FieldState>;
 };
