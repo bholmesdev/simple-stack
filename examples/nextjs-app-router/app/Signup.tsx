@@ -1,6 +1,6 @@
 "use client";
 
-import { Form, Input, useFormContext, useFormState } from "../components/Form";
+import { Form, Input, useFormState } from "../components/Form";
 import { signup } from "./page";
 import { signupSubmit } from "./action";
 
@@ -25,7 +25,6 @@ export default function Signup() {
 				className="flex flex-col gap-2 items-start"
 				fieldErrors={state?.fieldErrors}
 				validator={signup.validator}
-				submitted={!!state?.data}
 				name="signupReact"
 			>
 				<FormGroup>
@@ -42,7 +41,6 @@ export default function Signup() {
 				>
 					Submit
 				</button>
-				<Loading />
 			</Form>
 		</>
 	);
@@ -50,10 +48,4 @@ export default function Signup() {
 
 function FormGroup({ children }: { children: React.ReactNode }) {
 	return <div className="flex gap-3 items-center">{children}</div>;
-}
-
-function Loading() {
-	const { value } = useFormContext();
-
-	return <p>{value.submitStatus}</p>;
 }
