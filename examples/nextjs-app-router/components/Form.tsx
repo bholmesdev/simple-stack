@@ -33,13 +33,12 @@ export function useFormState(
 export function useCreateFormContext(
 	validator: FormValidator,
 	fieldErrors?: FieldErrors,
-	submitted?: boolean,
 ) {
 	const initial = getInitialFormState({ validator, fieldErrors });
 	const [formState, setFormState] = useState<FormState>(initial);
 
 	return {
-		value: submitted ? { ...formState, submitStatus: "submitted" } : formState,
+		value: formState,
 		set: setFormState,
 		setValidationErrors: toSetValidationErrors(setFormState),
 		validateField: toValidateField(setFormState),
@@ -66,15 +65,13 @@ export function Form({
 	fieldErrors,
 	name,
 	action,
-	submitted,
 	...formProps
 }: {
 	validator: FormValidator;
 	fieldErrors?: FieldErrors;
 	action: (formData: FormData) => void;
-	submitted: boolean;
 } & Omit<ComponentProps<"form">, "method" | "onSubmit">) {
-	const formContext = useCreateFormContext(validator, fieldErrors, submitted);
+	const formContext = useCreateFormContext(validator, fieldErrors);
 
 	return (
 		<FormContext.Provider value={formContext}>
@@ -123,7 +120,7 @@ export function Input(inputProps: ComponentProps<"input"> & { name: string }) {
 	return (
 		<>
 			<input
-				className={twMerge("", inputProps.className)}
+				className={twMerge("dark:bg-gray-800", inputProps.className)}
 				onBlur={async (e) => {
 					const value = e.target.value;
 					if (value === "") return;
