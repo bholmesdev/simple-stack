@@ -31,6 +31,11 @@ export default defineConfig({
 					},
 				},
 			],
+			customCss: [
+				"@fontsource/atkinson-hyperlegible/400.css",
+				"@fontsource/atkinson-hyperlegible/700.css",
+				"./src/styles/custom.css",
+			],
 		}),
 	],
 });
