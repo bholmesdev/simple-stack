@@ -7,10 +7,10 @@ import {
 	confirm,
 	intro,
 	isCancel,
+	log,
 	outro,
 	select,
 	text,
-	log,
 } from "@clack/prompts";
 import { copy } from "fs-extra/esm";
 import { bgGreen, bgWhite, black, bold, dim, green } from "kleur/colors";
