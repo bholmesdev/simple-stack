@@ -1,5 +1,29 @@
 # simple-stack-form
 
+## 0.1.10
+
+### Patch Changes
+
+- [#34](https://github.com/bholmesdev/simple-stack/pull/34) [`574fee1`](https://github.com/bholmesdev/simple-stack/commit/574fee1bf5cd3a78d36d412ecee4f87c75cc6999) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Add a generic React template to use simple-form in non-Astro projects.
+
+  To try it, install `simple-stack-form` as a dependency in your React-based project:
+
+  ```bash
+  # pnpm
+  pnpm i simple-stack-form
+  # npm
+  npm i simple-stack-form
+  ```
+
+  And run the `simple-form create` command. This will create a base template for validation, and leave `onSubmit` handling to you.
+
+  ```bash
+  # pnpm
+  pnpx run simple-form create
+  # npm
+  npx simple-form create
+  ```
+
 ## 0.1.9
 
 ### Patch Changes
