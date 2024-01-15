@@ -24,4 +24,4 @@ Output:
 */
 ```
 
-📚 Visit [the docs](https://simple-stack-docs.vercel.app/packages/scope) for more information
+📚 Visit [the docs](https://simple-stack-docs.vercel.app/scope) for more information and usage examples.

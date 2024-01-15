@@ -24,4 +24,5 @@ import { Suspense, ResolveSuspended } from 'simple-stack-stream/components';
 <ResolveSuspended />
 ```
 
-📚 Visit [the docs](https://simple-stack-docs.vercel.app/packages/stream) for more information
+
+📚 Visit [the docs](https://simple-stack-docs.vercel.app/stream) for more information and usage examples.
