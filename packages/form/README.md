@@ -33,4 +33,4 @@ if (result?.data) {
 </form>
 ```
 
-📚 Visit [the docs](https://simple-stack-docs.vercel.app/form) for more information and usage examples.
+📚 Visit [the docs](https://simple-stack.dev/form) for more information and usage examples.
