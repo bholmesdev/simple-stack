@@ -12,7 +12,7 @@ export default defineConfig({
 			sidebar: [
 				{
 					label: "🧘‍♂️ Form",
-					link: "/form",
+					autogenerate: { directory: "form" },
 				},
 				{
 					label: "🔎 Scope",

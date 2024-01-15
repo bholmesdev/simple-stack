@@ -7,6 +7,7 @@ import {
 	confirm,
 	intro,
 	isCancel,
+	log,
 	outro,
 	select,
 	text,
@@ -49,13 +50,18 @@ switch (cmd) {
 
 async function create() {
 	intro(`Create a new form component`);
-	// Do stuff
+
+	let isUsingAstro: boolean = false;
 	let foundFramework: Framework | null = null;
 	const packageJsonPath = resolve(process.cwd(), "package.json");
 	if (existsSync(packageJsonPath)) {
 		const { dependencies = {}, devDependencies = {} } = JSON.parse(
 			await readFile(packageJsonPath, { encoding: "utf-8" }),
 		);
+
+		isUsingAstro =
+			Object.keys(dependencies).includes("astro") ||
+			Object.keys(devDependencies).includes("astro");
 
 		for (const framework of frameworks) {
 			if (
@@ -68,6 +74,25 @@ async function create() {
 		}
 	}
 
+	if (!isUsingAstro) {
+		if (foundFramework?.value === "react") {
+			log.warn(
+				`${bold(
+					`Looks like you're using simple:form outside of Astro.`,
+				)} Using our generic React template.`,
+			);
+
+			await handleFormTemplate({
+				framework: foundFramework,
+				useExternalTemplate: true,
+			});
+			return outro(`Form created. You're all set!`);
+		}
+		return log.error(
+			"Sorry, simple:form is only supported in Astro or other React-based frameworks.",
+		);
+	}
+
 	const useFoundFramework =
 		!!foundFramework &&
 		handleCancel(
@@ -77,7 +102,7 @@ async function create() {
 			}),
 		);
 
-	const toUseFramework = await (async () => {
+	const framework = await (async () => {
 		if (useFoundFramework) {
 			return foundFramework!;
 		}
@@ -93,16 +118,32 @@ async function create() {
 		return frameworks.find((framework) => framework.value === selected)!;
 	})();
 
-	const fileNamesToCreate = (
-		await readdir(
-			new URL(`../templates/${toUseFramework.templateDir}`, import.meta.url),
-		)
-	).filter((fileName) => !internalFiles.includes(fileName));
+	await handleFormTemplate({ framework });
+
+	outro(`Form created. You're all set!`);
+}
+
+async function handleFormTemplate({
+	framework,
+	useExternalTemplate,
+}: { framework: Framework; useExternalTemplate?: boolean }) {
+	const templateFileUrl = new URL(
+		`../templates/${
+			// TODO: make external templates generic for all frameworks.
+			// still testing non-Astro support.
+			useExternalTemplate ? "react-external" : framework.templateDir
+		}`,
+		import.meta.url,
+	);
+
+	const fileNamesToCreate = (await readdir(templateFileUrl)).filter(
+		(fileName) => !internalFiles.includes(fileName),
+	);
 
 	const relativeOutputDir = handleCancel(
 		await text({
 			message: "What directory should we use?",
-			initialValue: "src/components",
+			initialValue: existsSync("src") ? "src/components" : "components",
 			validate: (value) => {
 				if (!value) {
 					return "Please enter a path.";
@@ -127,18 +168,12 @@ async function create() {
 
 	const outputPath = resolve(process.cwd(), relativeOutputDir);
 
-	const templatePath = fileURLToPath(
-		new URL(`../templates/${toUseFramework.templateDir}`, import.meta.url),
-	);
-
-	await copy(templatePath, outputPath, {
+	await copy(fileURLToPath(templateFileUrl), outputPath, {
 		filter: (src) => {
 			const fileName = src.split("/").at(-1);
 			return !!fileName && !internalFiles.includes(fileName);
 		},
 	});
-
-	outro(`Form created. You're all set!`);
 }
 
 function help() {
