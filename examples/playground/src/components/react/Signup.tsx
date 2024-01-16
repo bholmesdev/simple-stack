@@ -13,7 +13,7 @@ export const signup = createForm({
 			await sleep(400);
 			return s !== "admin";
 		}),
-	email: z.string().email().optional().or(z.literal("")),
+	email: z.string().email().optional(),
 	optIn: z.boolean().optional(),
 });
 

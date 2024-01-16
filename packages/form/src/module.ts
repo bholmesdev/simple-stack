@@ -93,6 +93,7 @@ function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
 					value = z.preprocess(Number, validator);
 					break;
 				case "text":
+				case "email":
 					value = z.preprocess(
 						// Consider empty input as "required"
 						(value) => (value === "" ? undefined : value),
@@ -230,29 +231,6 @@ function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
 		fieldValidator._def.checks.some((check) => check.kind === "email")
 	) {
 		return "email";
-	}
-
-	if (fieldValidator instanceof ZodOptional) {
-		return getInputType(fieldValidator._def.innerType);
-	}
-
-	if (fieldValidator instanceof ZodUnion) {
-		const types: InputProp["type"][] =
-			fieldValidator._def.options.map(getInputType);
-		if (!types[0]) {
-			return "text";
-		}
-		if (types.every((type) => type === types[0])) {
-			return types[0];
-		}
-		if (
-			types.length === 2 &&
-			fieldValidator._def.options[1] instanceof ZodLiteral &&
-			!fieldValidator._def.options[1].value
-		) {
-			// Handles specific case where email is optional. E.g.: `z.string().email().optional().or(z.literal(""))`
-			return types[0];
-		}
 	}
 
 	return "text";
