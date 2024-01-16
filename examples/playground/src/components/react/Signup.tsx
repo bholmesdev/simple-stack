@@ -13,6 +13,7 @@ export const signup = createForm({
 			await sleep(400);
 			return s !== "admin";
 		}),
+	email: z.string().email().optional().or(z.literal("")),
 	optIn: z.boolean().optional(),
 });
 
@@ -29,6 +30,10 @@ export default function Signup({
 			<FormGroup>
 				<label htmlFor={scope("name")}>Name</label>
 				<Input id={scope("name")} {...signup.inputProps.username} />
+			</FormGroup>
+			<FormGroup>
+				<label htmlFor={scope("email")}>Email</label>
+				<Input id={scope("email")} {...signup.inputProps.email} />
 			</FormGroup>
 			<FormGroup>
 				<label htmlFor={scope("optIn")}>Opt in</label>

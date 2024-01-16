@@ -3,12 +3,15 @@ import {
 	ZodArray,
 	ZodBoolean,
 	type ZodError,
+	ZodLiteral,
 	ZodNullable,
 	ZodNumber,
 	ZodObject,
 	ZodOptional,
 	type ZodRawShape,
+	ZodString,
 	type ZodType,
+	ZodUnion,
 	z,
 } from "zod";
 
@@ -20,7 +23,7 @@ export type FieldErrors<
 export type InputProp = {
 	"aria-required": boolean;
 	name: string;
-	type: "text" | "number" | "checkbox";
+	type: "text" | "number" | "checkbox" | "email";
 };
 
 export const formNameInputProps = {
@@ -213,6 +216,48 @@ function getInputProp<T extends ZodType>(
 	return inputProp;
 }
 
+function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
+	if (fieldValidator instanceof ZodBoolean) {
+		return "checkbox";
+	}
+
+	if (fieldValidator instanceof ZodNumber) {
+		return "number";
+	}
+
+	if (
+		fieldValidator instanceof ZodString &&
+		fieldValidator._def.checks.some((check) => check.kind === "email")
+	) {
+		return "email";
+	}
+
+	if (fieldValidator instanceof ZodOptional) {
+		return getInputType(fieldValidator._def.innerType);
+	}
+
+	if (fieldValidator instanceof ZodUnion) {
+		const types: InputProp["type"][] =
+			fieldValidator._def.options.map(getInputType);
+		if (!types[0]) {
+			return "text";
+		}
+		if (types.every((type) => type === types[0])) {
+			return types[0];
+		}
+		if (
+			types.length === 2 &&
+			fieldValidator._def.options[1] instanceof ZodLiteral &&
+			!fieldValidator._def.options[1].value
+		) {
+			// Handles specific case where email is optional. E.g.: `z.string().email().optional().or(z.literal(""))`
+			return types[0];
+		}
+	}
+
+	return "text";
+}
+
 function getInputInfo<T extends ZodType>(fieldValidator: T): {
 	type: InputProp["type"];
 	isArray: boolean;
@@ -236,15 +281,7 @@ function getInputInfo<T extends ZodType>(fieldValidator: T): {
 
 	// TODO: respect preprocess() wrappers
 
-	let type: InputProp["type"];
-
-	if (resolvedType instanceof ZodBoolean) {
-		type = "checkbox";
-	} else if (resolvedType instanceof ZodNumber) {
-		type = "number";
-	} else {
-		type = "text";
-	}
+	const type = getInputType(resolvedType);
 
 	return { type, isArray, isOptional };
 }
