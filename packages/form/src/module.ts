@@ -3,12 +3,15 @@ import {
 	ZodArray,
 	ZodBoolean,
 	type ZodError,
+	ZodLiteral,
 	ZodNullable,
 	ZodNumber,
 	ZodObject,
 	ZodOptional,
 	type ZodRawShape,
+	ZodString,
 	type ZodType,
+	ZodUnion,
 	z,
 } from "zod";
 
@@ -20,7 +23,7 @@ export type FieldErrors<
 export type InputProp = {
 	"aria-required": boolean;
 	name: string;
-	type: "text" | "number" | "checkbox";
+	type: "text" | "number" | "checkbox" | "email";
 };
 
 export const formNameInputProps = {
@@ -90,6 +93,7 @@ function preprocessValidators<T extends ZodRawShape>(formValidator: T) {
 					value = z.preprocess(Number, validator);
 					break;
 				case "text":
+				case "email":
 					value = z.preprocess(
 						// Consider empty input as "required"
 						(value) => (value === "" ? undefined : value),
@@ -213,6 +217,25 @@ function getInputProp<T extends ZodType>(
 	return inputProp;
 }
 
+function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
+	if (fieldValidator instanceof ZodBoolean) {
+		return "checkbox";
+	}
+
+	if (fieldValidator instanceof ZodNumber) {
+		return "number";
+	}
+
+	if (
+		fieldValidator instanceof ZodString &&
+		fieldValidator._def.checks.some((check) => check.kind === "email")
+	) {
+		return "email";
+	}
+
+	return "text";
+}
+
 function getInputInfo<T extends ZodType>(fieldValidator: T): {
 	type: InputProp["type"];
 	isArray: boolean;
@@ -236,15 +259,7 @@ function getInputInfo<T extends ZodType>(fieldValidator: T): {
 
 	// TODO: respect preprocess() wrappers
 
-	let type: InputProp["type"];
-
-	if (resolvedType instanceof ZodBoolean) {
-		type = "checkbox";
-	} else if (resolvedType instanceof ZodNumber) {
-		type = "number";
-	} else {
-		type = "text";
-	}
+	const type = getInputType(resolvedType);
 
 	return { type, isArray, isOptional };
 }
