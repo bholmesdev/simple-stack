@@ -1,5 +1,11 @@
 # simple-stack-form
 
+## 0.1.11
+
+### Patch Changes
+
+- [#38](https://github.com/bholmesdev/simple-stack/pull/38) [`43eb52c`](https://github.com/bholmesdev/simple-stack/commit/43eb52cea8af0c2c5e62bff6dc2e6a2e957dda90) Thanks [@dsnjunior](https://github.com/dsnjunior)! - Set input type as email for inputs validating email values
+
 ## 0.1.10
 
 ### Patch Changes
