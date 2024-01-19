@@ -3,7 +3,6 @@ import {
 	ZodArray,
 	ZodBoolean,
 	type ZodError,
-	ZodLiteral,
 	ZodNullable,
 	ZodNumber,
 	ZodObject,
@@ -11,7 +10,6 @@ import {
 	type ZodRawShape,
 	ZodString,
 	type ZodType,
-	ZodUnion,
 	z,
 } from "zod";
 
@@ -23,8 +21,10 @@ export type FieldErrors<
 export type InputProp = {
 	"aria-required": boolean;
 	name: string;
-	type: "text" | "number" | "checkbox" | "email";
-};
+} & (
+	| { type: "text" | "checkbox" | "email" }
+	| { type: "number"; min?: number; max?: number }
+);
 
 export const formNameInputProps = {
 	type: "hidden",
@@ -207,11 +207,15 @@ function getInputProp<T extends ZodType>(
 	fieldValidator: T,
 	name: string | number | symbol,
 ) {
+	const inputInfo = getInputInfo<T>(fieldValidator);
+
 	const inputProp: InputProp = {
 		name: String(name),
 		"aria-required":
 			!fieldValidator.isOptional() && !fieldValidator.isNullable(),
-		type: getInputInfo<T>(fieldValidator).type,
+		type: inputInfo.type,
+		min: inputInfo.min,
+		max: inputInfo.max,
 	};
 
 	return inputProp;
@@ -240,6 +244,8 @@ function getInputInfo<T extends ZodType>(fieldValidator: T): {
 	type: InputProp["type"];
 	isArray: boolean;
 	isOptional: boolean;
+	min?: number;
+	max?: number;
 } {
 	let resolvedType = fieldValidator;
 	let isArray = false;
@@ -261,7 +267,20 @@ function getInputInfo<T extends ZodType>(fieldValidator: T): {
 
 	const type = getInputType(resolvedType);
 
-	return { type, isArray, isOptional };
+	const result: ReturnType<typeof getInputInfo> = { type, isArray, isOptional };
+
+	if (type === "number" && resolvedType instanceof ZodNumber) {
+		for (const check of resolvedType._def.checks) {
+			if (check.kind === "min") {
+				result.min = check.value + (check.inclusive ? 0 : 1);
+			}
+			if (check.kind === "max") {
+				result.max = check.value - (check.inclusive ? 0 : 1);
+			}
+		}
+	}
+
+	return result;
 }
 
 export async function validateForm<T extends ZodRawShape>({
