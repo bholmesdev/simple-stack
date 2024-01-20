@@ -3,20 +3,16 @@ import type { LocalsWithStreamInternals } from "./types";
 
 const { stream } = Astro.locals as LocalsWithStreamInternals;
 
-const entries = [...stream._internal.components.entries()];
-
-const resolvedEntries = await Promise.all(
-  entries.map(
-    async ([id, slotPromise]) => [id, await slotPromise],
-  )
+const resolvedHtml = await Promise.all(
+  stream.components
 );
 ---
 
 {
-  resolvedEntries.map( ([id, html]) => (
+  resolvedHtml.map( (html, idx) => (
     <>
-      <template data-suspense-id={id} set:html={html} />
-      <script is:inline define:vars={{ id }}>
+      <template data-suspense-id={idx} set:html={html} />
+      <script is:inline define:vars={{ id: idx }}>
         const template = document.querySelector(`[data-suspense-id="${id}"]`).content;
         const dest = document.getElementById(id);
         dest.replaceWith(template);
