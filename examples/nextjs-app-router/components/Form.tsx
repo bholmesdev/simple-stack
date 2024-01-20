@@ -17,18 +17,6 @@ import {
 	validateForm,
 } from "simple-stack-form/module";
 import { twMerge } from "tailwind-merge";
-import { useFormState as useForStateBase } from "react-dom";
-
-type ValidateFormResult = Awaited<ReturnType<typeof validateForm>> | null;
-
-export function useFormState(
-	action: (formData: FormData) => Promise<ValidateFormResult>,
-) {
-	return useForStateBase(
-		async (_: ValidateFormResult, formData: FormData) => action(formData),
-		null,
-	);
-}
 
 export function useCreateFormContext(
 	validator: FormValidator,
@@ -36,7 +24,6 @@ export function useCreateFormContext(
 ) {
 	const initial = getInitialFormState({ validator, fieldErrors });
 	const [formState, setFormState] = useState<FormState>(initial);
-
 	return {
 		value: formState,
 		set: setFormState,

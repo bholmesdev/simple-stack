@@ -1,8 +1,9 @@
 "use client";
 
-import { Form, Input, useFormState } from "../components/Form";
 import { signup } from "./page";
 import { signupSubmit } from "./action";
+import { useFormState } from "./utils";
+import { Form, Input } from "../components/Form";
 
 export default function Signup() {
 	const [state, formAction] = useFormState(signupSubmit);
