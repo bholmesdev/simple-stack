@@ -1,5 +1,28 @@
 # simple-stack-stream
 
+## 0.1.0
+
+### Minor Changes
+
+- [#42](https://github.com/bholmesdev/simple-stack/pull/42) [`3e72f1c`](https://github.com/bholmesdev/simple-stack/commit/3e72f1cc2ed02b3015fd918d32e0ff9cb9bf6d1e) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Fix rendering issues when using Layouts with simple stream. This change replaces the `ResolveSuspended` component with automatic rendering via middleware. Once updated, you should now remove `ResolveSuspended` from your project code:
+
+  ```diff
+  ---
+  import {
+    Suspense,
+  - ResolveSuspended
+  } from 'simple-stack-stream/components';
+  ---
+
+  <Suspense>
+    <VideoPlayer />
+    <LoadingSkeleton slot="fallback" />
+  </Suspense>
+
+  <Footer />
+  - <ResolveSuspended />
+  ```
+
 ## 0.0.3
 
 ### Patch Changes

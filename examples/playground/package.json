@@ -1,7 +1,7 @@
 {
 	"name": "@examples/playground",
 	"type": "module",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"private": true,
 	"scripts": {
 		"dev": "astro dev",
@@ -25,7 +25,7 @@
 		"react-dom": "^18.0.0",
 		"sanitize-html": "^2.11.0",
 		"simple-stack-form": "^0.1.7",
-		"simple-stack-stream": "^0.0.3",
+		"simple-stack-stream": "^0.1.0",
 		"solid-js": "^1.8.7",
 		"tailwindcss": "^3.0.24",
 		"vite-plugin-simple-scope": "^2.0.0",
