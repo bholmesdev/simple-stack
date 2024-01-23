@@ -1,5 +1,11 @@
 # simple-stack-form
 
+## 0.1.12
+
+### Patch Changes
+
+- [#40](https://github.com/bholmesdev/simple-stack/pull/40) [`23cb93c`](https://github.com/bholmesdev/simple-stack/commit/23cb93cf35f4e8400c22289a655f4c4d2bb3bb08) Thanks [@dsnjunior](https://github.com/dsnjunior)! - Add `min` and `max` input props to number input if present on schema
+
 ## 0.1.11
 
 ### Patch Changes
