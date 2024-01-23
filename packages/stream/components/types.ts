@@ -1,7 +1,5 @@
 export type LocalsWithStreamInternals = {
 	stream: {
-		_internal: {
-			components: Map<string, Promise<string>>;
-		};
+		components: Array<Promise<string>>;
 	};
 };
