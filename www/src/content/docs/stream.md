@@ -11,7 +11,7 @@ Suspend Astro components with fallback content. Like React Server Components, bu
 
 ```astro
 ---
-import { Suspense, ResolveSuspended } from 'simple-stack-stream/components';
+import { Suspense } from 'simple-stack-stream/components';
 ---
 
 <h1>Simple stream</h1>
@@ -25,8 +25,6 @@ import { Suspense, ResolveSuspended } from 'simple-stack-stream/components';
 </Suspense>
 
 <Footer />
-<!--Render suspended content-->
-<ResolveSuspended />
 ```
 
 ## Installation
@@ -70,26 +68,4 @@ import { Suspense } from 'simple-stack-stream/components';
     <p>Loading...</p>
   </div>
 </Suspense>
-```
-
-### `ResolveSuspended`
-
-The `<ResolveSuspended />` component renders all suspended content. This component should be placed at the _end_ of your HTML document, ideally before the closing `</body>` tag. This prevents `ResolveSuspended` from blocking components below it when [using Astro SSR](https://docs.astro.build/en/guides/server-side-rendering/#html-streaming).
-
-We recommend [a reusable Layout](https://docs.astro.build/en/core-concepts/layouts/) to ensure this component is present wherever `<Suspense>` is used:
-
-```astro
----
-// src/layouts/Layout.astro
-import { ResolveSuspended } from 'simple-stack-stream/components';
----
-
-<!DOCTYPE html>
-<html lang="en">
-<head>...</head>
-<body>
-  <slot />
-  <ResolveSuspended />
-</body>
-</html>
 ```

@@ -6,7 +6,7 @@ https://github.com/bholmesdev/simple-stack/assets/51384119/99ed15a4-5a70-4f19-bc
 
 ```astro
 ---
-import { Suspense, ResolveSuspended } from 'simple-stack-stream/components';
+import { Suspense } from 'simple-stack-stream/components';
 ---
 
 <h1>Simple stream</h1>
@@ -20,8 +20,6 @@ import { Suspense, ResolveSuspended } from 'simple-stack-stream/components';
 </Suspense>
 
 <Footer />
-<!--Render suspended content-->
-<ResolveSuspended />
 ```
 
 
