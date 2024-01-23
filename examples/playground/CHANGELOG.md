@@ -1,5 +1,12 @@
 # @examples/playground
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`3e72f1c`](https://github.com/bholmesdev/simple-stack/commit/3e72f1cc2ed02b3015fd918d32e0ff9cb9bf6d1e)]:
+  - simple-stack-stream@0.1.0
+
 ## 0.0.3
 
 ### Patch Changes
