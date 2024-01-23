@@ -1,0 +1,6 @@
+---
+import ResolveSuspended from './ResolveSuspended.astro';
+---
+
+<slot />
+<ResolveSuspended slotPromise={Astro.slots.render('default')} />

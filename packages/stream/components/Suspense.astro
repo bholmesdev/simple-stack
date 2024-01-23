@@ -8,6 +8,6 @@ const id = stream.components.length;
 stream.components.push(slotPromise);
 ---
 
-<simple-suspense id={id}>
+<simple-suspense data-suspense-id={id}>
   <slot name="fallback" />
 </simple-suspense>

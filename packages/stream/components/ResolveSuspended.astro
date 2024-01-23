@@ -1,6 +1,12 @@
 ---
 import type { LocalsWithStreamInternals } from "./types";
 
+type Props = {
+  slotPromise: Promise<string>;
+}
+
+await Astro.props.slotPromise;
+
 const { stream } = Astro.locals as LocalsWithStreamInternals;
 
 const resolvedHtml = await Promise.all(
@@ -13,8 +19,8 @@ const resolvedHtml = await Promise.all(
     <>
       <template data-suspense-id={idx} set:html={html} />
       <script is:inline define:vars={{ id: idx }}>
-        const template = document.querySelector(`[data-suspense-id="${id}"]`).content;
-        const dest = document.getElementById(id);
+        const template = document.querySelector(`template[data-suspense-id="${id}"]`).content;
+        const dest = document.querySelector(`simple-suspense[data-suspense-id="${id}"]`);
         dest.replaceWith(template);
       </script>
     </>

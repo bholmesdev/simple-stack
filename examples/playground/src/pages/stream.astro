@@ -1,16 +1,9 @@
 ---
+import Layout from "../components/Layout.astro";
 import Wait from "../components/Wait.astro";
-import { Suspense, ResolveSuspended } from 'simple-stack-stream/components'
+import { Suspense } from 'simple-stack-stream/components'
 ---
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suspense</title>
-</head>
-<body>
+<Layout>
  <h1>Out of order streaming</h1> 
  <!-- out-of-order streaming: fallback,
   JS to swap content -->
@@ -28,8 +21,4 @@ import { Suspense, ResolveSuspended } from 'simple-stack-stream/components'
       <p>Join the newsletter</p>
     </footer>
   </Wait>
-
-  <!-- render all suspended content -->
-  <ResolveSuspended />
-</body>
-</html>
+</Layout>
