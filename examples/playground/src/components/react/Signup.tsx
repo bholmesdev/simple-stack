@@ -14,6 +14,7 @@ export const signup = createForm({
 			return s !== "admin";
 		}),
 	email: z.string().email().optional(),
+	coffees: z.number().lt(10).min(2),
 	optIn: z.boolean().optional(),
 });
 
@@ -34,6 +35,10 @@ export default function Signup({
 			<FormGroup>
 				<label htmlFor={scope("email")}>Email</label>
 				<Input id={scope("email")} {...signup.inputProps.email} />
+			</FormGroup>
+			<FormGroup>
+				<label htmlFor={scope("coffees")}>Coffees taken</label>
+				<Input id={scope("coffees")} {...signup.inputProps.coffees} />
 			</FormGroup>
 			<FormGroup>
 				<label htmlFor={scope("optIn")}>Opt in</label>
