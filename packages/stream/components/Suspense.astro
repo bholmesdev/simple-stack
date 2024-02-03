@@ -1,14 +1,8 @@
 ---
-import type { LocalsWithStreamInternals } from "./types";
-
-const slotPromise = Astro.slots.render('default');
-
-const { stream } =  Astro.locals as LocalsWithStreamInternals;
-
-const idx = stream.components.length;
-stream.components.push(slotPromise);
+const idx = Astro.locals.suspend(Astro.slots.render("default"));
 ---
 
-<simple-suspense data-suspense-id={idx}>
+<div style="display: contents" data-suspense-fallback={idx}>
   <slot name="fallback" />
-</simple-suspense>
+</div>
+
