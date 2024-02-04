@@ -1,8 +1,49 @@
 ---
-const idx = Astro.locals.suspend(Astro.slots.render("default"));
+import { trackThenableState, sleep } from "./utils";
+
+const thenable = trackThenableState(Astro.slots.render("default"));
+
+// Wait a moment to see if the slot renders quickly enough --
+// if it does, there's no need to send a fallback.
+const DEADLINE_MS = 5;
+await sleep(DEADLINE_MS);
+
+type RenderKind = { kind: 'fallback', id: number } | { kind: 'content', content: string }
+
+// Check if the slot managed to render in time.
+// Note that after this point, we shouldn't rely on `thenable.status` --
+// we need to make sure that what we do here matches what the middleware does,
+// but thenable.status might change if the promise finishes sometime in the meantime,
+// which'd result in a race condition.
+let renderKind: RenderKind;
+
+switch (thenable.status) {
+  case "pending": {
+    const id = Astro.locals.suspend(thenable);
+    renderKind = { kind: 'fallback', id }
+    break;
+  }
+  case "rejected": {
+    throw thenable.reason;
+  }
+  case "fulfilled": {
+    if (import.meta.env.DEV) {
+      console.log(
+        `Suspense :: slot resolved within deadline (${DEADLINE_MS}ms), no need to show fallback`
+      );
+    }
+    renderKind = { kind: 'content', content: thenable.value }
+    break;
+  }
+}
 ---
 
-<div style="display: contents" data-suspense-fallback={idx}>
-  <slot name="fallback" />
-</div>
-
+{
+  renderKind.kind === 'fallback' ? (
+    <div style="display: contents" data-suspense-fallback={renderKind.id}>
+      <slot name="fallback" />
+    </div>
+  ) : (
+    <Fragment set:html={renderKind.content} />
+  )
+}

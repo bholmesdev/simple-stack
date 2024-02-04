@@ -4,14 +4,16 @@ import Wait from "../components/Wait.astro";
 import { Suspense, } from 'simple-stack-stream/components'
 ---
 <Layout>
- <h1>Out of order streaming</h1> 
+
+  <main class="flex flex-col gap-2 max-w-prose mx-2">
+   <h1 class="font-bold text-xl">Out of order streaming</h1>
  <!-- out-of-order streaming: fallback,
   JS to swap content -->
   <Suspense>
     <Wait ms={2000}>
-      <p class="font-bold text-xl">Content</p>
+      <p class="font-bold text-lg">Slow content</p>
     </Wait>
-    <p slot="fallback">Loading...</p>
+    <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
   </Suspense>
 
   <!-- in-order HTML streaming (no client JS) -->
@@ -21,4 +23,21 @@ import { Suspense, } from 'simple-stack-stream/components'
       <p>Join the newsletter</p>
     </footer>
   </Wait>
+
+  <Suspense>
+    <p slot="fallback">Loading... (shouldn't appear)</p>
+    <div class="rounded p-2 border-gray-300 border-2">
+      <p class="font-bold text-lg">Synchronous content wrapped in a Suspense</p>
+      <p>(it shouldn't show a fallback)</p>
+    </div>
+  </Suspense>
+
+  <Suspense>
+    <p slot="fallback">Loading... (also shouldn't appear)</p>
+    <Wait ms={1}>
+      <p class="font-bold text-lg">More content</p>
+      <p>It's only delayed by only 1ms, so it shouldn't show a fallback either</p>
+    </Wait>
+  </Suspense>
+</main>
 </Layout>
