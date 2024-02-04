@@ -51,16 +51,16 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
     if (!pending.size) return streamController.close();
 
+    yield `<script>window.__SIMPLE_SUSPENSE_INSERT = function (idx) {
+	var template = document.querySelector('[data-suspense="' + idx + '"]').content;
+	var dest = document.querySelector('[data-suspense-fallback="' + idx + '"]');
+	dest.replaceWith(template);
+}</script>`;
+
     // @ts-expect-error ReadableStream does not have asyncIterator
     for await (const { chunk, idx } of stream) {
-      yield `<template data-suspense=${JSON.stringify(idx)}>${chunk}</template>
-<script>
-(() => {
-	const template = document.querySelector(\`[data-suspense="${idx}"]\`).content;
-	const dest = document.querySelector(\`[data-suspense-fallback="${idx}"]\`);
-	dest.replaceWith(template);
-})();
-</script>`;
+      yield `<template data-suspense=${idx}>${chunk}</template>` +
+        `<script>window.__SIMPLE_SUSPENSE_INSERT(${idx});</script>`;
       if (!pending.size) return streamController.close();
     }
   }
