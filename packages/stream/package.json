@@ -1,6 +1,6 @@
 {
 	"name": "simple-stack-stream",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Suspend your Astro components with fallback content.",
 	"type": "module",
 	"scripts": {
