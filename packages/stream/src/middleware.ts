@@ -1,55 +1,59 @@
 import { defineMiddleware } from "astro:middleware";
 
 type SuspendedChunk = {
-	chunk: string;
-	idx: number;
+  chunk: string;
+  idx: number;
 };
 
 export const onRequest = defineMiddleware(async (ctx, next) => {
-	const response = await next();
-	// ignore non-HTML responses
-	if (!response.headers.get("content-type")?.startsWith("text/html")) {
-		return response;
-	}
+  let streamController: ReadableStreamDefaultController<SuspendedChunk>;
 
-	let streamController: ReadableStreamDefaultController<SuspendedChunk>;
+  // Thank you owoce!
+  // https://gist.github.com/lubieowoce/05a4cb2e8cd252787b54b7c8a41f09fc
+  const stream = new ReadableStream<SuspendedChunk>({
+    start(controller) {
+      streamController = controller;
+    },
+  });
 
-	async function* render() {
-		// Thank you owoce!
-		// https://gist.github.com/lubieowoce/05a4cb2e8cd252787b54b7c8a41f09fc
-		const stream = new ReadableStream<SuspendedChunk>({
-			start(controller) {
-				streamController = controller;
-			},
-		});
+  let curId = 0;
+  const pending = new Set<Promise<string>>();
 
-		let curId = 0;
-		const pending = new Set<Promise<string>>();
+  ctx.locals.suspend = (promise) => {
+    const idx = curId++;
+    pending.add(promise);
+    promise
+      .then((chunk) => {
+        try {
+          streamController.enqueue({ chunk, idx });
+        } finally {
+          pending.delete(promise);
+        }
+      })
+      .catch((e) => {
+        streamController.error(e);
+      });
+    return idx;
+  };
 
-		ctx.locals.suspend = (promise) => {
-			const idx = curId++;
-			pending.add(promise);
-			promise
-				.then((chunk) => {
-					streamController.enqueue({ chunk, idx });
-					pending.delete(promise);
-				})
-				.catch((e) => {
-					streamController.error(e);
-				});
-			return idx;
-		};
+  const response = await next();
 
-		// @ts-expect-error ReadableStream does not have asyncIterator
-		for await (const chunk of response.body) {
-			yield chunk;
-		}
+  // ignore non-HTML responses
+  if (!response.headers.get("content-type")?.startsWith("text/html")) {
+    return response;
+  }
 
-		if (!pending.size) return streamController.close();
+  async function* render() {
+    // @ts-expect-error ReadableStream does not have asyncIterator
+    for await (const chunk of response.body) {
+      yield chunk;
+    }
 
-		// @ts-expect-error ReadableStream does not have asyncIterator
-		for await (const { chunk, idx } of stream) {
-			yield `<template data-suspense=${JSON.stringify(idx)}>${chunk}</template>
+    if (!pending.size) return streamController.close();
+
+    // @ts-expect-error ReadableStream does not have asyncIterator
+    for await (const { chunk, idx } of stream) {
+      yield `<template data-suspense=${JSON.stringify(idx)}>${chunk}</template>
 <script>
 (() => {
 	const template = document.querySelector(\`[data-suspense="${idx}"]\`).content;
@@ -57,10 +61,10 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 	dest.replaceWith(template);
 })();
 </script>`;
-			if (!pending.size) return streamController.close();
-		}
-	}
+      if (!pending.size) return streamController.close();
+    }
+  }
 
-	// @ts-expect-error generator not assignable to ReadableStream
-	return new Response(render(), response.headers);
+  // @ts-expect-error generator not assignable to ReadableStream
+  return new Response(render(), response.headers);
 });
