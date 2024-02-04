@@ -1,5 +1,11 @@
 # simple-stack-stream
 
+## 0.2.0
+
+### Minor Changes
+
+- [#44](https://github.com/bholmesdev/simple-stack/pull/44) [`08b907c`](https://github.com/bholmesdev/simple-stack/commit/08b907c964412110f6c089e09b4cba61431aafbf) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Update simple:stream internals to support parallel Suspense boundaries and fix nested Suspense edge cases.
+
 ## 0.1.0
 
 ### Minor Changes
