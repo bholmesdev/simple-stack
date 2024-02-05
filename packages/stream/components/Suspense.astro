@@ -1,7 +1,7 @@
 ---
-import { trackThenableState, sleep } from "./utils";
+import { trackPromiseState, sleep } from "./utils";
 
-const thenable = trackThenableState(Astro.slots.render("default"));
+const thenable = trackPromiseState(Astro.slots.render("default"));
 
 // Wait a moment to see if the slot renders quickly enough --
 // if it does, there's no need to send a fallback.

@@ -9,7 +9,7 @@ type ThenableState<T> =
 
 export type Thenable<T> = Promise<T> & ThenableState<T>;
 
-export function trackThenableState<T>(promise: Promise<T>): Thenable<T> {
+export function trackPromiseState<T>(promise: Promise<T>): Thenable<T> {
 	const thenable = promise as Promise<T> & PendingThenableState;
 	thenable.status = "pending";
 	thenable.then(
