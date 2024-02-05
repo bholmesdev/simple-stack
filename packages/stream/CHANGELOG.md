@@ -1,5 +1,15 @@
 # simple-stack-stream
 
+## 0.3.0
+
+### Minor Changes
+
+- [#46](https://github.com/bholmesdev/simple-stack/pull/46) [`edfe2a7`](https://github.com/bholmesdev/simple-stack/commit/edfe2a761b55fab26a757e6b18e90a0bf0094e74) Thanks [@lubieowoce](https://github.com/lubieowoce)! - Don't show a fallback if the content renders quickly enough (current timeout: 5ms)
+
+### Patch Changes
+
+- [#46](https://github.com/bholmesdev/simple-stack/pull/46) [`edfe2a7`](https://github.com/bholmesdev/simple-stack/commit/edfe2a761b55fab26a757e6b18e90a0bf0094e74) Thanks [@lubieowoce](https://github.com/lubieowoce)! - Reduced the size of the `<script>` tags that insert streamed content into the DOM
+
 ## 0.2.0
 
 ### Minor Changes
