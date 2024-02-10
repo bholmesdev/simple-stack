@@ -9,14 +9,27 @@ import { Suspense, } from 'simple-stack-stream/components'
    <h1 class="font-bold text-xl">Out of order streaming</h1>
  <!-- out-of-order streaming: fallback,
   JS to swap content -->
+  <!-- <Suspense>
+    <Wait ms={2000}>
+      <p class="font-bold text-lg">Slow content</p>
+    </Wait>
+    <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
+  </Suspense> -->
+
   <Suspense>
     <Wait ms={2000}>
       <p class="font-bold text-lg">Slow content</p>
     </Wait>
     <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
+    <Suspense>
+      <Wait ms={1000}>
+        <p class="font-bold text-lg">Slow content</p>
+      </Wait>
+      <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
+    </Suspense>
   </Suspense>
 
-  <!-- in-order HTML streaming (no client JS) -->
+  <!-- in-order HTML streaming (no client JS)
   <Wait class="fixed bottom-0 left-0 right-0" ms={500}>
     <footer>
       <p>Follow us</p>
@@ -38,6 +51,6 @@ import { Suspense, } from 'simple-stack-stream/components'
       <p class="font-bold text-lg">More content</p>
       <p>It's only delayed by only 1ms, so it shouldn't show a fallback either</p>
     </Wait>
-  </Suspense>
+  </Suspense> -->
 </main>
 </Layout>

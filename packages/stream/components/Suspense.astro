@@ -1,14 +1,47 @@
 ---
-import { trackPromiseState, sleep } from "./utils";
+import { SuspenseStorage, type SuspenseGlobalCtx } from "../src/suspense-context";
+import { sleep, trackPromiseState } from "../src/utils";
 
-const thenable = trackPromiseState(Astro.slots.render("default"));
+const globalCtx = Astro.locals.suspense as SuspenseGlobalCtx;
+const parentCtx = SuspenseStorage.getStore();
 
-// Wait a moment to see if the slot renders quickly enough --
-// if it does, there's no need to send a fallback.
-const DEADLINE_MS = 5;
-await sleep(DEADLINE_MS);
+const parentId = parentCtx?.parentId;
+const ancestorIds = parentCtx?.ancestorIds ?? [];
+const id = globalCtx.getBoundaryId();
 
-type RenderKind = { kind: 'fallback', id: number } | { kind: 'content', content: string }
+console.log(`Suspense ${id} :: parent ${parentId}`);
+
+const result = globalCtx.addBoundary(id, parentId);
+const onParentRendered = parentId !== undefined ? globalCtx.getOnRendered(parentId) : undefined;
+const onParentFlushed = parentId !== undefined ? globalCtx.getOnFlushed(parentId) : undefined;
+const onSelfRendered = globalCtx.getOnRendered(id);
+
+const contentsThenable = trackPromiseState(
+  SuspenseStorage.run(
+    { parentId: id, ancestorIds: [...ancestorIds, id] },
+    () => Astro.slots.render("default")
+  )
+);
+globalCtx.contents.set(id, contentsThenable);
+
+if (!onParentRendered) {
+  // no parent, we're a root boundary.
+  const SYNC_FLUSH_DEADLINE_MS = 5
+  await sleep(SYNC_FLUSH_DEADLINE_MS);
+  console.log(`Suspense ${id} :: pinging self`);
+  onSelfRendered?.controller.resolve();
+  await Promise.resolve(null);
+} else {
+  console.log(`Suspense ${id} :: waiting for parent ${parentId} to ping us`);
+  await onParentRendered.thenable;
+  console.log(`Suspense ${id} :: parent ${parentId} pinged`);
+  onSelfRendered?.controller.resolve();
+  console.log(`Suspense ${id} :: pinging self`);
+  await Promise.resolve(null);
+}
+
+
+type RenderKind = { kind: 'fallback' } | { kind: 'content', content: string }
 
 // Check if the slot managed to render in time.
 // Note that after this point, we shouldn't rely on `thenable.status` --
@@ -17,32 +50,54 @@ type RenderKind = { kind: 'fallback', id: number } | { kind: 'content', content:
 // which'd result in a race condition.
 let renderKind: RenderKind;
 
-switch (thenable.status) {
+console.log(`Suspense ${id} :: checking children:`, contentsThenable.status)
+switch (contentsThenable.status) {
   case "pending": {
-    const id = Astro.locals.suspend(thenable);
-    renderKind = { kind: 'fallback', id }
+    console.log(`Suspense ${id} :: children will do stuff later, showing fallback`);
+    const ready = onParentFlushed
+      ? onParentFlushed.thenable.then(() => contentsThenable)
+      : contentsThenable;
+    ready.then(
+      (value) => {
+        result.controller.resolve(value)
+      },
+      (error) => result.controller.reject(error),
+    );
+    renderKind = { kind: 'fallback' }
     break;
   }
   case "rejected": {
-    throw thenable.reason;
+    result.controller.reject(contentsThenable.reason);
+    throw contentsThenable.reason;
   }
   case "fulfilled": {
+    // TODO: how do we make sure that this is what we render if we resolved when parent did?
     if (import.meta.env.DEV) {
       console.log(
-        `Suspense :: slot resolved within deadline (${DEADLINE_MS}ms), no need to show fallback`
+        `Suspense :: slot already resolved, no need to show fallback`
       );
     }
-    renderKind = { kind: 'content', content: thenable.value }
+    result.controller.resolve(null);
+    renderKind = { kind: 'content', content: contentsThenable.value }
     break;
   }
 }
+
+if (onParentRendered) {
+  onSelfRendered?.controller.resolve();
+}
+
 ---
 
 {
   renderKind.kind === 'fallback' ? (
-    <div style="display: contents" data-suspense-fallback={renderKind.id}>
-      <slot name="fallback" />
-    </div>
+    <Fragment>
+      <div style="display: contents" data-suspense-fallback={id}>
+        <slot name="fallback" />
+        <!-- suspense-fallback-end:{id} -->
+      </div>
+        
+    </Fragment>
   ) : (
     <Fragment set:html={renderKind.content} />
   )

@@ -1,9 +1,17 @@
 import { defineMiddleware } from "astro:middleware";
+import { promiseWithResolvers, trackPromiseState } from "./utils";
+import {
+	createSuspenseResponse,
+	type Boundary,
+	type SuspenseGlobalCtx,
+} from "./suspense-context";
 
 type SuspendedChunk = {
+	id: number;
 	chunk: string;
-	idx: number;
 };
+
+const SUSPENSE_LIST_REVEAL_DELAY_MS = 300;
 
 export const onRequest = defineMiddleware(async (ctx, next) => {
 	let streamController: ReadableStreamDefaultController<SuspendedChunk>;
@@ -16,25 +24,21 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 		},
 	});
 
-	let curId = 0;
-	const pending = new Set<Promise<string>>();
+	const suspenseCtx: SuspenseGlobalCtx = createSuspenseResponse({
+		onBoundaryReady(chunk, boundary) {
+			const { id } = boundary;
+			console.log("middleware :: enqueuing", id);
+			streamController.enqueue({ chunk, id });
+		},
+		onBoundaryErrored(error: unknown) {
+			streamController.error(error);
+		},
+		onAllReady() {
+			return streamController.close();
+		},
+	});
 
-	ctx.locals.suspend = (promise) => {
-		const idx = curId++;
-		pending.add(promise);
-		promise
-			.then((chunk) => {
-				try {
-					streamController.enqueue({ chunk, idx });
-				} finally {
-					pending.delete(promise);
-				}
-			})
-			.catch((e) => {
-				streamController.error(e);
-			});
-		return idx;
-	};
+	ctx.locals.suspense = suspenseCtx;
 
 	const response = await next();
 
@@ -49,19 +53,25 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 			yield chunk;
 		}
 
-		if (!pending.size) return streamController.close();
+		if (!suspenseCtx.pending.size) return streamController.close();
 
-		yield `<script>window.__SIMPLE_SUSPENSE_INSERT = function (idx) {
-	var template = document.querySelector('[data-suspense="' + idx + '"]').content;
-	var dest = document.querySelector('[data-suspense-fallback="' + idx + '"]');
+		console.log(`middleware :: ${suspenseCtx.pending.size} chunks pending`);
+		if (!suspenseCtx.pending.size) return streamController.close();
+
+		yield `<script>
+window.__SIMPLE_SUSPENSE_INSERT = function (id) {
+	var template = document.querySelector('[data-suspense="' + id + '"]').content;
+	var dest = document.querySelector('[data-suspense-fallback="' + id + '"]');
 	dest.replaceWith(template);
-}</script>`;
+}
+</script>`;
 
 		// @ts-expect-error ReadableStream does not have asyncIterator
-		for await (const { chunk, idx } of stream) {
-			yield `<template data-suspense=${idx}>${chunk}</template>` +
-				`<script>window.__SIMPLE_SUSPENSE_INSERT(${idx});</script>`;
-			if (!pending.size) return streamController.close();
+		for await (const item of stream) {
+			const { id, chunk } = item as SuspendedChunk;
+			console.log("middleware :: yielding", id, chunk);
+			yield `<template data-suspense=${id}>${chunk}</template>` +
+				`<script>window.__SIMPLE_SUSPENSE_INSERT(${id});</script>`;
 		}
 	}
 

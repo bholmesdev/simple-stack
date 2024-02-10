@@ -1,0 +1,2 @@
+[*.{js,jsx,ts,tsx,astro}]
+indent_style = tab

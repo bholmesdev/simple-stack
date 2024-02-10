@@ -1,7 +1,10 @@
 /// <reference types="astro/client" />
+import type { SuspenseGlobalCtx } from "../components/suspense-context";
 
-declare namespace App {
-	interface Locals {
-		suspend(promise: Promise<string>): number;
+declare global {
+	namespace App {
+		interface Locals {
+			suspense: SuspenseGlobalCtx;
+		}
 	}
 }
