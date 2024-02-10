@@ -1,5 +1,5 @@
 /// <reference types="astro/client" />
-import type { SuspenseGlobalCtx } from "../components/suspense-context";
+import type { SuspenseGlobalCtx } from "../src/suspense-context";
 
 declare global {
 	namespace App {

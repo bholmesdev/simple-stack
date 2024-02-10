@@ -42,9 +42,8 @@ export function createSuspenseResponse({
 		},
 		boundaries: new Map<number, Boundary>(),
 		pending: new Set<number>(),
-		contents: new Map<number, Thenable<string>>(),
+		flushed: new Set<number>(),
 		pings: {
-			rendered: new Map<number, GenericBoundary<void>>(),
 			flushed: new Map<number, GenericBoundary<void>>(),
 		},
 		dependencies: new Map<number, Set<number>>(),
@@ -56,20 +55,6 @@ export function createSuspenseResponse({
 			}
 			edges.add(idTo);
 			return edges;
-		},
-		getOnRendered(id: number) {
-			return getOrCreate(this.pings.rendered, id, () => {
-				const [promise, controller] = promiseWithResolvers<void>();
-				promise.then(() => console.log("onRendered", id));
-				return { id, thenable: trackPromiseState(promise), controller };
-			});
-		},
-		getOnFlushed(id: number) {
-			return getOrCreate(this.pings.flushed, id, () => {
-				const [promise, controller] = promiseWithResolvers<void>();
-				promise.then(() => console.log("onFlushed", id));
-				return { id, thenable: trackPromiseState(promise), controller };
-			});
 		},
 		getBoundary(id: number) {
 			return getOrCreate(this.boundaries, id, () => {
@@ -91,34 +76,48 @@ export function createSuspenseResponse({
 						`simple-suspense :: internal error: nonexistent parent id ${parentId}`
 					);
 				}
-				this.addDependency(id, parentId);
+				this.addDependency(parentId, id);
 			}
 
-			boundary.thenable
-				.then((chunk) => {
-					console.log(
-						"middleware :: boundary resolved",
-						id,
-						chunk === null ? null : chunk.slice(0, 16) + "..."
-					);
-					try {
-						if (chunk !== null) {
-							onBoundaryReady(chunk, boundary);
-						}
-					} finally {
-						this.pending.delete(id);
-						const onFlushed = this.getOnFlushed(id);
-						onFlushed.controller.resolve();
-						if (!this.pending.size) {
-							onAllReady();
-						}
-					}
-				})
-				.catch((error) => {
-					onBoundaryErrored(error, boundary);
-				});
+			// TODO: is this the right place to do this?
+			boundary.thenable.catch((error) => {
+				onBoundaryErrored(error, boundary);
+			});
 
 			return boundary;
+		},
+
+		markEmittedSync(boundary: Boundary) {
+			const { id } = boundary;
+			console.log(`boundary was emitted synchronously ${id}`);
+			this.flushed.add(id);
+			this.pending.delete(id);
+			boundary.controller.resolve(null);
+		},
+
+		emitAsync(boundary: Boundary, chunk: string) {
+			const { id } = boundary;
+			boundary.controller.resolve(chunk);
+			if (this.flushed.has(id)) {
+				console.error("tried to emitAsync a boundary that already flushed");
+				return;
+			}
+			console.log(
+				"middleware :: boundary resolved",
+				id,
+				chunk === null ? null : chunk.slice(0, 16) + "..."
+			);
+			try {
+				if (chunk !== null) {
+					onBoundaryReady(chunk, boundary);
+				}
+			} finally {
+				this.pending.delete(id);
+				this.flushed.add(id);
+				if (!this.pending.size) {
+					onAllReady();
+				}
+			}
 		},
 	};
 }

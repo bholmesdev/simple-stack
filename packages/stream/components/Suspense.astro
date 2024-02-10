@@ -11,10 +11,7 @@ const id = globalCtx.getBoundaryId();
 
 console.log(`Suspense ${id} :: parent ${parentId}`);
 
-const result = globalCtx.addBoundary(id, parentId);
-const onParentRendered = parentId !== undefined ? globalCtx.getOnRendered(parentId) : undefined;
-const onParentFlushed = parentId !== undefined ? globalCtx.getOnFlushed(parentId) : undefined;
-const onSelfRendered = globalCtx.getOnRendered(id);
+const thisBoundary = globalCtx.addBoundary(id, parentId);
 
 const contentsThenable = trackPromiseState(
   SuspenseStorage.run(
@@ -22,26 +19,18 @@ const contentsThenable = trackPromiseState(
     () => Astro.slots.render("default")
   )
 );
-globalCtx.contents.set(id, contentsThenable);
 
-if (!onParentRendered) {
-  // no parent, we're a root boundary.
-  const SYNC_FLUSH_DEADLINE_MS = 5
-  await sleep(SYNC_FLUSH_DEADLINE_MS);
-  console.log(`Suspense ${id} :: pinging self`);
-  onSelfRendered?.controller.resolve();
-  await Promise.resolve(null);
-} else {
-  console.log(`Suspense ${id} :: waiting for parent ${parentId} to ping us`);
-  await onParentRendered.thenable;
-  console.log(`Suspense ${id} :: parent ${parentId} pinged`);
-  onSelfRendered?.controller.resolve();
-  console.log(`Suspense ${id} :: pinging self`);
-  await Promise.resolve(null);
-}
-
+const SYNC_FLUSH_DEADLINE_MS = 5
+await sleep(SYNC_FLUSH_DEADLINE_MS);
 
 type RenderKind = { kind: 'fallback' } | { kind: 'content', content: string }
+
+function getMarkerCommentBegin(id: number) {
+  return `<!-- suspense-fallback-begin:${id} -->`
+}
+function getMarkerCommentEnd(id: number) {
+  return `<!-- suspense-fallback-end:${id} -->`
+}
 
 // Check if the slot managed to render in time.
 // Note that after this point, we shouldn't rely on `thenable.status` --
@@ -50,54 +39,104 @@ type RenderKind = { kind: 'fallback' } | { kind: 'content', content: string }
 // which'd result in a race condition.
 let renderKind: RenderKind;
 
+function tryReplaceChildFallbacks(content: string) {
+  const childBoundaryIds = globalCtx.dependencies.get(id);
+  if (!childBoundaryIds) {
+    return content;
+  }
+  for (const childId of childBoundaryIds) {
+    const childBoundary = globalCtx.boundaries.get(childId)!;
+    const childContents = childBoundary.thenable;
+    if (childContents.status === 'fulfilled' && !globalCtx.flushed.has(childId)) {
+      const childContentStr = childContents.value;
+      if (childContentStr !== null) {
+        console.log('replacing child', childId)
+        const pat = new RegExp(getMarkerCommentBegin(childId) + '.*?' + getMarkerCommentEnd(childId));
+        // TODO: is the didReplace necessary? it should always be true...
+        let didReplace = false;
+        content = content.replace(
+          pat,
+          (_) => {
+            didReplace = true;
+            return childContentStr
+          }
+        );
+        if (didReplace) {
+          // we included the contents here, so we don't want it to get emitted again elsewhere.
+          globalCtx.markEmittedSync(childBoundary);
+        }
+        console.log('replacing child', childId, didReplace ? 'success' : 'failed (not found)')
+      }
+    }
+  };
+  return content;
+}
+
+
 console.log(`Suspense ${id} :: checking children:`, contentsThenable.status)
 switch (contentsThenable.status) {
   case "pending": {
     console.log(`Suspense ${id} :: children will do stuff later, showing fallback`);
-    const ready = onParentFlushed
-      ? onParentFlushed.thenable.then(() => contentsThenable)
-      : contentsThenable;
-    ready.then(
-      (value) => {
-        result.controller.resolve(value)
-      },
-      (error) => result.controller.reject(error),
-    );
     renderKind = { kind: 'fallback' }
+    contentsThenable.then(
+      async (value) => {
+        // children are "ready", but some of them might be fallbacks. suspense returns ~immediately --
+        // if we don't do it that way, there's no way to distinguish the async stuff that belongs to this boundary
+        // from stuff that belongs to child boundaries.
+
+        // if there's any boundaries below us, give the children one more chance to resolve.
+        if (globalCtx.dependencies.get(id)?.size) {
+          await Promise.resolve(null);
+        }
+
+        // incorporate any resolved child boundaries into our output.
+        value = tryReplaceChildFallbacks(value);
+
+        if (parentId === undefined) {
+          // there's no boundary above us, so we have to emit ourselves.
+          globalCtx.emitAsync(thisBoundary, value);
+        } else {
+          // there's a parent boundary above us.
+          if (globalCtx.flushed.has(parentId)) {
+            // parent already flushed, so we have to emit ourselves.
+            globalCtx.emitAsync(thisBoundary, value);
+          } else {
+            // parent hasn't flushed yet. we can just resolve, and it will incorporate us.
+            thisBoundary.controller.resolve(value);
+          }
+        }
+      },
+      (error) => thisBoundary.controller.reject(error),
+    );
     break;
   }
   case "rejected": {
-    result.controller.reject(contentsThenable.reason);
+    thisBoundary.controller.reject(contentsThenable.reason);
     throw contentsThenable.reason;
   }
   case "fulfilled": {
-    // TODO: how do we make sure that this is what we render if we resolved when parent did?
     if (import.meta.env.DEV) {
       console.log(
         `Suspense :: slot already resolved, no need to show fallback`
       );
     }
-    result.controller.resolve(null);
+    globalCtx.markEmittedSync(thisBoundary);
     renderKind = { kind: 'content', content: contentsThenable.value }
     break;
   }
-}
-
-if (onParentRendered) {
-  onSelfRendered?.controller.resolve();
 }
 
 ---
 
 {
   renderKind.kind === 'fallback' ? (
-    <Fragment>
+    <>
+      <Fragment set:html={getMarkerCommentBegin(id)} />
       <div style="display: contents" data-suspense-fallback={id}>
         <slot name="fallback" />
-        <!-- suspense-fallback-end:{id} -->
       </div>
-        
-    </Fragment>
+      <Fragment set:html={getMarkerCommentEnd(id)} />
+    </>
   ) : (
     <Fragment set:html={renderKind.content} />
   )
