@@ -70,10 +70,14 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
 const BOOTSTRAP_SCRIPT = `<script>
 window.__SIMPLE_SUSPENSE_INSERT = function (id) {
-	var template = document.querySelector('[data-suspense="' + id + '"]').content;
-	var dest = document.querySelector('[data-suspense-fallback="' + id + '"]');
-	dest.replaceWith(template);
-}
+	try {
+		var template = document.querySelector('[data-suspense="' + id + '"]').content;
+		var dest = document.querySelector('[data-suspense-fallback="' + id + '"]');
+		dest.replaceWith(template);
+	} catch (e) {
+		console.error("Failed to insert async content (Suspense boundary id: " + id + ")", e);
+	}
+};
 </script>`;
 
 function asyncChunkInsertionHTML(id: number, chunk: string) {
