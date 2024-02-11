@@ -21,7 +21,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 	});
 
 	const suspenseCtx: SuspenseGlobalCtx = createSuspenseResponse({
-		onBoundaryReady(chunk, boundary) {
+		onAsyncChunkReady(chunk, boundary) {
 			const { id } = boundary;
 			console.log("middleware :: enqueuing", id);
 			streamController.enqueue({ chunk, id });

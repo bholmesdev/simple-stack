@@ -16,16 +16,6 @@ type GenericBoundary<T> = {
 type BoundaryResult = null | string | (() => string);
 export type Boundary = GenericBoundary<BoundaryResult>;
 
-// export type SuspenseGlobalCtx = {
-// 	pending: Set<number>;
-// 	dependencies: Map<number, Set<number>>;
-// 	curId: number;
-// 	getBoundaryId(): number;
-// 	boundaries: Map<number, Boundary>;
-// 	getBoundary(id: number): Boundary;
-// 	addBoundary(id: number, parentId?: number): Boundary;
-// };
-
 export type SuspenseGlobalCtx = ReturnType<typeof createSuspenseResponse>;
 
 export type SuspenseStorageCtx = {
@@ -36,11 +26,11 @@ export type SuspenseStorageCtx = {
 export const SuspenseStorage = new AsyncLocalStorage<SuspenseStorageCtx>();
 
 export function createSuspenseResponse({
-	onBoundaryReady,
+	onAsyncChunkReady,
 	onAllReady,
 	onBoundaryErrored,
 }: {
-	onBoundaryReady: (chunk: string, boundary: Boundary) => void;
+	onAsyncChunkReady: (chunk: string, boundary: Boundary) => void;
 	onBoundaryErrored: (error: unknown, boundary: Boundary) => void;
 	onAllReady: () => void;
 }) {
@@ -167,7 +157,7 @@ export function createSuspenseResponse({
 			this.markFlushed(id);
 			try {
 				if (chunk !== null) {
-					onBoundaryReady(chunk, boundary);
+					onAsyncChunkReady(chunk, boundary);
 				}
 			} finally {
 				if (!this.pending.size) {
