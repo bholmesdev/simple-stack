@@ -44,3 +44,25 @@ export function promiseWithResolvers<T>() {
 export function sleep(ms: number) {
 	return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
+
+export function once<T>(create: () => T): () => T {
+	type Entry<T> =
+		| { status: "empty"; value: null }
+		| { status: "full"; value: T }
+		| { status: "error"; error: unknown };
+
+	let cache: Entry<T> = { status: "empty", value: null };
+	return () => {
+		if (cache.status == "empty") {
+			try {
+				cache = { status: "full", value: create() };
+			} catch (error) {
+				cache = { status: "error", error };
+			}
+		}
+		if (cache.status === "error") {
+			throw cache.error;
+		}
+		return cache.value;
+	};
+}

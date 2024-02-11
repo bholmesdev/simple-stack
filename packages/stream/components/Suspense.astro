@@ -1,6 +1,6 @@
 ---
 import { SuspenseStorage, type SuspenseGlobalCtx } from "../src/suspense-context";
-import { sleep, trackPromiseState } from "../src/utils";
+import { once, sleep, trackPromiseState } from "../src/utils";
 
 const globalCtx = Astro.locals.suspense as SuspenseGlobalCtx;
 const parentCtx = SuspenseStorage.getStore();
@@ -20,10 +20,8 @@ const contentsThenable = trackPromiseState(
   )
 );
 
-const SYNC_FLUSH_DEADLINE_MS = 5
-await sleep(SYNC_FLUSH_DEADLINE_MS);
-
-type RenderKind = { kind: 'fallback' } | { kind: 'content', content: string }
+// TODO: figure out what to do with this mess here
+//====================================================
 
 function getMarkerCommentBegin(id: number) {
   return `<!-- suspense-fallback-begin:${id} -->`
@@ -64,28 +62,6 @@ function tryReplaceChildFallbacks(content: string) {
     }
   };
   return content;
-}
-
-function once<T>(create: () => T): () => T {
-  type Entry<T> =
-    | { status: 'empty', value: null }
-    | { status: 'full', value: T }
-    | { status: 'error', error: unknown }
-  
-  let cache: Entry<T> = { status: 'empty', value: null }
-  return () => {
-    if (cache.status == 'empty') {
-      try {
-        cache = { status: 'full', value: create() }
-      } catch (error) {
-        cache = { status: 'error', error }
-      }
-    }
-    if (cache.status === 'error') {
-      throw cache.error;
-    }
-    return cache.value;
-  }
 }
 
 async function onChildrenSlotRendered(value: string) {
@@ -155,6 +131,12 @@ async function onChildrenSlotRendered(value: string) {
     }
   }
 }
+
+//====================================================
+
+const SYNC_FLUSH_DEADLINE_MS = 5
+await sleep(SYNC_FLUSH_DEADLINE_MS);
+type RenderKind = { kind: 'fallback' } | { kind: 'content', content: string }
 
 
 // Check if the slot managed to render in time.
