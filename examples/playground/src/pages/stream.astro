@@ -57,8 +57,28 @@ import { Suspense, } from 'simple-stack-stream/components'
     </Suspense>
   </Suspense>
 
-  <!--
+  <hr />
+  
   <Suspense>
+    <Wait ms={1000}>
+      <p class="font-bold text-lg">Slow content 1</p>
+    </Wait>
+    <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
+    <Suspense>
+      <Wait ms={2000}>
+        <p class="font-bold text-lg">Slow content 2</p>
+      </Wait>
+      <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
+      <Suspense>
+        <Wait ms={1000}>
+          <p class="font-bold text-lg">Slow content 3</p>
+        </Wait>
+        <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
+      </Suspense>
+    </Suspense>
+  </Suspense>
+
+  <!-- <Suspense>
     <p slot="fallback">Loading... (also shouldn't appear)</p>
     <Wait ms={1}>
       <p class="font-bold text-lg">More content</p>

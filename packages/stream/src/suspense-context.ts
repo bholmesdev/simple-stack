@@ -28,6 +28,13 @@ export type Boundary = GenericBoundary<BoundaryResult>;
 
 export type SuspenseGlobalCtx = ReturnType<typeof createSuspenseResponse>;
 
+export type SuspenseStorageCtx = {
+	parentId: number;
+	ancestorIds: number[];
+};
+
+export const SuspenseStorage = new AsyncLocalStorage<SuspenseStorageCtx>();
+
 export function createSuspenseResponse({
 	onBoundaryReady,
 	onAllReady,
@@ -37,11 +44,6 @@ export function createSuspenseResponse({
 	onBoundaryErrored: (error: unknown, boundary: Boundary) => void;
 	onAllReady: () => void;
 }) {
-	type Flush = {
-		collect(): Promise<void>;
-		register(): () => void;
-		registered: Promise<void>[];
-	};
 	return {
 		curId: 1,
 		getBoundaryId() {
@@ -51,45 +53,49 @@ export function createSuspenseResponse({
 		pending: new Set<number>(),
 		flushed: new Set<number>(),
 
-		pendingFlush: null as Flush | null,
-		getOrCreateNextFlush(duration: number) {
-			let flush = this.pendingFlush;
-			if (!flush) {
-				const deadline = sleep(duration);
-				deadline.then(() => {
-					this.pendingFlush = null;
+		batches: new Map<number, Batch>(),
+		getOrCreateNextBatch({
+			boundaryId,
+			ancestorIds,
+			duration,
+		}: {
+			boundaryId: number;
+			ancestorIds: number[] | undefined;
+			duration: number;
+		}) {
+			// check if we have an ongoing batch, starting from the outermost ancestor
+			const ancerstorWithBatch = ancestorIds?.find((ancestorId) =>
+				this.batches.has(ancestorId)
+			);
+			const existingBatch =
+				ancerstorWithBatch !== undefined
+					? this.batches.get(ancerstorWithBatch)
+					: undefined;
+
+			if (!existingBatch) {
+				const initiatorId = boundaryId;
+				const newBatch: Batch = createBatch({ duration, initiatorId });
+				newBatch.deadline.then(() => {
+					this.batches.delete(initiatorId);
 				});
-				flush = {
-					registered: [],
-					register() {
-						const [promise, { resolve }] = promiseWithResolvers<void>();
-						this.registered.push(promise);
-						return resolve;
-					},
-					async collect() {
-						await deadline;
-						console.log("flush :: deadline passed", this.registered.length);
-						await Promise.all(this.registered);
-						console.log("flush :: collect resolving", this.registered.length);
-					},
-				};
-				this.pendingFlush = flush;
-				return [flush, true] as const;
+				this.batches.set(initiatorId, newBatch);
+				return [newBatch, true] as const;
 			} else {
-				return [flush, false] as const;
+				return [existingBatch, false] as const;
 			}
 		},
 
-		dependencies: new Map<number, Set<number>>(),
-		addDependency(idFrom: number, idTo: number) {
-			let edges = this.dependencies.get(idFrom);
-			if (!edges) {
-				edges = new Set();
-				this.dependencies.set(idFrom, edges);
-			}
-			edges.add(idTo);
+		children: new Map<number, Set<number>>(),
+		addChild(parentId: number, childId: number) {
+			const edges = getOrCreate(
+				this.children,
+				parentId,
+				() => new Set<number>()
+			);
+			edges.add(childId);
 			return edges;
 		},
+
 		getBoundary(id: number) {
 			return getOrCreate(this.boundaries, id, () => {
 				const [promise, controller] = promiseWithResolvers<BoundaryResult>();
@@ -110,7 +116,7 @@ export function createSuspenseResponse({
 						`simple-suspense :: internal error: nonexistent parent id ${parentId}`
 					);
 				}
-				this.addDependency(parentId, id);
+				this.addChild(parentId, id);
 			}
 
 			// TODO: is this the right place to do this?
@@ -133,18 +139,16 @@ export function createSuspenseResponse({
 			return thenable.then(callback);
 		},
 		markFlushed(id: number) {
+			this.pending.delete(id);
 			this.flushed.add(id);
 			const { controller } = this.getOrCreateFlush(id);
 			controller.resolve();
 		},
 
-		markEmittedSync(boundary: Boundary, { flushed = true } = {}) {
+		markEmittedSync(boundary: Boundary) {
 			const { id } = boundary;
 			console.log(`boundary was emitted synchronously ${id}`);
-			if (flushed) {
-				this.markFlushed(id);
-			}
-			this.pending.delete(id);
+			this.markFlushed(id);
 			boundary.controller.resolve(null);
 		},
 
@@ -160,7 +164,6 @@ export function createSuspenseResponse({
 				id,
 				chunk === null ? null : chunk.slice(0, 16) + "..."
 			);
-			this.pending.delete(id);
 			this.markFlushed(id);
 			try {
 				if (chunk !== null) {
@@ -175,6 +178,48 @@ export function createSuspenseResponse({
 	};
 }
 
+type Batch = {
+	deadline: Promise<void>;
+	isFinished: boolean;
+	initiatorId: number;
+	collect(): Promise<void>;
+	register(): () => void;
+	registered: Promise<void>[];
+};
+
+function createBatch({
+	initiatorId,
+	duration,
+}: {
+	initiatorId: number;
+	duration: number;
+}): Batch {
+	const deadline = sleep(duration);
+	return {
+		deadline,
+		isFinished: false,
+		initiatorId,
+		registered: [],
+		register() {
+			if (this.isFinished) {
+				throw new Error(
+					`Internal error: Cannot register into a finished batch`
+				);
+			}
+			const [promise, { resolve }] = promiseWithResolvers<void>();
+			this.registered.push(promise);
+			return resolve;
+		},
+		async collect() {
+			await deadline;
+			console.log("batch :: deadline passed", this.registered.length);
+			this.isFinished = true;
+			await Promise.all(this.registered);
+			console.log("batch :: collect resolving", this.registered.length);
+		},
+	};
+}
+
 function getOrCreate<K, V>(map: Map<K, V>, key: K, create: () => V): V {
 	let value = map.get(key);
 	if (!value && !map.has(key)) {
@@ -183,11 +228,3 @@ function getOrCreate<K, V>(map: Map<K, V>, key: K, create: () => V): V {
 	}
 	return value!;
 }
-
-export type SuspenseStorageCtx = {
-	parentId: number;
-	ancestorIds: number[];
-	// registerBoundary(id: number, promise: Promise<string>): number;
-};
-
-export const SuspenseStorage = new AsyncLocalStorage<SuspenseStorageCtx>();
