@@ -47,6 +47,7 @@ function tryReplaceChildFallbacks(content: string) {
   for (const childId of childBoundaryIds) {
     const childBoundary = globalCtx.boundaries.get(childId)!;
     const childContents = childBoundary.thenable;
+    console.log(`Suspense ${id} :: attempting to replace child boundary ${childId}:`, childContents.status)
     if (childContents.status === 'fulfilled' && !globalCtx.flushed.has(childId)) {
       const childContentStr = childContents.value;
       if (childContentStr !== null) {
@@ -58,7 +59,7 @@ function tryReplaceChildFallbacks(content: string) {
           pat,
           (_) => {
             didReplace = true;
-            return childContentStr
+            return typeof childContentStr === 'function' ? childContentStr() : childContentStr
           }
         );
         if (didReplace) {
@@ -72,6 +73,15 @@ function tryReplaceChildFallbacks(content: string) {
   return content;
 }
 
+function once<T>(create: () => T): () => T {
+  let cache: { has: false, value: null } | { has: true, value: T } = { has: false, value: null }
+  return () => {
+    if (!cache.has) {
+      cache = { has: true, value: create() }
+    }
+    return cache.value
+  }
+}
 
 console.log(`Suspense ${id} :: checking children:`, contentsThenable.status)
 switch (contentsThenable.status) {
@@ -84,27 +94,60 @@ switch (contentsThenable.status) {
         // if we don't do it that way, there's no way to distinguish the async stuff that belongs to this boundary
         // from stuff that belongs to child boundaries.
 
-        // if there's any boundaries below us, give the children one more chance to resolve.
-        if (globalCtx.dependencies.get(id)?.size) {
-          await Promise.resolve(null);
-        }
+        // // if there's any boundaries below us, give the children one more chance to resolve.
+        // const children = globalCtx.dependencies.get(id);
+        // console.log(`Suspense ${id} :: waiting for children`, children);
+        // // TODO: this should only apply to ancestors, not any random boundary in the tree!!!
+        // const [pendingFlush, didInitiate] = globalCtx.getOrCreateNextFlush(SYNC_FLUSH_DEADLINE_MS);
+        // console.log(`Suspense ${id} ::`, didInitiate ? 'initiating flush' : 'joining existing flush');
+        // let finish: (() => void) | undefined
+        // if (didInitiate) {
+        //   console.log(`Suspense ${id} ::`, 'waiting to collect...');
+        //   await pendingFlush.collect()
+        //   console.log(`Suspense ${id} ::`, '(initiator) time is up, initiator is flushing NOW');
+        // } else {
+        //   finish = pendingFlush.register();
+        // }
+
+        // NOTE: this is kind of like a buffered stream...
+        // 1. if parent is pending, and a child completes, we need to buffer the children and make them available to read
+        // 2. if parent is already flushed, we need to schedule the child to flush itself
+        //    - in particular, when a parent flushes, all of its unbuffered (=pending) children become new "roots" that can emit themselves,
+        //      i.e. they switch from pull(ables) to push(ers)
+        // would be nicer to have that more visible in the code...
+        // i realy think "emit" and "make the contents available for pull" need to get decoupled
 
         // incorporate any resolved child boundaries into our output.
-        value = tryReplaceChildFallbacks(value);
-
+        const getFinalValue = once(() => tryReplaceChildFallbacks(value));
+        
+        console.log(`Suspense ${id} :: about to emit`)
         if (parentId === undefined) {
           // there's no boundary above us, so we have to emit ourselves.
-          globalCtx.emitAsync(thisBoundary, value);
+          globalCtx.emitAsync(thisBoundary, getFinalValue());
         } else {
           // there's a parent boundary above us.
           if (globalCtx.flushed.has(parentId)) {
+            console.log(`Suspense ${id} :: parent boundary (${parentId}) already flushed`)
             // parent already flushed, so we have to emit ourselves.
-            globalCtx.emitAsync(thisBoundary, value);
+            globalCtx.emitAsync(thisBoundary, getFinalValue());
           } else {
-            // parent hasn't flushed yet. we can just resolve, and it will incorporate us.
-            thisBoundary.controller.resolve(value);
+            console.log(`Suspense ${id} :: parent boundary (${parentId}) hasn't flushed yet, resolving`)
+            // parent hasn't flushed yet. we can just resolve, and it should incorporate us.
+            // (note that we're passing a function (NOT a string) on purpose here)
+            thisBoundary.controller.resolve(getFinalValue);
+            globalCtx.onFlushed(parentId, () => {
+              // ...but if the parent didn't end up incorporating us for whatever reason,
+              // we'll emit ourselves.
+              if (!globalCtx.flushed.has(id)) {
+                globalCtx.emitAsync(thisBoundary, getFinalValue())
+              }
+            })
           }
         }
+
+        // if (finish) {
+        //   finish();
+        // }
       },
       (error) => thisBoundary.controller.reject(error),
     );
@@ -120,7 +163,7 @@ switch (contentsThenable.status) {
         `Suspense :: slot already resolved, no need to show fallback`
       );
     }
-    globalCtx.markEmittedSync(thisBoundary);
+    globalCtx.markEmittedSync(thisBoundary, { flushed: true });
     renderKind = { kind: 'content', content: contentsThenable.value }
     break;
   }

@@ -16,7 +16,7 @@ import { Suspense, } from 'simple-stack-stream/components'
     <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
   </Suspense> -->
 
-  <Suspense>
+  <!-- <Suspense>
     <Wait ms={2000}>
       <p class="font-bold text-lg">Slow content</p>
     </Wait>
@@ -27,7 +27,7 @@ import { Suspense, } from 'simple-stack-stream/components'
       </Wait>
       <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
     </Suspense>
-  </Suspense>
+  </Suspense> -->
 
   <!-- in-order HTML streaming (no client JS)
   <Wait class="fixed bottom-0 left-0 right-0" ms={500}>
@@ -36,15 +36,28 @@ import { Suspense, } from 'simple-stack-stream/components'
       <p>Join the newsletter</p>
     </footer>
   </Wait>
+  -->
 
   <Suspense>
-    <p slot="fallback">Loading... (shouldn't appear)</p>
-    <div class="rounded p-2 border-gray-300 border-2">
-      <p class="font-bold text-lg">Synchronous content wrapped in a Suspense</p>
-      <p>(it shouldn't show a fallback)</p>
-    </div>
+    <Wait ms={1000}>
+      <p class="font-bold text-lg">Slow content 1</p>
+    </Wait>
+    <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
+    <Suspense>
+      <Wait ms={1000}>
+        <p class="font-bold text-lg">Slow content 2</p>
+      </Wait>
+      <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
+      <Suspense>
+        <Wait ms={1000}>
+          <p class="font-bold text-lg">Slow content 3</p>
+        </Wait>
+        <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
+      </Suspense>
+    </Suspense>
   </Suspense>
 
+  <!--
   <Suspense>
     <p slot="fallback">Loading... (also shouldn't appear)</p>
     <Wait ms={1}>

@@ -6,7 +6,9 @@ type Props = {
 
 const {ms, class: cls} = Astro.props;
 
+console.log(`Wait :: sleeping for ${ms}ms`)
 await new Promise(resolve => setTimeout(resolve, ms));
+console.log('Wait :: finished')
 ---
 <div class:list={["rounded p-2 border-gray-300 border-2", cls]}>
 <slot />

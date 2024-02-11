@@ -4,6 +4,7 @@ import {
 	type PromiseController,
 	type Thenable,
 	trackPromiseState,
+	sleep,
 } from "./utils";
 
 type GenericBoundary<T> = {
@@ -12,7 +13,8 @@ type GenericBoundary<T> = {
 	controller: PromiseController<T>;
 };
 
-export type Boundary = GenericBoundary<string | null>;
+type BoundaryResult = null | string | (() => string);
+export type Boundary = GenericBoundary<BoundaryResult>;
 
 // export type SuspenseGlobalCtx = {
 // 	pending: Set<number>;
@@ -35,6 +37,11 @@ export function createSuspenseResponse({
 	onBoundaryErrored: (error: unknown, boundary: Boundary) => void;
 	onAllReady: () => void;
 }) {
+	type Flush = {
+		collect(): Promise<void>;
+		register(): () => void;
+		registered: Promise<void>[];
+	};
 	return {
 		curId: 1,
 		getBoundaryId() {
@@ -43,9 +50,36 @@ export function createSuspenseResponse({
 		boundaries: new Map<number, Boundary>(),
 		pending: new Set<number>(),
 		flushed: new Set<number>(),
-		pings: {
-			flushed: new Map<number, GenericBoundary<void>>(),
+
+		pendingFlush: null as Flush | null,
+		getOrCreateNextFlush(duration: number) {
+			let flush = this.pendingFlush;
+			if (!flush) {
+				const deadline = sleep(duration);
+				deadline.then(() => {
+					this.pendingFlush = null;
+				});
+				flush = {
+					registered: [],
+					register() {
+						const [promise, { resolve }] = promiseWithResolvers<void>();
+						this.registered.push(promise);
+						return resolve;
+					},
+					async collect() {
+						await deadline;
+						console.log("flush :: deadline passed", this.registered.length);
+						await Promise.all(this.registered);
+						console.log("flush :: collect resolving", this.registered.length);
+					},
+				};
+				this.pendingFlush = flush;
+				return [flush, true] as const;
+			} else {
+				return [flush, false] as const;
+			}
 		},
+
 		dependencies: new Map<number, Set<number>>(),
 		addDependency(idFrom: number, idTo: number) {
 			let edges = this.dependencies.get(idFrom);
@@ -58,7 +92,7 @@ export function createSuspenseResponse({
 		},
 		getBoundary(id: number) {
 			return getOrCreate(this.boundaries, id, () => {
-				const [promise, controller] = promiseWithResolvers<string | null>();
+				const [promise, controller] = promiseWithResolvers<BoundaryResult>();
 				return { id, thenable: trackPromiseState(promise), controller };
 			});
 		},
@@ -87,10 +121,29 @@ export function createSuspenseResponse({
 			return boundary;
 		},
 
-		markEmittedSync(boundary: Boundary) {
+		flushes: new Map<number, GenericBoundary<void>>(),
+		getOrCreateFlush(id: number) {
+			return getOrCreate(this.flushes, id, () => {
+				const [promise, controller] = promiseWithResolvers<void>();
+				return { id, controller, thenable: trackPromiseState(promise) };
+			});
+		},
+		onFlushed(id: number, callback: () => void) {
+			const { thenable } = this.getOrCreateFlush(id);
+			return thenable.then(callback);
+		},
+		markFlushed(id: number) {
+			this.flushed.add(id);
+			const { controller } = this.getOrCreateFlush(id);
+			controller.resolve();
+		},
+
+		markEmittedSync(boundary: Boundary, { flushed = true } = {}) {
 			const { id } = boundary;
 			console.log(`boundary was emitted synchronously ${id}`);
-			this.flushed.add(id);
+			if (flushed) {
+				this.markFlushed(id);
+			}
 			this.pending.delete(id);
 			boundary.controller.resolve(null);
 		},
@@ -107,13 +160,13 @@ export function createSuspenseResponse({
 				id,
 				chunk === null ? null : chunk.slice(0, 16) + "..."
 			);
+			this.pending.delete(id);
+			this.markFlushed(id);
 			try {
 				if (chunk !== null) {
 					onBoundaryReady(chunk, boundary);
 				}
 			} finally {
-				this.pending.delete(id);
-				this.flushed.add(id);
 				if (!this.pending.size) {
 					onAllReady();
 				}
