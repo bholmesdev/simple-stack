@@ -1,8 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
-import { promiseWithResolvers, trackPromiseState } from "./utils";
 import {
 	createSuspenseResponse,
-	type Boundary,
 	type SuspenseGlobalCtx,
 } from "./suspense-context";
 
@@ -10,8 +8,6 @@ type SuspendedChunk = {
 	id: number;
 	chunk: string;
 };
-
-const SUSPENSE_LIST_REVEAL_DELAY_MS = 300;
 
 export const onRequest = defineMiddleware(async (ctx, next) => {
 	let streamController: ReadableStreamDefaultController<SuspendedChunk>;
@@ -58,7 +54,21 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 		console.log(`middleware :: ${suspenseCtx.pending.size} chunks pending`);
 		if (!suspenseCtx.pending.size) return streamController.close();
 
-		yield `<script>
+		yield BOOTSTRAP_SCRIPT;
+
+		// @ts-expect-error ReadableStream does not have asyncIterator
+		for await (const item of stream) {
+			const { id, chunk } = item as SuspendedChunk;
+			console.log("middleware :: yielding", id, chunk);
+			yield asyncChunkInsertionHTML(id, chunk);
+		}
+	}
+
+	// @ts-expect-error generator not assignable to ReadableStream
+	return new Response(render(), response.headers);
+});
+
+const BOOTSTRAP_SCRIPT = `<script>
 window.__SIMPLE_SUSPENSE_INSERT = function (id) {
 	var template = document.querySelector('[data-suspense="' + id + '"]').content;
 	var dest = document.querySelector('[data-suspense-fallback="' + id + '"]');
@@ -66,15 +76,9 @@ window.__SIMPLE_SUSPENSE_INSERT = function (id) {
 }
 </script>`;
 
-		// @ts-expect-error ReadableStream does not have asyncIterator
-		for await (const item of stream) {
-			const { id, chunk } = item as SuspendedChunk;
-			console.log("middleware :: yielding", id, chunk);
-			yield `<template data-suspense=${id}>${chunk}</template>` +
-				`<script>window.__SIMPLE_SUSPENSE_INSERT(${id});</script>`;
-		}
-	}
-
-	// @ts-expect-error generator not assignable to ReadableStream
-	return new Response(render(), response.headers);
-});
+function asyncChunkInsertionHTML(id: number, chunk: string) {
+	return (
+		`<template data-suspense=${id}>${chunk}</template>` +
+		`<script>window.__SIMPLE_SUSPENSE_INSERT(${id});</script>`
+	);
+}
