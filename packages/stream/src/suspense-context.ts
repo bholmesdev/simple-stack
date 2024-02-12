@@ -1,10 +1,10 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import {
-	promiseWithResolvers,
 	type PromiseController,
 	type Thenable,
-	trackPromiseState,
+	promiseWithResolvers,
 	sleep,
+	trackPromiseState,
 } from "./utils";
 
 type GenericBoundary<T> = {
@@ -55,7 +55,7 @@ export function createSuspenseResponse({
 		}) {
 			// check if we have an ongoing batch, starting from the outermost ancestor
 			const ancerstorWithBatch = ancestorIds?.find((ancestorId) =>
-				this.batches.has(ancestorId)
+				this.batches.has(ancestorId),
 			);
 			const existingBatch =
 				ancerstorWithBatch !== undefined
@@ -80,7 +80,7 @@ export function createSuspenseResponse({
 			const edges = getOrCreate(
 				this.children,
 				parentId,
-				() => new Set<number>()
+				() => new Set<number>(),
 			);
 			edges.add(childId);
 			return edges;
@@ -95,7 +95,7 @@ export function createSuspenseResponse({
 		addBoundary(id: number, parentId?: number): Boundary {
 			if (this.boundaries.has(id)) {
 				throw new Error(
-					`simple-suspense :: internal error: duplicate boundary id ${id}`
+					`simple-suspense :: internal error: duplicate boundary id ${id}`,
 				);
 			}
 			this.pending.add(id);
@@ -103,7 +103,7 @@ export function createSuspenseResponse({
 			if (parentId !== undefined) {
 				if (!this.boundaries.has(parentId)) {
 					throw new Error(
-						`simple-suspense :: internal error: nonexistent parent id ${parentId}`
+						`simple-suspense :: internal error: nonexistent parent id ${parentId}`,
 					);
 				}
 				this.addChild(parentId, id);
@@ -120,6 +120,7 @@ export function createSuspenseResponse({
 		flushes: new Map<number, GenericBoundary<void>>(),
 		getOrCreateFlush(id: number) {
 			return getOrCreate(this.flushes, id, () => {
+				// biome-ignore lint/suspicious/noConfusingVoidType: this is correct usage of void, not sure what biome's problem is
 				const [promise, controller] = promiseWithResolvers<void>();
 				return { id, controller, thenable: trackPromiseState(promise) };
 			});
@@ -152,7 +153,7 @@ export function createSuspenseResponse({
 			console.log(
 				"middleware :: boundary resolved",
 				id,
-				chunk === null ? null : chunk.slice(0, 16) + "..."
+				chunk === null ? null : chunk.slice(0, 16) + "...",
 			);
 			this.markFlushed(id);
 			try {
@@ -193,9 +194,10 @@ function createBatch({
 		register() {
 			if (this.isFinished) {
 				throw new Error(
-					`Internal error: Cannot register into a finished batch`
+					`Internal error: Cannot register into a finished batch`,
 				);
 			}
+			// biome-ignore lint/suspicious/noConfusingVoidType: this is correct usage of void, not sure what biome's problem is
 			const [promise, { resolve }] = promiseWithResolvers<void>();
 			this.registered.push(promise);
 			return resolve;

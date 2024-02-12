@@ -1,8 +1,8 @@
-import { defineMiddleware } from "astro:middleware";
 import {
-	createSuspenseResponse,
 	type SuspenseGlobalCtx,
+	createSuspenseResponse,
 } from "./suspense-context";
+import { defineMiddleware } from "astro:middleware";
 
 type SuspendedChunk = {
 	id: number;

@@ -22,7 +22,7 @@ export function trackPromiseState<T>(promise: Promise<T>): Thenable<T> {
 			const rejected = promise as Promise<T> & RejectedThenableState;
 			rejected.status = "rejected";
 			rejected.reason = error;
-		}
+		},
 	);
 	return thenable;
 }
@@ -53,7 +53,7 @@ export function once<T>(create: () => T): () => T {
 
 	let cache: Entry<T> = { status: "empty", value: null };
 	return () => {
-		if (cache.status == "empty") {
+		if (cache.status === "empty") {
 			try {
 				cache = { status: "full", value: create() };
 			} catch (error) {
