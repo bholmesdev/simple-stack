@@ -64,23 +64,9 @@ export function Form({
 		<FormContext.Provider value={formContext}>
 			<form
 				{...formProps}
-				method="POST"
-				onSubmit={async (e) => {
-					e.preventDefault();
-					e.stopPropagation();
-					const formData = new FormData(e.currentTarget);
-					formContext.set((formState) => ({
-						...formState,
-						isSubmitPending: true,
-						submitStatus: "validating",
-					}));
+				action={async (formData) => {
 					const parsed = await validateForm({ formData, validator });
 					if (parsed.data) {
-						formContext.set((formState) => ({
-							...formState,
-							isSubmitPending: false,
-							submitStatus: "submitting",
-						}));
 						return action(formData);
 					}
 

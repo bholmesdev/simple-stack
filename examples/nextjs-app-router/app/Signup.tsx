@@ -4,6 +4,7 @@ import { signup } from "./page";
 import { signupSubmit } from "./action";
 import { useFormState } from "./utils";
 import { Form, Input } from "../components/Form";
+import { useFormStatus } from "react-dom";
 
 export default function Signup() {
 	const [state, formAction] = useFormState(signupSubmit);
@@ -42,9 +43,15 @@ export default function Signup() {
 				>
 					Submit
 				</button>
+				<Loading />
 			</Form>
 		</>
 	);
+}
+
+function Loading() {
+	const { pending } = useFormStatus();
+	return pending ? <p>submitting</p> : null;
 }
 
 function FormGroup({ children }: { children: React.ReactNode }) {
