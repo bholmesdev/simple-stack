@@ -51,20 +51,45 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
 		if (!pending.size) return streamController.close();
 
-		yield `<script>window.__SIMPLE_SUSPENSE_INSERT = function (idx) {
-	var template = document.querySelector('[data-suspense="' + idx + '"]').content;
-	var dest = document.querySelector('[data-suspense-fallback="' + idx + '"]');
-	dest.replaceWith(template);
-}</script>`;
+		yield SCRIPT_START;
 
 		// @ts-expect-error ReadableStream does not have asyncIterator
 		for await (const { chunk, idx } of stream) {
-			yield `<template data-suspense=${idx}>${chunk}</template>` +
-				`<script>window.__SIMPLE_SUSPENSE_INSERT(${idx});</script>`;
+			yield `insert(${idx}, ${JSON.stringify(chunk)});`;
+
 			if (!pending.size) return streamController.close();
 		}
+
+		yield SCRIPT_END;
 	}
 
 	// @ts-expect-error generator not assignable to ReadableStream
 	return new Response(render(), response.headers);
 });
+
+const SCRIPT_START = `<script>{
+	let range = new Range();
+	let insert = (id, content) => {
+		let fragment = range.createContextualFragment(content);
+		let selector = '[data-suspense-fallback="' + id + '"]';
+		let replacer = () => {
+			fallback = document.querySelector(selector);
+	
+			if (fallback) {
+				fallback.replaceWith(fragment);
+			} else if (id-- > 0) {
+				queueMicrotask(replacer);
+			} else {
+				console.error(errormsg);
+			}
+		};
+		let errormsg = "Failed to insert async content (Suspense boundary id: " + id + ")";
+		let fallback;
+	
+		replacer();
+	};
+	
+	range.selectNodeContents(document.createElement('template'));
+`.replace(/[\n\t]/g, '');
+
+const SCRIPT_END = `}</script>`
