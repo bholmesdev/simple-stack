@@ -40,9 +40,9 @@ switch (thenable.status) {
 
 {
   renderKind.kind === 'fallback' ? (
-    <div style="display: contents" data-suspense-fallback={renderKind.id}>
+    <span style="display: contents" data-suspense-fallback={renderKind.id}>
       <slot name="fallback" />
-    </div>
+    </span>
   ) : (
     <Fragment set:html={renderKind.content} />
   )
