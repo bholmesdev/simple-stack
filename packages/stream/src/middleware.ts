@@ -79,11 +79,8 @@ const SCRIPT_START = `<script>{
 				fallback.replaceWith(fragment);
 			} else if (id-- > 0) {
 				queueMicrotask(replacer);
-			} else {
-				console.error(errormsg);
 			}
 		};
-		let errormsg = "Failed to insert async content (Suspense boundary id: " + id + ")";
 		let fallback;
 	
 		replacer();
