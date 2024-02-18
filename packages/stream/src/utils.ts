@@ -6,3 +6,11 @@ export const sleep = (ms: number) =>
 export const SuspenseStorage = new AsyncLocalStorage<{
 	id: number;
 }>();
+
+export function fallbackMarkerStart(id: number) {
+	return `<!--fallback-start-${id}-->`;
+}
+
+export function fallbackMarkerEnd(id: number) {
+	return `<!--fallback-end-${id}-->`;
+}

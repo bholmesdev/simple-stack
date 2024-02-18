@@ -1,4 +1,9 @@
-import { SuspenseStorage, sleep } from "./utils.js";
+import {
+	SuspenseStorage,
+	fallbackMarkerEnd,
+	fallbackMarkerStart,
+	sleep,
+} from "./utils.js";
 import { defineMiddleware } from "astro:middleware";
 
 type SuspendedChunk = {
@@ -21,6 +26,13 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
 	let curId = 0;
 	const pending = new Map<number, Promise<string>>();
+
+	/** Track suspense boundaries for parent <> child flattening */
+	const claimableChunks = new Set<{
+		id: number;
+		parentId: number;
+		chunk: string;
+	}>();
 
 	ctx.locals.suspend = async (promiseCb) => {
 		const id = curId++;
@@ -50,8 +62,33 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 		}
 
 		promise
-			.then(async (chunk) => {
+			.then(async (baseChunk) => {
+				const claimable = { id, parentId: parentId ?? -1, chunk: baseChunk };
+				claimableChunks.add(claimable);
+
+				// Wait to see if child promises resolve quickly.
+				// If they do, we will flatten, or "flush,"
+				// to avoid unnecessary fallbacks.
+				await sleep(FLUSH_THRESHOLD);
+
+				let chunk = baseChunk;
+				const children = [...claimableChunks].filter((c) => c.parentId === id);
+
+				for (const child of children) {
+					chunk = chunk.replace(
+						new RegExp(
+							`${fallbackMarkerStart(child.id)}.*?${fallbackMarkerEnd(
+								child.id,
+							)}`,
+							"s",
+						),
+						child.chunk,
+					);
+					pending.delete(child.id);
+					claimableChunks.delete(child);
+				}
 				streamController.enqueue({ chunk, id });
+				claimableChunks.delete(claimable);
 			})
 			.catch((e) => {
 				streamController.error(e);
