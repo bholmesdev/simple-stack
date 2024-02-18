@@ -1,5 +1,5 @@
-import { defineMiddleware } from "astro:middleware";
 import { SuspenseStorage, sleep } from "./utils.js";
+import { defineMiddleware } from "astro:middleware";
 
 type SuspendedChunk = {
 	chunk: string;
