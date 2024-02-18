@@ -11,7 +11,7 @@ type SuspendedChunk = {
 	id: number;
 };
 
-const FLUSH_THRESHOLD = 50;
+const FLUSH_THRESHOLD = 20;
 
 export const onRequest = defineMiddleware(async (ctx, next) => {
 	let streamController: ReadableStreamDefaultController<SuspendedChunk>;
