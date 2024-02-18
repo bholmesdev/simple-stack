@@ -1,14 +1,17 @@
 import { defineMiddleware } from "astro:middleware";
+import { SuspenseStorage, sleep } from "./utils.js";
 
 type SuspendedChunk = {
 	chunk: string;
-	idx: number;
+	id: number;
 };
+
+const FLUSH_THRESHOLD = 50;
 
 export const onRequest = defineMiddleware(async (ctx, next) => {
 	let streamController: ReadableStreamDefaultController<SuspendedChunk>;
 
-	// Thank you owoce!
+	// Thank you owoce for the ReadableStream idea ;)
 	// https://gist.github.com/lubieowoce/05a4cb2e8cd252787b54b7c8a41f09fc
 	const stream = new ReadableStream<SuspendedChunk>({
 		start(controller) {
@@ -17,23 +20,44 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 	});
 
 	let curId = 0;
-	const pending = new Set<Promise<string>>();
+	const pending = new Map<number, Promise<string>>();
 
-	ctx.locals.suspend = (promise) => {
-		const idx = curId++;
-		pending.add(promise);
+	ctx.locals.suspend = async (promiseCb) => {
+		const id = curId++;
+
+		// Pass `id` as context while rendering child content.
+		// This lets us track the parent from nested suspense calls.
+		const basePromise = SuspenseStorage.run({ id }, promiseCb);
+
+		const parentId = SuspenseStorage.getStore()?.id;
+		const parentPromise =
+			parentId !== undefined ? pending.get(parentId) : undefined;
+
+		const promise = new Promise<string>((resolve) => {
+			// Await the parent before resolving the child.
+			// This ensures the parent is sent to the client first.
+			const parent = parentPromise ?? Promise.resolve();
+			parent.then(() => resolve(basePromise));
+		});
+		pending.set(id, promise);
+
+		// Render content without a fallback if resolved quickly.
+		const child = await Promise.race([promise, sleep(FLUSH_THRESHOLD)]);
+
+		if (typeof child === "string") {
+			pending.delete(id);
+			return { render: "content", value: child };
+		}
+
 		promise
-			.then((chunk) => {
-				try {
-					streamController.enqueue({ chunk, idx });
-				} finally {
-					pending.delete(promise);
-				}
+			.then(async (chunk) => {
+				streamController.enqueue({ chunk, id });
 			})
 			.catch((e) => {
 				streamController.error(e);
 			});
-		return idx;
+
+		return { render: "fallback", id };
 	};
 
 	const response = await next();
@@ -49,6 +73,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 			yield chunk;
 		}
 
+		// Immediately close the stream if Suspense was not used.
 		if (!pending.size) return streamController.close();
 
 		yield `<script>window.__SIMPLE_SUSPENSE_INSERT = function (idx) {
@@ -58,9 +83,11 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 }</script>`;
 
 		// @ts-expect-error ReadableStream does not have asyncIterator
-		for await (const { chunk, idx } of stream) {
-			yield `<template data-suspense=${idx}>${chunk}</template>` +
-				`<script>window.__SIMPLE_SUSPENSE_INSERT(${idx});</script>`;
+		for await (const { chunk, id } of stream) {
+			yield `<template data-suspense=${id}>${chunk}</template>` +
+				`<script>window.__SIMPLE_SUSPENSE_INSERT(${id});</script>`;
+
+			pending.delete(id);
 			if (!pending.size) return streamController.close();
 		}
 	}

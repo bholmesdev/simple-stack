@@ -2,6 +2,15 @@
 
 declare namespace App {
 	interface Locals {
-		suspend(promise: Promise<string>): number;
+		suspend(promiseCb: () => Promise<string>): Promise<
+			| {
+					render: "fallback";
+					id: number;
+			  }
+			| {
+					render: "content";
+					value: string;
+			  }
+		>;
 	}
 }
