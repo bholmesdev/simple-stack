@@ -1,3 +1,4 @@
+import { ReadableStream } from "node:stream/web";
 import {
 	SuspenseStorage,
 	fallbackMarkerEnd,
@@ -5,7 +6,6 @@ import {
 	sleep,
 } from "./utils.js";
 import { defineMiddleware } from "astro:middleware";
-import { ReadableStream } from "node:stream/web";
 
 type SuspendedChunk = {
 	chunk: string;
