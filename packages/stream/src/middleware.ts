@@ -5,6 +5,7 @@ import {
 	sleep,
 } from "./utils.js";
 import { defineMiddleware } from "astro:middleware";
+import { ReadableStream } from "node:stream/web";
 
 type SuspendedChunk = {
 	chunk: string;
@@ -129,8 +130,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 	}
 
 	async function* render() {
-		// @ts-expect-error ReadableStream does not have asyncIterator
-		for await (const chunk of response.body) {
+		for await (const chunk of response.body as ReadableStream<ArrayBuffer>) {
 			yield chunk;
 		}
 
@@ -146,7 +146,6 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 	dest.replaceWith(template);
 }</script>`;
 
-		// @ts-expect-error ReadableStream does not have asyncIterator
 		for await (const { chunk, id } of stream) {
 			yield `<template data-suspense=${id}>${chunk}</template>` +
 				`<script>window.__SIMPLE_SUSPENSE_INSERT(${id});</script>`;
