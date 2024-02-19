@@ -26,7 +26,51 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
 	let curId = 0;
 	const pending = new Map<number, Promise<string>>();
-	const nestedChunks = new Map<number, SuspendedChunk[]>();
+	const suspendedChunks = new Map<number, string>();
+	const ancestors = new Map<number, number>();
+
+	function getRootId(id: number) {
+		let rootId = id;
+		while (ancestors.has(rootId)) {
+			rootId = ancestors.get(rootId)!;
+		}
+		return rootId;
+	}
+
+	function flushSuspendedChunk({ id, chunk }: SuspendedChunk) {
+		const parentId = SuspenseStorage.getStore()?.id;
+		if (parentId !== undefined) {
+			ancestors.set(id, parentId);
+		}
+		const rootId = getRootId(id);
+		if (rootId === id) {
+			suspendedChunks.set(id, chunk);
+			// Send the chunk after a delay to allow
+			// nested suspense boundaries to flush.
+			setTimeout(() => {
+				streamController.enqueue({ id, chunk: suspendedChunks.get(id)! });
+				suspendedChunks.delete(id);
+			}, FLUSH_THRESHOLD);
+			return;
+		}
+
+		const flushedChunk = suspendedChunks.get(rootId)?.replace(
+			new RegExp(
+				// Replace fallbacks with resolved content.
+				`${fallbackMarkerStart(id)}.*?${fallbackMarkerEnd(id)}`,
+				"s",
+			),
+			chunk,
+		);
+		if (flushedChunk) {
+			pending.delete(id);
+			suspendedChunks.set(rootId, flushedChunk);
+		} else {
+			// Root was already sent to the client.
+			// Enqueue to resolve the child via client JS.
+			streamController.enqueue({ id, chunk });
+		}
+	}
 
 	ctx.locals.suspend = async (promiseCb) => {
 		const id = curId++;
@@ -57,34 +101,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
 		promise
 			.then(async (baseChunk) => {
-				nestedChunks.set(id, []);
-				if (parentId !== undefined) {
-					nestedChunks.get(parentId)?.push({ chunk: baseChunk, id });
-				}
-
-				// Wait to see if child content resolves quickly.
-				// If so, we will replace fallbacks with resolved content.
-				await sleep(FLUSH_THRESHOLD);
-
-				let chunk = baseChunk;
-				// Check if any children were added during the FLUSH_THRESHOLD.
-				const children = nestedChunks.get(id) ?? [];
-
-				for (const child of children) {
-					chunk = chunk.replace(
-						new RegExp(
-							// Replace fallbacks with resolved content.
-							`${fallbackMarkerStart(child.id)}.*?${fallbackMarkerEnd(
-								child.id,
-							)}`,
-							"s",
-						),
-						child.chunk,
-					);
-					pending.delete(child.id);
-				}
-				nestedChunks.delete(id);
-				streamController.enqueue({ chunk, id });
+				flushSuspendedChunk({ id, chunk: baseChunk });
 			})
 			.catch((e) => {
 				streamController.error(e);
