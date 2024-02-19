@@ -84,10 +84,13 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 			parentId !== undefined ? pending.get(parentId) : undefined;
 
 		const promise = new Promise<string>((resolve) => {
+			if (!parentPromise) {
+				resolve(basePromise);
+				return;
+			}
 			// Await the parent before resolving the child.
 			// This ensures the parent is sent to the client first.
-			const parent = parentPromise ?? Promise.resolve();
-			parent.then(() => resolve(basePromise));
+			parentPromise.then(() => resolve(basePromise));
 		});
 		pending.set(id, promise);
 
