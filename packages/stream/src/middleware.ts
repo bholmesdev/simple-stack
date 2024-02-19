@@ -26,7 +26,6 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
 	let curId = 0;
 	const pending = new Map<number, Promise<string>>();
-	/** Track suspense boundaries for parent <> child flattening */
 	const nestedChunks = new Map<number, SuspendedChunk[]>();
 
 	ctx.locals.suspend = async (promiseCb) => {
