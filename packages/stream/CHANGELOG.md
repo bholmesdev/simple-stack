@@ -1,5 +1,11 @@
 # simple-stack-stream
 
+## 0.3.1
+
+### Patch Changes
+
+- [#52](https://github.com/bholmesdev/simple-stack/pull/52) [`314eac6`](https://github.com/bholmesdev/simple-stack/commit/314eac6ee074f07d6abd34427de209e9bd5e80fd) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Handle cases where child Suspense boundaries resolve faster than their parent.
+
 ## 0.3.0
 
 ### Minor Changes
