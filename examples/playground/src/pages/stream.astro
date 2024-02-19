@@ -12,7 +12,23 @@ import { Suspense, } from 'simple-stack-stream/components'
   <Suspense>
     <Wait ms={2000}>
       <p class="font-bold text-lg">Slow content</p>
-    </Wait>
+		</Wait>
+		<Suspense>
+			<Wait ms={1000}>
+				<p class="font-bold text-lg">Fast child content</p>
+			</Wait>
+			<p class="rounded p-2 border-gray-300 border-2" slot="fallback">
+				Loading fast child... (shouldn't appear)
+			</p>
+		</Suspense>
+		<Suspense>
+			<Wait ms={3000}>
+				<p class="font-bold text-lg">Slow child content</p>
+			</Wait>
+			<p class="rounded p-2 border-gray-300 border-2" slot="fallback">
+				Loading slower child...
+			</p>
+		</Suspense>
     <p class="rounded p-2 border-gray-300 border-2" slot="fallback">Loading...</p>
   </Suspense>
 
@@ -34,7 +50,7 @@ import { Suspense, } from 'simple-stack-stream/components'
 
   <Suspense>
     <p slot="fallback">Loading... (also shouldn't appear)</p>
-    <Wait ms={1}>
+    <Wait ms={20}>
       <p class="font-bold text-lg">More content</p>
       <p>It's only delayed by only 1ms, so it shouldn't show a fallback either</p>
     </Wait>
