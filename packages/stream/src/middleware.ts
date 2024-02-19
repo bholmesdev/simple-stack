@@ -26,13 +26,8 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
 	let curId = 0;
 	const pending = new Map<number, Promise<string>>();
-
 	/** Track suspense boundaries for parent <> child flattening */
-	const claimableChunks = new Set<{
-		id: number;
-		parentId: number;
-		chunk: string;
-	}>();
+	const nestedChunks = new Map<number, SuspendedChunk[]>();
 
 	ctx.locals.suspend = async (promiseCb) => {
 		const id = curId++;
@@ -63,20 +58,23 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 
 		promise
 			.then(async (baseChunk) => {
-				const claimable = { id, parentId: parentId ?? -1, chunk: baseChunk };
-				claimableChunks.add(claimable);
+				nestedChunks.set(id, []);
+				if (parentId !== undefined) {
+					nestedChunks.get(parentId)?.push({ chunk: baseChunk, id });
+				}
 
-				// Wait to see if child promises resolve quickly.
-				// If they do, we will flatten, or "flush,"
-				// to avoid unnecessary fallbacks.
+				// Wait to see if child content resolves quickly.
+				// If so, we will replace fallbacks with resolved content.
 				await sleep(FLUSH_THRESHOLD);
 
 				let chunk = baseChunk;
-				const children = [...claimableChunks].filter((c) => c.parentId === id);
+				// Check if any children were added during the FLUSH_THRESHOLD.
+				const children = nestedChunks.get(id) ?? [];
 
 				for (const child of children) {
 					chunk = chunk.replace(
 						new RegExp(
+							// Replace fallbacks with resolved content.
 							`${fallbackMarkerStart(child.id)}.*?${fallbackMarkerEnd(
 								child.id,
 							)}`,
@@ -85,10 +83,9 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 						child.chunk,
 					);
 					pending.delete(child.id);
-					claimableChunks.delete(child);
 				}
+				nestedChunks.delete(id);
 				streamController.enqueue({ chunk, id });
-				claimableChunks.delete(claimable);
 			})
 			.catch((e) => {
 				streamController.error(e);
