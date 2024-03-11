@@ -82,8 +82,15 @@ However, we've found console logs are harder to read using this approach. Use wh
 
 ## Making a Pull Request
 
-When making a pull request, be sure to add a changeset when a package has changed. Non-packages (`examples/*`) do not need changesets.
+When requesting a change to a simple stack package, be sure to add a [changeset](https://github.com/changesets/changesets?tab=readme-ov-file#how-do-we-do-that). This is used to specify the version bump for the package, and to update the package CHANGELOG with a description of the change. Note that changes to examples (`examples/*`) do not need changesets.
+
+To create a new changeset, run the following command:
 
 ```bash
 pnpm exec changeset
 ```
+
+Then, provide a brief description of the change. Be sure to focus on the _user-facing change_ (the what), rather than describing _technical implementation_ (the how).
+
+❌ Apply response headers using the `{ headers }` object in the middleware function.
+✅ Fix the missing `text/html` header for Astro routes.
