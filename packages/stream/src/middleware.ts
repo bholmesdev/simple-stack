@@ -156,5 +156,5 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 	}
 
 	// @ts-expect-error generator not assignable to ReadableStream
-	return new Response(render(), response.headers);
+	return new Response(render(), { headers: response.headers });
 });
