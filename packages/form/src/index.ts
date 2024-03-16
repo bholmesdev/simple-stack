@@ -4,15 +4,16 @@ const VIRTUAL_MOD_ID = "simple:form";
 const RESOLVED_VIRTUAL_MOD_ID = "\0" + VIRTUAL_MOD_ID;
 
 export type Options = {
-	injectMiddleware?: false;
-}
+	injectMiddleware?: true | false;
+};
 
 export default function integration(opts?: Options): AstroIntegration {
 	return {
 		name: "simple-form",
 		hooks: {
 			"astro:config:setup"({ addMiddleware, updateConfig }) {
-				const shouldInjectMiddleware = opts?.injectMiddleware ?? 'true'
+				const shouldInjectMiddleware: boolean = opts?.injectMiddleware ?? true;
+				console.log("simple-form:astro:config:setup", shouldInjectMiddleware);
 				if (shouldInjectMiddleware) {
 					addMiddleware({
 						entrypoint: "simple-stack-form/middleware",
