@@ -3,15 +3,22 @@ import type { AstroIntegration } from "astro";
 const VIRTUAL_MOD_ID = "simple:form";
 const RESOLVED_VIRTUAL_MOD_ID = "\0" + VIRTUAL_MOD_ID;
 
-export default function integration(): AstroIntegration {
+export type Options = {
+	injectMiddleware?: false;
+}
+
+export default function integration(opts?: Options): AstroIntegration {
 	return {
 		name: "simple-form",
 		hooks: {
 			"astro:config:setup"({ addMiddleware, updateConfig }) {
-				addMiddleware({
-					entrypoint: "simple-stack-form/middleware",
-					order: "pre",
-				});
+				const shouldInjectMiddleware = opts?.injectMiddleware ?? 'true'
+				if (shouldInjectMiddleware) {
+					addMiddleware({
+						entrypoint: "simple-stack-form/middleware",
+						order: "pre",
+					});
+				}
 
 				updateConfig({
 					vite: {
