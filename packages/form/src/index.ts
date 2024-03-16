@@ -13,7 +13,6 @@ export default function integration(opts?: Options): AstroIntegration {
 		hooks: {
 			"astro:config:setup"({ addMiddleware, updateConfig }) {
 				const shouldInjectMiddleware: boolean = opts?.injectMiddleware ?? true;
-				console.log("simple-form:astro:config:setup", shouldInjectMiddleware);
 				if (shouldInjectMiddleware) {
 					addMiddleware({
 						entrypoint: "simple-stack-form/middleware",
