@@ -1,5 +1,11 @@
 # simple-stack-stream
 
+## 0.3.3
+
+### Patch Changes
+
+- [#50](https://github.com/bholmesdev/simple-stack/pull/50) [`25bf781`](https://github.com/bholmesdev/simple-stack/commit/25bf7816a81457a755a06afb5ad96b8e711db24b) Thanks [@jonathantneal](https://github.com/jonathantneal)! - Change Suspense wrapper from a `<div>` to a `<span>`. This ensures inline HTML content is correctly parsed.
+
 ## 0.3.2
 
 ### Patch Changes
