@@ -1,5 +1,5 @@
 ---
-title: Simple partial ⏳
+title: Simple frame ⏳
 tableOfContents: false
 sidebar:
   badge:

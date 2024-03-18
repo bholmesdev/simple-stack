@@ -1,5 +1,17 @@
 # simple-stack-stream
 
+## 0.3.2
+
+### Patch Changes
+
+- [#55](https://github.com/bholmesdev/simple-stack/pull/55) [`44460a5`](https://github.com/bholmesdev/simple-stack/commit/44460a55aa99c40d23c15473b523bd4e64497d37) Thanks [@parrad0](https://github.com/parrad0)! - Fix missing `text/html` header on Astro pages when using the simple-stack-stream middleware.
+
+## 0.3.1
+
+### Patch Changes
+
+- [#52](https://github.com/bholmesdev/simple-stack/pull/52) [`314eac6`](https://github.com/bholmesdev/simple-stack/commit/314eac6ee074f07d6abd34427de209e9bd5e80fd) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Handle cases where child Suspense boundaries resolve faster than their parent.
+
 ## 0.3.0
 
 ### Minor Changes
