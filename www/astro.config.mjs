@@ -23,8 +23,8 @@ export default defineConfig({
 					link: "/stream",
 				},
 				{
-					label: "⏳ Partial",
-					link: "/partial",
+					label: "⏳ Frame",
+					link: "/frame",
 					badge: {
 						text: "WIP",
 						variant: "caution",
