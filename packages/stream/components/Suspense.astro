@@ -9,9 +9,9 @@ const result = await Astro.locals.suspend(() => Astro.slots.render("default"));
   result.render === "fallback" && (
     <>
       <Fragment set:html={fallbackMarkerStart(result.id)} />
-        <div style="display: contents" data-suspense-fallback={result.id}>
+        <span style="display: contents" data-suspense-fallback={result.id}>
           <slot name="fallback" />
-        </div>
+        </span>
       <Fragment set:html={fallbackMarkerEnd(result.id)} />
     </>
   )
