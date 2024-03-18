@@ -1,5 +1,5 @@
-/// <reference types="astro/client" /> 
+/// <reference types="astro/client" />
 
 interface ImportMetaEnv {
-  readonly PAGES_DIR: string;
+	readonly PAGES_DIR: string;
 }
