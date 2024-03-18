@@ -18,7 +18,7 @@ Simple stack offers a growing collection of packages:
 - **[🧘‍♂️ Simple form](/form):** A full stack solution to validate forms with your client framework of choice.
 - **[🔎 Simple scope](/scope):** Get a scoped ID for any file you're in. Perfect for form label IDs and query selectors.
 - **[🌊 Simple stream](/stream):** Suspend Astro components with fallback content.
-- **[⏳ WIP: Simple partial](/partial):** Re-render just the parts that change in your Astro app.
+- **[⏳ WIP: Simple frame](/frame):** Re-render just the parts that change in your Astro app.
 
 ## Get involved
 
