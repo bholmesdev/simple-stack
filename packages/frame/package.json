@@ -1,7 +1,7 @@
 {
 	"name": "simple-stack-frame",
 	"version": "0.0.1",
-	"description": "Granular updates for any Astro component",
+	"description": "Rerender just the parts that change",
 	"type": "module",
 	"scripts": {
 		"build": "tsc",
