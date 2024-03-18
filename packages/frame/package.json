@@ -1,0 +1,32 @@
+{
+	"name": "simple-stack-frame",
+	"version": "0.0.1",
+	"description": "Granular updates for any Astro component",
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch"
+	},
+	"exports": {
+		".": "./src/index.ts",
+		"./module": "./dist/module.js",
+		"./client": "./dist/client.js",
+		"./components": "./components/index.ts"
+	},
+	"keywords": ["withastro", "astro-integration"],
+	"author": "bholmesdev",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/bholmesdev/simple-stack.git",
+		"directory": "packages/frame"
+	},
+	"dependencies": {
+		"astro-integration-kit": "^0.6.0"
+	},
+	"devDependencies": {
+		"astro": "^4.5.5",
+		"vite": "^5.0.10",
+		"typescript": "^5.3.3"
+	}
+}
