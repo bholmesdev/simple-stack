@@ -1,5 +1,4 @@
 import {
-	navigate,
 	supportsViewTransitions,
 	transitionEnabledOnThisPage,
 } from "astro/virtual-modules/transitions-router.js";
@@ -26,26 +25,44 @@ function setupForms(forms: NodeListOf<HTMLFormElement>) {
 				// TODO: decide error handling strategy
 				return;
 			}
-			const formData = new FormData(form);
 			const headers = new Headers();
 			headers.set("Accept", "text/html");
 			const stringifiedProps = frame.getAttribute("data-props");
 			if (stringifiedProps) headers.set("x-frame-props", stringifiedProps);
 			frame.toggleAttribute("data-loading", true);
 			form.toggleAttribute("data-loading", true);
-			frame.dispatchEvent(new CustomEvent("simple-frame:submit"));
-			form.dispatchEvent(new CustomEvent("simple-frame:submit"));
+			frame.dispatchEvent(new CustomEvent("frame-submit"));
+			form.dispatchEvent(new CustomEvent("frame-submit"));
 			try {
-				const res = await fetch(frameUrl, {
-					method: form.method,
-					body: formData,
-					signal: controller.signal,
-					headers,
-				});
+				let res: Response;
+				if (form.method === "POST") {
+					res = await fetch(frameUrl, {
+						method: "POST",
+						body: new FormData(form),
+						signal: controller.signal,
+						headers,
+					});
+				} else {
+					const searchParams = new URLSearchParams(new FormData(form) as any);
+					const shouldMirrorQuery = form.getAttribute("data-mirror-query");
+					if (shouldMirrorQuery !== "false") {
+						window.history.replaceState(
+							{},
+							"",
+							`${window.location.pathname}?${searchParams}`,
+						);
+					}
+
+					res = await fetch(`${frameUrl}?${searchParams}`, {
+						method: "GET",
+						signal: controller.signal,
+						headers,
+					});
+				}
 				if (!res.ok) {
-					// Bubble error handling to root.
-					// TODO: figure out how to handle errors mid-stream
-					return navigate(window.location.pathname, { formData });
+					frame.dispatchEvent(new CustomEvent("frame-error", { detail: res }));
+					form.dispatchEvent(new CustomEvent("frame-error", { detail: res }));
+					return;
 				}
 				// TODO: handle redirects
 				const htmlString = await res.text();
@@ -66,8 +83,8 @@ function setupForms(forms: NodeListOf<HTMLFormElement>) {
 				}
 				frame.toggleAttribute("data-loading", false);
 				form.toggleAttribute("data-loading", false);
-				frame.dispatchEvent(new CustomEvent("simple-frame:load"));
-				form.dispatchEvent(new CustomEvent("simple-frame:load"));
+				frame.dispatchEvent(new CustomEvent("frame-load"));
+				form.dispatchEvent(new CustomEvent("frame-load"));
 			} catch (e) {
 				if (e instanceof DOMException && e.name === "AbortError") {
 					return;
@@ -75,8 +92,8 @@ function setupForms(forms: NodeListOf<HTMLFormElement>) {
 				// TODO: generic error handling
 				frame.toggleAttribute("data-loading", false);
 				form.toggleAttribute("data-loading", false);
-				frame.dispatchEvent(new CustomEvent("simple-frame:load"));
-				form.dispatchEvent(new CustomEvent("simple-frame:load"));
+				frame.dispatchEvent(new CustomEvent("frame-load"));
+				form.dispatchEvent(new CustomEvent("frame-load"));
 				throw e;
 			}
 		});
