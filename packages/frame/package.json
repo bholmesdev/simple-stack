@@ -1,6 +1,6 @@
 {
 	"name": "simple-stack-frame",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Rerender just the parts that change",
 	"type": "module",
 	"scripts": {

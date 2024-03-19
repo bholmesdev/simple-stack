@@ -1,5 +1,11 @@
 # simple-stack-frame
 
+## 0.0.3
+
+### Patch Changes
+
+- [`abbd3b3`](https://github.com/bholmesdev/simple-stack/commit/abbd3b3279f13df168bad1d787f67a7cac43ba41) - Add GET request handling
+
 ## 0.0.2
 
 ### Patch Changes
