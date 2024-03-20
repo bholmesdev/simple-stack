@@ -1,5 +1,5 @@
 ---
-title: API Reference 
+title: Config Reference 
 description: Reference for simple-stack-form
 sidebar:
   order: 4
