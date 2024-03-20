@@ -9,7 +9,7 @@ sidebar:
 
 **Type:** `true | false`
 
-The adapter option `injectMiddleware` allows to opt-out of the default behaviour, which injects a middleware. This could be useful if you want to add your own data retrivial and `POST` handling logic.
+The adapter option `injectMiddleware` allows you to opt-out of middleware injection used to expose [`Astro.locals.form`](form/parse/#astrolocalsform). This could be useful if you want to add your own data retrieval and `POST` handling logic.
 
 ```ts ins={3,7-9}
 // astro.config.ts
