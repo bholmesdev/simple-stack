@@ -79,7 +79,11 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 					// The React team calls this server-side resolution "flushing."
 					setTimeout(() => {
 						const flushedChunk = flushableChunks.get(id) ?? chunk;
-						streamController.enqueue({ id, chunk: flushedChunk });
+						try {
+								streamController.enqueue({ id, chunk: flushedChunk });
+						} catch (e) {  
+								streamController.error(e);
+						}
 						flushableChunks.delete(id);
 					}, FLUSH_THRESHOLD);
 					return;
