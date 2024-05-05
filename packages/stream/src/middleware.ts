@@ -80,9 +80,9 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 					setTimeout(() => {
 						const flushedChunk = flushableChunks.get(id) ?? chunk;
 						try {
-								streamController.enqueue({ id, chunk: flushedChunk });
+							streamController.enqueue({ id, chunk: flushedChunk });
 						} catch (e) {  
-								streamController.error(e);
+							streamController.error(e);
 						}
 						flushableChunks.delete(id);
 					}, FLUSH_THRESHOLD);
