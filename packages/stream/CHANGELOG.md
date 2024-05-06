@@ -1,5 +1,11 @@
 # simple-stack-stream
 
+## 0.3.4
+
+### Patch Changes
+
+- [#64](https://github.com/bholmesdev/simple-stack/pull/64) [`51c5ae0`](https://github.com/bholmesdev/simple-stack/commit/51c5ae024867777407d0fcc5359d35fc2de7d65d) Thanks [@Mupu](https://github.com/Mupu)! - Fix unhandled crash when a connection is closed before Suspense components are streamed.
+
 ## 0.3.3
 
 ### Patch Changes
