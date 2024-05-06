@@ -81,7 +81,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
 						const flushedChunk = flushableChunks.get(id) ?? chunk;
 						try {
 							streamController.enqueue({ id, chunk: flushedChunk });
-						} catch (e) {  
+						} catch (e) {
 							streamController.error(e);
 						}
 						flushableChunks.delete(id);
