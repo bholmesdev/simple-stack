@@ -7,4 +7,4 @@ declare namespace $ {
 	): T | undefined;
 }
 
-declare function ready(callback: () => void): undefined | (() => void);
+declare function ready(callback: () => void): void;
