@@ -1,5 +1,11 @@
 # vite-plugin-simple-scope
 
+## 2.0.2
+
+### Patch Changes
+
+- [#70](https://github.com/bholmesdev/simple-stack/pull/70) [`7ff6c6d`](https://github.com/bholmesdev/simple-stack/commit/7ff6c6dc2f1aae9b26f574ec93aef1cc8014495b) Thanks [@bholmesdev](https://github.com/bholmesdev)! - fixes "failed to resolve entry" error on dev server start.
+
 ## 2.0.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # simple-stack-query
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`7ff6c6d`](https://github.com/bholmesdev/simple-stack/commit/7ff6c6dc2f1aae9b26f574ec93aef1cc8014495b)]:
+  - vite-plugin-simple-scope@2.0.2
+
 ## 0.0.2
 
 ### Patch Changes
