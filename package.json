@@ -14,7 +14,7 @@
 		"lint:apply": "biome lint packages/ --apply",
 		"format": "biome format",
 		"format:write": "biome format --write",
-		"version": "changeset version && pnpm install --no-frozen-lockfile"
+		"version": "changeset version && pnpm install --no-frozen-lockfile && pnpm run check:apply"
 	},
 	"keywords": ["withastro"],
 	"author": "bholmesdev",
