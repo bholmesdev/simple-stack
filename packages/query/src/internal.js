@@ -1,5 +1,3 @@
-import { transitionEnabledOnThisPage } from "astro:transitions/client";
-
 /**
  * Create $ function based on scope.
  * @param {(id: string) => string} scope
@@ -29,15 +27,16 @@ export function create$(scope) {
 /**
  * Create ready function based on scope.
  * @param {(id: string) => string} scope
+ * @param {boolean} transitionEnabledOnThisPage
  */
-export function createReady(scope) {
+export function createReady(scope, transitionEnabledOnThisPage) {
 	const selector = `[data-target$=${JSON.stringify(scope())}`;
 	function hasScopeElement() {
 		return Boolean(document.querySelector(selector));
 	}
 
 	return function ready(callback) {
-		if (transitionEnabledOnThisPage()) {
+		if (transitionEnabledOnThisPage) {
 			let cleanup;
 
 			document.addEventListener("astro:page-load", async () => {

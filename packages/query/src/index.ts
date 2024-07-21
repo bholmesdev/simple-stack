@@ -1,7 +1,7 @@
 import type { AstroConfig, AstroIntegration } from "astro";
 import vitePluginSimpleScope from "vite-plugin-simple-scope";
 
-import "../ambient.js";
+import "../ambient.d.ts";
 
 type VitePlugin = Required<AstroConfig["vite"]>["plugins"][number];
 
@@ -40,10 +40,11 @@ function vitePlugin(): VitePlugin {
 
 			return `
     import { scope } from 'simple:scope';
-    import * as __queryInternals from 'simple-stack-query/internal';
+    import * as __queryInternals from "simple-stack-query/internal";
+		import { transitionEnabledOnThisPage } from "astro:transitions/client";
 
     const $ = __queryInternals.create$(scope);
-    const ready = __queryInternals.createReady(scope);\n${code}`;
+    const ready = __queryInternals.createReady(scope, transitionEnabledOnThisPage());\n${code}`;
 		},
 	};
 }
