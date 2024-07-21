@@ -17,10 +17,7 @@
 		"./components": "./components/index.ts",
 		"./types": "./types.d.ts"
 	},
-	"keywords": [
-		"withastro",
-		"astro-integration"
-	],
+	"keywords": ["withastro", "astro-integration"],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/bholmesdev/simple-stack.git",

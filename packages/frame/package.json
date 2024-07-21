@@ -13,10 +13,7 @@
 		"./client": "./dist/client.js",
 		"./components": "./components/index.ts"
 	},
-	"keywords": [
-		"withastro",
-		"astro-integration"
-	],
+	"keywords": ["withastro", "astro-integration"],
 	"author": "bholmesdev",
 	"license": "MIT",
 	"repository": {

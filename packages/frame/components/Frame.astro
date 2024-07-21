@@ -2,44 +2,44 @@
 import type { HTMLAttributes } from "astro/types";
 
 type Props<T extends Record<string, any>> = {
-  component(_props: T): any;
-  props?: T;
+	component(_props: T): any;
+	props?: T;
 } & HTMLAttributes<"div">;
 
 const { component: Component, props, ...attrs } = Astro.props;
 
 function safeParseUrl(url: string) {
-  try {
-    return new URL(url);
-  } catch {
-    return null;
-  }
+	try {
+		return new URL(url);
+	} catch {
+		return null;
+	}
 }
 
 const componentFileUrl = Component.moduleId
-  ? safeParseUrl("file://" + Component.moduleId)
-  : null;
+	? safeParseUrl("file://" + Component.moduleId)
+	: null;
 const pagesDirUrl = safeParseUrl(import.meta.env.PAGES_DIR);
 if (!(pagesDirUrl instanceof URL)) {
-  throw new Error(
-    "[simple:frame] Could not scan pages directory. Did you apply the `simple:frame` integration?"
-  );
+	throw new Error(
+		"[simple:frame] Could not scan pages directory. Did you apply the `simple:frame` integration?",
+	);
 }
 if (!(componentFileUrl instanceof URL)) {
-  throw new Error(
-    "[simple:frame] Could not resolve component file path. Did you pass an Astro component to <Frame component />?"
-  );
+	throw new Error(
+		"[simple:frame] Could not resolve component file path. Did you pass an Astro component to <Frame component />?",
+	);
 }
 if (!componentFileUrl.href.startsWith(pagesDirUrl.href)) {
-  throw new Error(
-    `[simple:frame] Frame component ${Component.moduleId} is not in the pages directory. Please move to pages/ to expose as a route.`
-  );
+	throw new Error(
+		`[simple:frame] Frame component ${Component.moduleId} is not in the pages directory. Please move to pages/ to expose as a route.`,
+	);
 }
 
 const pagePath = componentFileUrl.href
-  .slice(pagesDirUrl.href.length)
-  .replace(/^\/+/, "")
-  .replace(/\.astro$/, "");
+	.slice(pagesDirUrl.href.length)
+	.replace(/^\/+/, "")
+	.replace(/\.astro$/, "");
 ---
 
 <simple-frame {...attrs} src={pagePath} data-props={JSON.stringify(props)}>

@@ -7,10 +7,7 @@
 		".": "./dist/index.js",
 		"./types": "./ambient.d.ts"
 	},
-	"files": [
-		"src",
-		"ambient.d.ts"
-	],
+	"files": ["src", "ambient.d.ts"],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/bholmesdev/simple-stack.git",

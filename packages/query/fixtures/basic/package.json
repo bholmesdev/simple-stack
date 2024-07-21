@@ -1,14 +1,14 @@
 {
-  "name": "@test/query-basic",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "astro": "^4.12.0",
-    "simple-stack-query": "workspace:*",
-    "typescript": "^5.5.3"
-  }
+	"name": "@test/query-basic",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro"
+	},
+	"dependencies": {
+		"astro": "^4.12.0",
+		"simple-stack-query": "workspace:*",
+		"typescript": "^5.5.3"
+	}
 }

@@ -1,5 +1,5 @@
-import { transitionEnabledOnThisPage } from "astro/virtual-modules/transitions-router.js";
 import type { scope as scopeFn } from "simple:scope";
+import { transitionEnabledOnThisPage } from "astro/virtual-modules/transitions-router.js";
 
 export function create$(scope: typeof scopeFn) {
 	function getSelector(scopeId: string) {
