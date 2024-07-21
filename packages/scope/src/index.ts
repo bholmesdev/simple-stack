@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
-import type { AstroConfig } from 'astro'
+import type { AstroConfig } from "astro";
 import { normalizePath } from "vite";
 
-type VitePlugin = Required<AstroConfig['vite']>['plugins'][number];
+type VitePlugin = Required<AstroConfig["vite"]>["plugins"][number];
 
 import "../ambient.d.ts";
 
