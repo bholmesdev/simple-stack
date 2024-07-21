@@ -20,4 +20,4 @@ introduces the new `simple-stack-query` package, a simple library to query the D
 </script>
 ```
 
-View the package README for more information.
+Visit the package README for more information.
