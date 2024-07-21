@@ -1,11 +1,14 @@
 import { createHash } from "node:crypto";
-import { normalizePath, type Plugin } from "vite";
+import type { AstroConfig } from 'astro'
+import { normalizePath } from "vite";
+
+type VitePlugin = Required<AstroConfig['vite']>['plugins'][number];
 
 import "../ambient.d.ts";
 
 const virtualMod = "simple:scope";
 
-export default function simpleScope(): Plugin {
+export default function vitePluginSimpleScope(): VitePlugin {
 	const scopeIdByImporter: Record<string, string> = {};
 
 	return {

@@ -27,5 +27,8 @@
 	"license": "MIT",
 	"engines": {
 		"node": ">=18.14.1"
+	},
+	"devDependencies": {
+		"astro": "^4.12.2"
 	}
 }
