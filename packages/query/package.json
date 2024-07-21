@@ -4,17 +4,21 @@
 	"description": "Select elements in Astro without the hassle",
 	"type": "module",
 	"scripts": {
-		"build": "tsc",
-		"dev": "tsc --watch"
+		"test": "node --test test",
+		"test:watch": "node --test --watch test"
 	},
 	"exports": {
-		".": "./index.ts",
-		"./internal": "./internal.js"
+		".": "./src/index.ts",
+		"./internal": "./src/internal.js"
 	},
 	"keywords": [
 		"withastro",
 		"astro-integration"
 	],
+  "files": [
+    "src",
+    "ambient.d.ts"
+  ],
 	"author": "bholmesdev",
 	"license": "MIT",
 	"repository": {
@@ -25,8 +29,12 @@
 	"dependencies": {
 		"vite-plugin-simple-scope": "workspace:*"
 	},
+	"engines": {
+		"node": "^18.17.1 || ^20.3.0 || >=21.0.0"
+	},
 	"devDependencies": {
-		"astro": "^4.5.5",
+		"astro": "^4.12.0",
+		"linkedom": "^0.18.4",
 		"typescript": "^5.3.3",
 		"vite": "^5.0.10"
 	}
