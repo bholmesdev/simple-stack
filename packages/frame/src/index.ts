@@ -1,5 +1,5 @@
+import type { AstroIntegration } from "astro";
 import { addDts, addVirtualImports } from "astro-integration-kit";
-import { AstroIntegration } from "astro";
 
 const name = "simple:frame";
 
