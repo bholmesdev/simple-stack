@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "astro": "^4.12.0",
-    "simple-stack-query": "workspace:*"
+    "simple-stack-query": "workspace:*",
+    "typescript": "^5.5.3"
   }
 }
