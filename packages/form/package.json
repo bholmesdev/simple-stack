@@ -1,6 +1,6 @@
 {
 	"name": "simple-stack-form",
-	"version": "0.1.13",
+	"version": "0.1.12",
 	"description": "A simple form library for Astro projects",
 	"type": "module",
 	"bin": {
