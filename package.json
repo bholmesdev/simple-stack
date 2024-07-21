@@ -7,6 +7,7 @@
     "dev:all": "turbo dev",
     "build": "turbo build --filter='./packages/*'",
     "build:all": "turbo build",
+    "test": "turbo test --filter='./packages/*'",
     "check": "biome check packages/",
     "check:apply": "biome check packages/ --apply",
     "lint": "biome lint packages/",
