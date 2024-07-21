@@ -1,5 +1,11 @@
 # vite-plugin-simple-scope
 
+## 2.0.1
+
+### Patch Changes
+
+- [#68](https://github.com/bholmesdev/simple-stack/pull/68) [`017e3ea`](https://github.com/bholmesdev/simple-stack/commit/017e3ea9de946148b7c02ae1b63e360ef45e9a99) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Fix type error applying the Simple scope plugin to a `.ts` config file.
+
 ## 2.0.0
 
 ### Major Changes
