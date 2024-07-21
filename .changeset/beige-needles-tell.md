@@ -6,12 +6,18 @@
 "simple-stack-form": patch
 ---
 
-Introduces the new `simple-stack-query` package. This makes querying the DOM from an Astro component simple and safely scoped.
+introduces the new `simple-stack-query` package, a simple library to query the DOM from your Astro components.
 
 ```astro
 <button data-target={$('btn')}>Click me</button>
-<!--data-target="btn-lsk34da"-->
+
 <script>
-$('btn').addEventListener('click', () => {});
+  ready(() => {
+    $('btn').addEventListener('click', () => {
+      console.log("It's like JQuery but not!");
+    });
+  });
 </script>
 ```
+
+View the package README for more information.
