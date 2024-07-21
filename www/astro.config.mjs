@@ -11,24 +11,20 @@ export default defineConfig({
 			},
 			sidebar: [
 				{
-					label: "🧘‍♂️ Form",
-					autogenerate: { directory: "form" },
-				},
-				{
-					label: "🔎 Scope",
-					link: "/scope",
+					label: "🔎 Query",
+					link: "/query",
 				},
 				{
 					label: "🌊 Stream",
 					link: "/stream",
 				},
 				{
-					label: "⏳ Frame",
-					link: "/frame",
-					badge: {
-						text: "WIP",
-						variant: "caution",
-					},
+					label: "🧘‍♂️ Form",
+					autogenerate: { directory: "form" },
+				},
+				{
+					label: "🔎 Scope",
+					link: "/scope",
 				},
 			],
 			customCss: [

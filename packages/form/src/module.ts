@@ -240,7 +240,9 @@ function getInputType<T extends ZodType>(fieldValidator: T): InputProp["type"] {
 	return "text";
 }
 
-function getInputInfo<T extends ZodType>(fieldValidator: T): {
+function getInputInfo<T extends ZodType>(
+	fieldValidator: T,
+): {
 	type: InputProp["type"];
 	isArray: boolean;
 	isOptional: boolean;

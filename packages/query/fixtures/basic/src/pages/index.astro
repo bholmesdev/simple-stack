@@ -1,0 +1,8 @@
+---
+import Nested from "./Nested.astro";
+import WithContext from "./WithContext.astro";
+---
+
+<h1 data-target={$('test')}>Hey</h1>
+<Nested />
+<WithContext $context={$} />

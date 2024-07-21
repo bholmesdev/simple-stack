@@ -13,10 +13,7 @@
 		"./client": "./dist/client.js",
 		"./components": "./components/index.ts"
 	},
-	"keywords": [
-		"withastro",
-		"astro-integration"
-	],
+	"keywords": ["withastro", "astro-integration"],
 	"author": "bholmesdev",
 	"license": "MIT",
 	"repository": {
@@ -25,11 +22,11 @@
 		"directory": "packages/frame"
 	},
 	"dependencies": {
-		"astro-integration-kit": "^0.6.0"
+		"astro-integration-kit": "^0.15.0"
 	},
 	"devDependencies": {
 		"astro": "^4.5.5",
-		"vite": "^5.0.10",
-		"typescript": "^5.3.3"
+		"typescript": "^5.5.3",
+		"vite": "^5.0.10"
 	}
 }

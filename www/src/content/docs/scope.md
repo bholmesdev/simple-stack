@@ -1,8 +1,6 @@
 ---
 title: Simple scope 🔎
 description: Get a scoped ID for whatever file you're in. Resolved at build-time with zero client JS.
-sidebar:
-  order: 2
 ---
 
 Get a scoped ID for whatever file you're in. Resolved at build-time with zero client JS.

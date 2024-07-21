@@ -1,7 +1,7 @@
 import type { ValidRedirectStatus } from "astro";
 import { defineMiddleware } from "astro/middleware";
 import type { ZodRawShape } from "zod";
-import { validateForm } from "./module";
+import { validateForm } from "./module.js";
 
 const formContentTypes = [
 	"application/x-www-form-urlencoded",

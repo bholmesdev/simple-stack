@@ -1,43 +1,38 @@
-import { defineIntegration } from "astro-integration-kit";
-import {
-	addDtsPlugin,
-	addVirtualImportsPlugin,
-} from "astro-integration-kit/plugins";
+import type { AstroIntegration } from "astro";
+import { addDts, addVirtualImports } from "astro-integration-kit";
 
-export default defineIntegration({
-	name: "simple:frame",
-	plugins: [addDtsPlugin, addVirtualImportsPlugin],
-	setup() {
-		return {
-			"astro:config:setup"({
-				addVirtualImports,
-				addDts,
-				config,
-				injectScript,
-				updateConfig,
-			}) {
-				addVirtualImports({
-					"simple:frame": `export * from 'simple-stack-frame/components';
+const name = "simple:frame";
+
+export default function simpleFrame(): AstroIntegration {
+	return {
+		name,
+		hooks: {
+			"astro:config:setup": (params) => {
+				addVirtualImports(params, {
+					name,
+					imports: {
+						"simple:frame": `export * from 'simple-stack-frame/components';
 export * from 'simple-stack-frame/module';`,
+					},
 				});
-				addDts({
-					name: "simple:frame",
+				addDts(params, {
+					name,
 					content: `declare module "simple:frame" {
-	export * from "simple-stack-frame/components";
-	export * from "simple-stack-frame/module";
+export * from "simple-stack-frame/components";
+export * from "simple-stack-frame/module";
 }`,
 				});
-				injectScript("page", 'import "simple-stack-frame/client";');
-				updateConfig({
+				params.injectScript("page", 'import "simple-stack-frame/client";');
+				params.updateConfig({
 					vite: {
 						define: {
 							"import.meta.env.PAGES_DIR": JSON.stringify(
-								new URL("src/pages", config.root).href,
+								new URL("src/pages", params.config.root).href,
 							),
 						},
 					},
 				});
 			},
-		};
-	},
-});
+		},
+	};
+}

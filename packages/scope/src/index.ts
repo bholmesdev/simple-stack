@@ -1,12 +1,15 @@
 import { createHash } from "node:crypto";
+import type { AstroConfig } from "astro";
 import { normalizePath } from "vite";
+
+type VitePlugin = Required<AstroConfig["vite"]>["plugins"][number];
+
+import "../ambient.d.ts";
 
 const virtualMod = "simple:scope";
 
-/** @returns {import('vite').Plugin} */
-export default function simpleScope() {
-	/** @type {Record<string, string>} */
-	const scopeIdByImporter = {};
+export default function vitePluginSimpleScope(): VitePlugin {
+	const scopeIdByImporter: Record<string, string> = {};
 
 	return {
 		name: "vite-plugin-simple-scope",
@@ -33,21 +36,13 @@ export function scope(id) {
 	};
 }
 
-/**
- * @param {string} filename
- * @returns {string}
- */
-function createScopeHash(filename) {
+function createScopeHash(filename: string) {
 	return createHash("shake256", { outputLength: 4 })
 		.update(normalizeFilename(filename))
 		.digest("hex");
 }
 
-/**
- * @param {string} filename
- * @returns {string}
- */
-function normalizeFilename(filename) {
+function normalizeFilename(filename: string) {
 	const normalizedFilename = normalizePath(filename);
 	const normalizedRoot = normalizePath(process.cwd());
 	if (normalizedFilename.startsWith(normalizedRoot)) {
@@ -60,10 +55,7 @@ function normalizeFilename(filename) {
 /**
  * Vite supports file search params with `?`.
  * Trim these off to get the base file path.
- *
- * @param {string} filePath
- * @returns {string}
  */
-function getBaseFilePath(filePath) {
+function getBaseFilePath(filePath: string) {
 	return filePath.replace(/\?.*$/, "");
 }
