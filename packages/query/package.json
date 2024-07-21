@@ -9,16 +9,10 @@
 	},
 	"exports": {
 		".": "./src/index.ts",
-		"./internal": "./src/internal.js"
+		"./internal": "./src/internal.ts"
 	},
-	"keywords": [
-		"withastro",
-		"astro-integration"
-	],
-	"files": [
-		"src",
-		"ambient.d.ts"
-	],
+	"keywords": ["withastro", "astro-integration"],
+	"files": ["src", "ambient.d.ts"],
 	"author": "bholmesdev",
 	"license": "MIT",
 	"repository": {

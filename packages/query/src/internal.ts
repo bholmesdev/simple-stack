@@ -1,22 +1,21 @@
-/**
- * Create $ function based on scope.
- * @param {(id: string) => string} scope
- */
-export function create$(scope) {
-	function getSelector(scopeId) {
+import type { scope as scopeFn } from "simple:scope";
+
+export function create$(scope: typeof scopeFn) {
+	function getSelector(scopeId: string) {
 		return `[data-target=${JSON.stringify(scope(scopeId))}]`;
 	}
-	function $(scopeId) {
-		const element = document.querySelector(getSelector(scopeId));
+	function $(scopeId: string) {
+		const selector = getSelector(scopeId);
+		const element = document.querySelector(selector);
 		if (!element) throw new Error(`Element not found: ${selector}`);
 		return element;
 	}
 	Object.assign($, {
-		optional(scopeId) {
+		optional(scopeId: string) {
 			const selector = getSelector(scopeId);
 			return document.querySelector(selector) ?? undefined;
 		},
-		all(scopeId) {
+		all(scopeId: string) {
 			const selector = getSelector(scopeId);
 			return [...document.querySelectorAll(selector)];
 		},
@@ -24,20 +23,22 @@ export function create$(scope) {
 	return $;
 }
 
-/**
- * Create ready function based on scope.
- * @param {(id: string) => string} scope
- * @param {boolean} transitionEnabledOnThisPage
- */
-export function createReady(scope, transitionEnabledOnThisPage) {
+type MaybePromise<T> = T | Promise<T>;
+
+export function createReady(
+	scope: typeof scopeFn,
+	transitionEnabledOnThisPage: boolean,
+) {
 	const selector = `[data-target$=${JSON.stringify(scope())}`;
 	function hasScopeElement() {
 		return Boolean(document.querySelector(selector));
 	}
 
-	return function ready(callback) {
+	return function ready(
+		callback: () => MaybePromise<undefined | (() => void)>,
+	) {
 		if (transitionEnabledOnThisPage) {
-			let cleanup;
+			let cleanup: (() => void) | undefined;
 
 			document.addEventListener("astro:page-load", async () => {
 				if (cleanup) cleanup();
