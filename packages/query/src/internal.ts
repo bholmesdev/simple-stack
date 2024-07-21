@@ -1,3 +1,4 @@
+import { transitionEnabledOnThisPage } from "astro/virtual-modules/transitions-router.js";
 import type { scope as scopeFn } from "simple:scope";
 
 export function create$(scope: typeof scopeFn) {
@@ -25,10 +26,7 @@ export function create$(scope: typeof scopeFn) {
 
 type MaybePromise<T> = T | Promise<T>;
 
-export function createReady(
-	scope: typeof scopeFn,
-	transitionEnabledOnThisPage: boolean,
-) {
+export function createReady(scope: typeof scopeFn) {
 	const selector = `[data-target$=${JSON.stringify(scope())}`;
 	function hasScopeElement() {
 		return Boolean(document.querySelector(selector));
@@ -37,7 +35,7 @@ export function createReady(
 	return function ready(
 		callback: () => MaybePromise<undefined | (() => void)>,
 	) {
-		if (transitionEnabledOnThisPage) {
+		if (transitionEnabledOnThisPage()) {
 			let cleanup: (() => void) | undefined;
 
 			document.addEventListener("astro:page-load", async () => {

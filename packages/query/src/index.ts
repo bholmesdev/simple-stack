@@ -31,20 +31,19 @@ function vitePlugin(): VitePlugin {
 
 			if (isAstroFrontmatter) {
 				return `
-      import { scope } from 'simple:scope';
-      const $ = scope;\n${code}`;
+      import { scope as __scope } from 'simple:scope';
+      const $ = __scope;\n${code}`;
 			}
 
 			const searchParams = new URLSearchParams(search);
 			if (!searchParams.has("lang.ts")) return;
 
 			return `
-    import { scope } from 'simple:scope';
+    import { scope as __scope } from 'simple:scope';
     import * as __queryInternals from "simple-stack-query/internal";
-		import { transitionEnabledOnThisPage } from "astro:transitions/client";
 
-    const $ = __queryInternals.create$(scope);
-    const ready = __queryInternals.createReady(scope, transitionEnabledOnThisPage());\n${code}`;
+    const $ = __queryInternals.create$(__scope);
+    const ready = __queryInternals.createReady(__scope);\n${code}`;
 		},
 	};
 }
