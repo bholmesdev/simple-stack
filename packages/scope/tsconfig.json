@@ -1,10 +1,8 @@
 {
+	"extends": "../../tsconfig.base.json",
+	"include": ["src"],
 	"compilerOptions": {
-		"checkJs": true,
-		"module": "ESNext",
-		"moduleResolution": "Node",
-		"target": "ESNext",
-		"noEmit": true,
-		"strict": true
+		"outDir": "./dist",
+		"rootDir": "./src"
 	}
 }
