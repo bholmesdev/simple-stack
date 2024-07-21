@@ -4,7 +4,7 @@
 	"description": "Get a scoped ID for whatever file you're in. Zero client-side JS.",
 	"type": "module",
 	"exports": {
-		".": "./dist/index.js",
+		".": "./src/index.ts",
 		"./types": "./ambient.d.ts"
 	},
 	"files": ["src", "ambient.d.ts"],
@@ -12,10 +12,6 @@
 		"type": "git",
 		"url": "https://github.com/bholmesdev/simple-stack.git",
 		"directory": "packages/scope"
-	},
-	"scripts": {
-		"dev": "tsc --watch",
-		"build": "tsc"
 	},
 	"dependencies": {
 		"typescript": "^5.5.3",

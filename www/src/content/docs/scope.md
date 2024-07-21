@@ -35,14 +35,7 @@ Simple scope is a vite plugin compatible with any vite-based framework (Astro, N
 npm i vite-plugin-simple-scope
 ```
 
-Then, set up type inferencing for the `simple:scope` module with an `env.d.ts` file. You can create this file at the base of your project, or add to the provided `src/env.d.ts` file for frameworks like Astro:
-
-```ts
-// env.d.ts
-/// <reference types="vite-plugin-simple-scope/types" />
-```
-
-Finally, apply as a vite plugin in your framework of choice:
+Then, apply as a vite plugin in your framework of choice:
 
 ```js
 import simpleScope from 'vite-plugin-simple-scope';
