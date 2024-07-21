@@ -1,0 +1,33 @@
+{
+	"name": "simple-stack-query",
+	"version": "0.0.1",
+	"description": "Select elements in Astro without the hassle",
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch"
+	},
+	"exports": {
+		".": "./index.ts",
+		"./internal": "./internal.js"
+	},
+	"keywords": [
+		"withastro",
+		"astro-integration"
+	],
+	"author": "bholmesdev",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/bholmesdev/simple-stack.git",
+		"directory": "packages/query"
+	},
+	"dependencies": {
+		"vite-plugin-simple-scope": "workspace:*"
+	},
+	"devDependencies": {
+		"astro": "^4.5.5",
+		"typescript": "^5.3.3",
+		"vite": "^5.0.10"
+	}
+}
