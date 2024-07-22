@@ -1,6 +1,6 @@
 {
 	"name": "simple-stack-query",
-	"version": "0.0.3",
+	"version": "0.1.0",
 	"description": "Select elements in Astro without the hassle",
 	"type": "module",
 	"scripts": {
