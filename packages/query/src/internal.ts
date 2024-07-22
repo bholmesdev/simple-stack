@@ -1,8 +1,5 @@
 import type { scope as scopeFn } from "simple:scope";
-import {
-	transitionEnabledOnThisPage,
-	supportsViewTransitions,
-} from "astro/virtual-modules/transitions-router.js";
+import { transitionEnabledOnThisPage } from "astro/virtual-modules/transitions-router.js";
 
 export function create$(scope: typeof scopeFn) {
 	const anyMatchSelector = `[data-target$=${JSON.stringify(scope())}`;
