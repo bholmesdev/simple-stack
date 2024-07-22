@@ -8,14 +8,20 @@ import { existsSync } from "node:fs";
 
 type VitePlugin = Required<AstroConfig["vite"]>["plugins"][number];
 
-export default function simpleStackQueryIntegration(): AstroIntegration {
+type Options = {
+	bypassSnippetsPrompt?: boolean;
+};
+
+export default function simpleStackQueryIntegration(
+	opts?: Options,
+): AstroIntegration {
 	let root: URL;
 	let command: "dev" | "build" | "preview";
 	return {
 		name: "simple-stack-query",
 		hooks: {
 			"astro:server:start": async () => {
-				if (command === "dev") {
+				if (command === "dev" && !opts?.bypassSnippetsPrompt) {
 					setTimeout(() => {
 						addSnippets({ root });
 					}, 100);
