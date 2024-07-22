@@ -38,7 +38,7 @@ Selectors should be applied to the `data-target` attribute. All selectors are sc
 <!--data-target="btn-4SzN_OBB"-->
 ```
 
-From your client script, the query result will be a plain HTML element. No, it's not a JQuery object. But who doesn't like a little nostalgia?
+Then, use the same `$()` function from your client script to select that element. The query result will be a plain [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement). No, it's not a JQuery object. We just used `$` for the nostalgia 😉
 
 ```ts
 $('btn').addEventListener(() => { /* ... */ });
@@ -72,7 +72,7 @@ ready(() => {
 
 ### `$.all()` selector
 
-You may want to select multiple targets with the same name. You can use `$.all()` to query for an array of results:
+You may want to select multiple targets with the same name. Use `$.all()` to query for an array of results:
 
 ```astro
 ---

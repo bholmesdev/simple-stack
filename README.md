@@ -8,10 +8,10 @@ Simple stack is a suite of tools built for [Astro](https://astro.build) to simpl
 
 Simple stack offers a growing collection of packages:
 
-- **[🧘‍♂️ Simple form](https://simple-stack.dev/form):** A full stack solution to validate forms with your client framework of choice.
-- **[🔎 Simple scope](https://simple-stack.dev/scope):** Get a scoped ID for any file you're in. Perfect for form label IDs and query selectors.
-- **[🌊 Simple stream](https://simple-stack.dev/stream):** Suspend Astro components with fallback content.
-- **[⏳ WIP: Simple partial](https://simple-stack.dev/partial):** Re-render just the parts that change in your Astro app.
+- **[🔎 Simple query](/query):** The simplest way to query elements from your Astro component.
+- **[🌊 Simple stream](/stream):** Suspend Astro components with fallback content.
+- **[🧘‍♂️ Simple form](/form):** A full stack solution to validate forms with your client framework of choice.
+- **[🔎 Simple scope](/scope):** A scoped ID generator for any file you're in. Perfect for form label IDs and query selectors.
 
 ## Get involved
 
