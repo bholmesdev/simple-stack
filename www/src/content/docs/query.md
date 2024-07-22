@@ -62,11 +62,11 @@ const promoActive = Astro.url.searchParams.has('promo');
 {promoActive && <p data-target={$('banner')}>Buy my thing</p>}
 
 <script>
-ready(() => {
-  $.optional('banner')?.addEventListener('mouseover', () => {
-    console.log("They're about to buy it omg");
+  $.ready(() => {
+    $.optional('banner')?.addEventListener('mouseover', () => {
+      console.log("They're about to buy it omg");
+    });
   });
-});
 </script>
 ```
 
@@ -84,24 +84,37 @@ const links = ["wtw.dev", "bholmes.dev"];
 ))}
 
 <script>
-ready(() => {
-  $.all('link').forEach(linkElement => { /* ... */ });
-});
+  $.ready(() => {
+    $.all('link').forEach(linkElement => { /* ... */ });
+  });
 </script>
 ```
 
 ## `$.ready()` function
 
-All `$` queries must be nested in a `$.ready()` block. This opts in to using the global `$` from client scripts. `$.ready()` also ensures your code reruns on every page [when view transitions are enabled.](https://docs.astro.build/en/guides/view-transitions/)
+All `$` queries should be nested in a `$.ready()` block. `$.ready()` will rerun on every page [when view transitions are enabled.](https://docs.astro.build/en/guides/view-transitions/)
 
 ```astro
 <script>
   $.ready(() => {
-    // ✅ Allowed
+    // ✅ Query code that should run on every navigation
     $('element').textContent = 'hey';
   })
 
-  // ❌ Not allowed
-  $('element').textContent = 'hey';
+  // ✅ Global code that should only run once
+  class MyElement extends HTMLElement { /* ... */}
+  customElements.define('my-element', MyElement);
 </script>
+```
 
+### 🙋‍♂️ `$.ready()` isn't running for me
+
+`$.ready()` runs when `data-target` is used by your component. This heuristic keeps simple query performant and ensures scripts run at the right time when view transitions are applied.
+
+If `data-target` is applied conditionally, or not at all, the `$.ready()` block may not run. You can apply a `data-target` selector anywhere in your component to resolve the issue:
+
+```astro ins="data-target={$('container')}"
+<div data-target={$('container')}>
+<!--...-->
+</div>
+```
