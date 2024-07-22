@@ -29,6 +29,18 @@ Output:
 
 ## Installation
 
+### With the Simple Query Astro integration
+
+Simple Scope is included with the [Simple Query](/query#installation) Astro integration. You can apply this integration using the `astro add` CLI:
+
+```bash
+astro add simple-stack-query
+```
+
+If you do not want to use Simple Query, install as a vite plugin with the following instructions.
+
+### As a vite plugin
+
 Simple scope is a vite plugin compatible with any vite-based framework (Astro, Nuxt, SvelteKit, etc). First install the dependency from npm:
 
 ```bash
