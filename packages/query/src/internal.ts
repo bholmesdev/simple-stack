@@ -25,7 +25,10 @@ export function create$(scope: typeof scopeFn) {
 			return [...document.querySelectorAll(selector)];
 		},
 		ready(callback: () => MaybePromise<undefined | (() => void)>) {
-			if (transitionEnabledOnThisPage()) {
+			const fallback = document
+				.querySelector('meta[name="astro-view-transitions-fallback"]')
+				?.getAttribute("content");
+			if (transitionEnabledOnThisPage() && fallback !== "none") {
 				let cleanup: (() => void) | undefined;
 
 				document.addEventListener("astro:page-load", async () => {
