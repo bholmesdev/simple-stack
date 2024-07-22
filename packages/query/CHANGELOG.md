@@ -1,5 +1,11 @@
 # simple-stack-query
 
+## 0.1.1
+
+### Patch Changes
+
+- [#75](https://github.com/bholmesdev/simple-stack/pull/75) [`56a4000`](https://github.com/bholmesdev/simple-stack/commit/56a4000810aed4ddb07f5d8fccd3b7e1c7c8bbd4) Thanks [@bholmesdev](https://github.com/bholmesdev)! - fixes issue where `$.ready` does not fire in Safari or Firefox when using Astro view transitions with `fallback="none"`
+
 ## 0.1.0
 
 ### Minor Changes
