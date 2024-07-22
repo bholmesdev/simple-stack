@@ -1,5 +1,8 @@
 import type { scope as scopeFn } from "simple:scope";
-import { transitionEnabledOnThisPage } from "astro/virtual-modules/transitions-router.js";
+import {
+	transitionEnabledOnThisPage,
+	supportsViewTransitions,
+} from "astro/virtual-modules/transitions-router.js";
 
 export function create$(scope: typeof scopeFn) {
 	const anyMatchSelector = `[data-target$=${JSON.stringify(scope())}`;
@@ -25,7 +28,7 @@ export function create$(scope: typeof scopeFn) {
 			return [...document.querySelectorAll(selector)];
 		},
 		ready(callback: () => MaybePromise<undefined | (() => void)>) {
-			if (transitionEnabledOnThisPage()) {
+			if (supportsViewTransitions && transitionEnabledOnThisPage()) {
 				let cleanup: (() => void) | undefined;
 
 				document.addEventListener("astro:page-load", async () => {
