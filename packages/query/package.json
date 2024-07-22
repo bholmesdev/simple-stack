@@ -21,6 +21,8 @@
 		"directory": "packages/query"
 	},
 	"dependencies": {
+		"@clack/prompts": "^0.7.0",
+		"kleur": "^4.1.5",
 		"vite-plugin-simple-scope": "workspace:*"
 	},
 	"engines": {

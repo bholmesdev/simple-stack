@@ -1,16 +1,37 @@
+import { mkdir, writeFile } from "node:fs/promises";
 import type { AstroConfig, AstroIntegration } from "astro";
+import { cyan } from "kleur/colors";
 import vitePluginSimpleScope from "vite-plugin-simple-scope";
 
 import "../ambient.d.ts";
+import { existsSync } from "node:fs";
 
 type VitePlugin = Required<AstroConfig["vite"]>["plugins"][number];
 
-export default function simpleStackQueryIntegration(): AstroIntegration {
+type Options = {
+	bypassSnippetsPrompt?: boolean;
+};
+
+export default function simpleStackQueryIntegration(
+	opts?: Options,
+): AstroIntegration {
+	let root: URL;
+	let command: "dev" | "build" | "preview";
 	return {
 		name: "simple-stack-query",
 		hooks: {
-			"astro:config:setup"({ updateConfig }) {
-				updateConfig({
+			"astro:server:start": async () => {
+				if (command === "dev" && !opts?.bypassSnippetsPrompt) {
+					setTimeout(() => {
+						addSnippets({ root });
+					}, 100);
+				}
+			},
+			async "astro:config:setup"(params) {
+				root = params.config.root;
+				command = params.command;
+
+				params.updateConfig({
 					vite: {
 						plugins: [vitePlugin(), vitePluginSimpleScope()],
 					},
@@ -45,4 +66,54 @@ function vitePlugin(): VitePlugin {
     const $ = __queryInternals.create$(__scope);\n${code}`;
 		},
 	};
+}
+
+async function addSnippets({ root }: { root: URL }) {
+	const dotAstroDir = new URL(".astro/", root);
+	const snippetsResponseFile = new URL(
+		"simple-query-snippets-response",
+		dotAstroDir,
+	);
+	if (existsSync(snippetsResponseFile)) return;
+
+	const { confirm, isCancel, outro } = await import("@clack/prompts");
+	const shouldAddSnippets = await confirm({
+		message:
+			"Simple query offers snippets for VS Code. Would you like to add them?",
+	});
+
+	if (isCancel(shouldAddSnippets)) process.exit(0);
+
+	await mkdir(dotAstroDir, { recursive: true });
+	await writeFile(snippetsResponseFile, shouldAddSnippets ? "true" : "false");
+
+	if (!shouldAddSnippets) {
+		outro(`No problem! Won't ask again. ${cyan("Dev server running.")}`);
+		return;
+	}
+
+	const vsCodeDir = new URL(".vscode/", root);
+	const vsCodeSnippetsFile = new URL("simple-query.code-snippets", vsCodeDir);
+
+	await mkdir(vsCodeDir, { recursive: true });
+	await writeFile(
+		vsCodeSnippetsFile,
+		JSON.stringify(
+			{
+				"query target": {
+					scope: "typescriptreact,javascriptreact",
+					prefix: "$:target",
+					body: ["data-target={$('$1')}"],
+				},
+				"query ready block": {
+					scope: "typescript,javascript",
+					prefix: "$:ready",
+					body: ["$.ready(async () => {", "  $1", "});"],
+				},
+			},
+			null,
+			2,
+		),
+	);
+	outro(`Snippets added ✔️\n   ${cyan("Dev server running.")}`);
 }
