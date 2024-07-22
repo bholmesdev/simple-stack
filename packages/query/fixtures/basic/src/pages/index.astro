@@ -6,3 +6,9 @@ import WithContext from "./WithContext.astro";
 <h1 data-target={$('test')}>Hey</h1>
 <Nested />
 <WithContext $context={$} />
+
+<script>
+  $.ready(() => {
+    $('test').textContent = 'Hello';
+  });
+</script>
