@@ -52,7 +52,7 @@ $<HTMLInputElement>('input').value = '';
 
 ### `$.optional()` selector
 
-`$()` throws when no matching element is found. To avoid this behavior, use `$.optional()`:
+`$()` throws when no matching element is found. To handle undefined values, use `$.optional()`:
 
 ```astro
 ---
@@ -90,7 +90,7 @@ ready(() => {
 </script>
 ```
 
-## Global `$.ready()` function
+## `$.ready()` function
 
 All `$` queries must be nested in a `$.ready()` block. This opts in to using the global `$` from client scripts. `$.ready()` also ensures your code reruns on every page [when view transitions are enabled.](https://docs.astro.build/en/guides/view-transitions/)
 
