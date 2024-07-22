@@ -2,6 +2,10 @@ import type { scope as scopeFn } from "simple:scope";
 import { transitionEnabledOnThisPage } from "astro/virtual-modules/transitions-router.js";
 
 export function create$(scope: typeof scopeFn) {
+	const anyMatchSelector = `[data-target$=${JSON.stringify(scope())}`;
+	function hasScopeElement() {
+		return Boolean(document.querySelector(anyMatchSelector));
+	}
 	function getSelector(scopeId: string) {
 		return `[data-target=${JSON.stringify(scope(scopeId))}]`;
 	}
@@ -20,33 +24,23 @@ export function create$(scope: typeof scopeFn) {
 			const selector = getSelector(scopeId);
 			return [...document.querySelectorAll(selector)];
 		},
+		ready(callback: () => MaybePromise<undefined | (() => void)>) {
+			if (transitionEnabledOnThisPage()) {
+				let cleanup: (() => void) | undefined;
+
+				document.addEventListener("astro:page-load", async () => {
+					if (cleanup) cleanup();
+					if (!hasScopeElement()) return;
+
+					cleanup = await callback();
+				});
+			} else {
+				if (!hasScopeElement()) return;
+				callback();
+			}
+		},
 	});
 	return $;
 }
 
 type MaybePromise<T> = T | Promise<T>;
-
-export function createReady(scope: typeof scopeFn) {
-	const selector = `[data-target$=${JSON.stringify(scope())}`;
-	function hasScopeElement() {
-		return Boolean(document.querySelector(selector));
-	}
-
-	return function ready(
-		callback: () => MaybePromise<undefined | (() => void)>,
-	) {
-		if (transitionEnabledOnThisPage()) {
-			let cleanup: (() => void) | undefined;
-
-			document.addEventListener("astro:page-load", async () => {
-				if (cleanup) cleanup();
-				if (!hasScopeElement()) return;
-
-				cleanup = await callback();
-			});
-		} else {
-			if (!hasScopeElement()) return;
-			callback();
-		}
-	};
-}

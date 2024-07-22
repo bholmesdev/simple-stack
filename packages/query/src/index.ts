@@ -42,8 +42,7 @@ function vitePlugin(): VitePlugin {
     import { scope as __scope } from 'simple:scope';
     import * as __queryInternals from "simple-stack-query/internal";
 
-    const $ = __queryInternals.create$(__scope);
-    const ready = __queryInternals.createReady(__scope);\n${code}`;
+    const $ = __queryInternals.create$(__scope);\n${code}`;
 		},
 	};
 }

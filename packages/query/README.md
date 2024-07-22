@@ -6,7 +6,7 @@ A simple library to query the DOM from your Astro components.
 <button data-target={$('btn')}>Click me</button>
 
 <script>
-  ready(() => {
+  $.ready(() => {
     $('btn').addEventListener('click', () => {
       console.log("It's like JQuery but not!");
     });
@@ -41,15 +41,15 @@ From your client script, the query result will be a plain HTML element. No, it's
 $('btn').addEventListener(() => { /* ... */ });
 ```
 
-You can also pass an `HTMLElement` or `SVGElement` type to access specific properties. For example, use `$<HTMLInputElement>` to access `.value`:
+You can also pass an `HTMLElement` or `SVGElement` type to access specific properties. For example, use `$<HTMLInputElement>()` to access `.value`:
 
 ```ts
 $<HTMLInputElement>('input').value = '';
 ```
 
-### `$.optional` selector
+### `$.optional()` selector
 
-`$` throws when no matching element is found. To avoid this behavior, use `$.optional`:
+`$()` throws when no matching element is found. To avoid this behavior, use `$.optional()`:
 
 ```astro
 ---
@@ -67,9 +67,9 @@ ready(() => {
 </script>
 ```
 
-### `$.all` selector
+### `$.all()` selector
 
-You may want to select multiple targets with the same name. You can use `$.all` to query for an array of results:
+You may want to select multiple targets with the same name. You can use `$.all()` to query for an array of results:
 
 ```astro
 ---
@@ -87,13 +87,13 @@ ready(() => {
 </script>
 ```
 
-## Global `ready()` function
+## Global `$.ready()` function
 
-All `$` queries must be nested in a `ready()` block. This opts in to using the global `$` from client scripts. `ready()` also ensures your code reruns on every page [when view transitions are enabled.](https://docs.astro.build/en/guides/view-transitions/)
+All `$` queries must be nested in a `$.ready()` block. This opts in to using the global `$` from client scripts. `$.ready()` also ensures your code reruns on every page [when view transitions are enabled.](https://docs.astro.build/en/guides/view-transitions/)
 
 ```astro
 <script>
-  ready(() => {
+  $.ready(() => {
     // ✅ Allowed
     $('element').textContent = 'hey';
   })

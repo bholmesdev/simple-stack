@@ -5,6 +5,5 @@ declare namespace $ {
 	function optional<T extends Element = HTMLElement>(
 		selector: string,
 	): T | undefined;
+	function ready(callback: () => void): void;
 }
-
-declare function ready(callback: () => void): void;
