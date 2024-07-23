@@ -1,9 +1,22 @@
-declare function $<T extends Element = HTMLElement>(selector: string): T;
+declare function $(selector: string): string;
 
-declare namespace $ {
-	function all<T extends Element = HTMLElement>(selector: string): Array<T>;
-	function optional<T extends Element = HTMLElement>(
-		selector: string,
-	): T | undefined;
-	function ready(callback: () => void): void;
+declare function RootElement(
+	result: any,
+	props: RootElementData,
+	slots: never,
+): any | Promise<any>;
+
+declare namespace RootElement {
+	function ready<T extends Record<string, any>>(
+		callback: (
+			$: {
+				<T extends Element = HTMLElement>(selector: string): T;
+				all<T extends Element = HTMLElement>(selector: string): Array<T>;
+				optional<T extends Element = HTMLElement>(
+					selector: string,
+				): T | undefined;
+			},
+			data: T,
+		) => void,
+	);
 }

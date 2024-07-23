@@ -3,12 +3,14 @@ import Nested from "./Nested.astro";
 import WithContext from "./WithContext.astro";
 ---
 
+<RootElement>
 <h1 data-target={$('test')}>Hey</h1>
 <Nested />
 <WithContext $context={$} />
+</RootElement>
 
 <script>
-  $.ready(() => {
+  RootElement.ready(($) => {
     $('test').textContent = 'Hello';
   });
 </script>

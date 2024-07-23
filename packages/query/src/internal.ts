@@ -1,11 +1,38 @@
 import type { scope as scopeFn } from "simple:scope";
-import { transitionEnabledOnThisPage } from "astro/virtual-modules/transitions-router.js";
 
-export function create$(scope: typeof scopeFn) {
-	const anyMatchSelector = `[data-target$=${JSON.stringify(scope())}`;
-	function hasScopeElement() {
-		return Boolean(document.querySelector(anyMatchSelector));
+type ReadyCallback = (
+	$: any,
+	data: any,
+) => MaybePromise<undefined | CleanupCallback>;
+type CleanupCallback = () => MaybePromise<void>;
+
+export class InternalRootElement extends HTMLElement {
+	#readyCallback?: ReadyCallback;
+	#cleanupCallback?: CleanupCallback;
+
+	async connectedCallback() {
+		if (!this.#readyCallback) return;
+
+		const scopeHash = this.getAttribute("data-scope-hash")!;
+		const stringifiedData = this.getAttribute("data-stringified")!;
+		const $ = create$((prefix) =>
+			prefix ? scopeHash : `${prefix}-${scopeHash}`,
+		);
+		const data = JSON.parse(stringifiedData);
+
+		this.#cleanupCallback = await this.#readyCallback($, data);
 	}
+
+	disconnectedCallback() {
+		this.#cleanupCallback?.();
+	}
+
+	ready(callback: ReadyCallback) {
+		this.#readyCallback = callback;
+	}
+}
+
+function create$(scope: typeof scopeFn) {
 	function getSelector(scopeId: string) {
 		return `[data-target=${JSON.stringify(scope(scopeId))}]`;
 	}
@@ -23,24 +50,6 @@ export function create$(scope: typeof scopeFn) {
 		all(scopeId: string) {
 			const selector = getSelector(scopeId);
 			return [...document.querySelectorAll(selector)];
-		},
-		ready(callback: () => MaybePromise<undefined | (() => void)>) {
-			const fallback = document
-				.querySelector('meta[name="astro-view-transitions-fallback"]')
-				?.getAttribute("content");
-			if (transitionEnabledOnThisPage() && fallback !== "none") {
-				let cleanup: (() => void) | undefined;
-
-				document.addEventListener("astro:page-load", async () => {
-					if (cleanup) cleanup();
-					if (!hasScopeElement()) return;
-
-					cleanup = await callback();
-				});
-			} else {
-				if (!hasScopeElement()) return;
-				callback();
-			}
 		},
 	});
 	return $;

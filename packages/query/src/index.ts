@@ -61,9 +61,15 @@ function vitePlugin(): VitePlugin {
 
 			return `
     import { scope as __scope } from 'simple:scope';
-    import * as __queryInternals from "simple-stack-query/internal";
+    import { InternalRootElement as __InternalRootElement } from "simple-stack-query/internal";
 
-    const $ = __queryInternals.create$(__scope);\n${code}`;
+		const $ = __scope;
+
+		if (!import.meta.env.SSR) {
+			window.customElements.define('simple-query-root', __InternalRootElement);
+		}
+
+		const RootElement = document.querySelector(\`simple-query-root[data-scope-hash=\${__scope()}]\`);\n${code}`;
 		},
 	};
 }
