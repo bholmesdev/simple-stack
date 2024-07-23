@@ -1,9 +1,10 @@
+/// <reference path="../ambient.d.ts" />
+
 import { mkdir, writeFile } from "node:fs/promises";
 import type { AstroConfig, AstroIntegration } from "astro";
 import { cyan } from "kleur/colors";
 import vitePluginSimpleScope from "vite-plugin-simple-scope";
 
-import "../ambient.d.ts";
 import { existsSync } from "node:fs";
 
 type VitePlugin = Required<AstroConfig["vite"]>["plugins"][number];
@@ -53,6 +54,9 @@ function vitePlugin(): VitePlugin {
 			if (isAstroFrontmatter) {
 				return `
       import { scope as __scope } from 'simple:scope';
+			import * as __internals from 'simple-stack-query/internal.server';
+
+			const RootElement = __internals.createRootElement(__scope);
       const $ = __scope;\n${code}`;
 			}
 
@@ -61,15 +65,16 @@ function vitePlugin(): VitePlugin {
 
 			return `
     import { scope as __scope } from 'simple:scope';
-    import { InternalRootElement as __InternalRootElement } from "simple-stack-query/internal";
+    import * as __internals from "simple-stack-query/internal";
 
 		const $ = __scope;
 
 		if (!import.meta.env.SSR) {
-			window.customElements.define('simple-query-root', __InternalRootElement);
-		}
-
-		const RootElement = document.querySelector(\`simple-query-root[data-scope-hash=\${__scope()}]\`);\n${code}`;
+			if (!customElements.get('simple-query-root')) {
+				window.customElements.define('simple-query-root', __internals.createRootElementClass());
+			}
+			var RootElement = __internals.createRootElement(__scope);
+		}\n${code}`;
 		},
 	};
 }

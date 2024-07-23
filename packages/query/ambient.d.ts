@@ -1,11 +1,5 @@
 declare function $(selector: string): string;
 
-declare function RootElement(
-	result: any,
-	props: RootElementData,
-	slots: never,
-): any | Promise<any>;
-
 declare namespace RootElement {
 	function ready<T extends Record<string, any>>(
 		callback: (
@@ -19,4 +13,11 @@ declare namespace RootElement {
 			data: T,
 		) => void,
 	);
+	function effect(callback: (() => Promise<void>) | (() => void)): void;
 }
+
+declare function RootElement<T extends Record<string, any>>(
+	result: any,
+	props: T,
+	slots: never,
+): any | Promise<any>;

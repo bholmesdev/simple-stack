@@ -9,7 +9,8 @@
 	},
 	"exports": {
 		".": "./src/index.ts",
-		"./internal": "./src/internal.ts"
+		"./internal": "./src/internal.ts",
+		"./internal.server": "./src/internal.server.ts"
 	},
 	"keywords": ["withastro", "astro-integration"],
 	"files": ["src", "ambient.d.ts"],
@@ -32,6 +33,10 @@
 		"astro": "^4.12.0",
 		"linkedom": "^0.18.4",
 		"typescript": "^5.5.3",
+		"signal-polyfill": "^0.1.2",
 		"vite": "^5.0.10"
+	},
+	"peerDependencies": {
+		"signal-polyfill": "^0.1.2"
 	}
 }
