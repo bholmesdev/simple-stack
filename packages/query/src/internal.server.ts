@@ -7,13 +7,15 @@ import { type scope as scopeFn } from "simple:scope";
 
 export const createRootElement = (scope: typeof scopeFn) =>
 	createComponent({
-		factory(result, props, slots) {
+		factory(result, { data, ...props }, slots) {
 			return render`${renderComponent(
 				result,
 				"RootElement",
 				"simple-query-root",
 				{
-					"data-stringified": JSON.stringify(props),
+					style: props.class ? "" : "display: contents",
+					...props,
+					"data-stringified": JSON.stringify(data),
 					"data-scope-hash": scope(),
 				},
 				slots,
