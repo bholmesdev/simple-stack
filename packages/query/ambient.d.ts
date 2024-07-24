@@ -5,19 +5,21 @@ declare namespace RootElement {
 		callback: (
 			$: {
 				<T extends Element = HTMLElement>(selector: string): T;
+				self: HTMLElement;
 				all<T extends Element = HTMLElement>(selector: string): Array<T>;
 				optional<T extends Element = HTMLElement>(
 					selector: string,
 				): T | undefined;
 			},
-			data: T,
+			context: {
+				effect: (callback: () => void | Promise<void>) => void;
+				data: T;
+				abortSignal: AbortSignal;
+			},
 		) => void,
 	);
-	function effect(callback: (() => Promise<void>) | (() => void)): void;
 }
 
 declare function RootElement<T extends Record<string, any>>(
-	result: any,
-	props: T,
-	slots: never,
+	props: import("astro/types").HTMLAttributes<"div"> & { data?: T },
 ): any | Promise<any>;

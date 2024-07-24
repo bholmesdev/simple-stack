@@ -1,9 +1,17 @@
 import type { scope as scopeFn } from "simple:scope";
-import { effect, type MaybePromise, type CleanupCallback } from "./effect.js";
+import type {
+	MaybePromise,
+	CleanupCallback,
+	effect as effectFn,
+} from "./effect.js";
 
 type ReadyCallback = (
 	$: any,
-	data: any,
+	context: {
+		effect: typeof effectFn;
+		data: any;
+		abortSignal: AbortSignal;
+	},
 ) => MaybePromise<undefined | CleanupCallback>;
 
 export function createRootElement(scope: typeof scopeFn) {
@@ -16,15 +24,16 @@ export function createRootElement(scope: typeof scopeFn) {
 				(root as any).ready(callback);
 			}
 		},
-		effect(callback: ReadyCallback) {
-			for (const root of roots) {
-				(root as any).effect(callback);
-			}
-		},
 	};
 }
 
-export function createRootElementClass() {
+export function createRootElementClass(
+	effect: typeof effectFn = () => {
+		throw new Error(
+			"Unable to call `effect()`. To use this function, install the `signal-polyfill` package.",
+		);
+	},
+) {
 	return class extends HTMLElement {
 		#cleanupCallback?: CleanupCallback;
 
@@ -44,33 +53,34 @@ export function createRootElementClass() {
 			);
 			const data = JSON.parse(stringifiedData);
 
-			this.#cleanupCallback = await callback($, data);
-		}
-
-		effect(callback: () => MaybePromise<undefined | CleanupCallback>) {
-			effect(callback, { signal: this.abortSignal });
+			this.#cleanupCallback = await callback($, {
+				effect: effect.bind({ signal: this.abortSignal }),
+				data,
+				abortSignal: this.abortSignal,
+			});
 		}
 	};
 }
 
-function create$(parent: HTMLElement, scope: typeof scopeFn) {
+function create$(self: HTMLElement, scope: typeof scopeFn) {
 	function getSelector(scopeId: string) {
 		return `[data-target=${JSON.stringify(scope(scopeId))}]`;
 	}
 	function $(scopeId: string) {
 		const selector = getSelector(scopeId);
-		const element = parent.querySelector(selector);
+		const element = self.querySelector(selector);
 		if (!element) throw new Error(`Element not found: ${selector}`);
 		return element;
 	}
 	Object.assign($, {
+		self,
 		optional(scopeId: string) {
 			const selector = getSelector(scopeId);
-			return parent.querySelector(selector) ?? undefined;
+			return self.querySelector(selector) ?? undefined;
 		},
 		all(scopeId: string) {
 			const selector = getSelector(scopeId);
-			return [...parent.querySelectorAll(selector)];
+			return [...self.querySelectorAll(selector)];
 		},
 	});
 	return $;

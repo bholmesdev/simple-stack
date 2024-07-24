@@ -4,6 +4,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import type { AstroConfig, AstroIntegration } from "astro";
 import { cyan } from "kleur/colors";
 import vitePluginSimpleScope from "vite-plugin-simple-scope";
+import { createRequire } from "node:module";
 
 import { existsSync } from "node:fs";
 
@@ -34,7 +35,10 @@ export default function simpleStackQueryIntegration(
 
 				params.updateConfig({
 					vite: {
-						plugins: [vitePlugin(), vitePluginSimpleScope()],
+						plugins: [
+							vitePlugin({ root: params.config.root }),
+							vitePluginSimpleScope(),
+						],
 					},
 				});
 			},
@@ -42,7 +46,7 @@ export default function simpleStackQueryIntegration(
 	};
 }
 
-function vitePlugin(): VitePlugin {
+function vitePlugin({ root }: { root: URL }): VitePlugin {
 	return {
 		name: "simple-stack-query",
 		transform(code, id) {
@@ -66,17 +70,31 @@ function vitePlugin(): VitePlugin {
 			return `
     import { scope as __scope } from 'simple:scope';
     import * as __internals from "simple-stack-query/internal";
+		${hasSignalPolyfill(root) ? `import { effect as __effect } from "simple-stack-query/effect";` : "const __effect = undefined;"}
 
 		const $ = __scope;
 
 		if (!import.meta.env.SSR) {
 			if (!customElements.get('simple-query-root')) {
-				window.customElements.define('simple-query-root', __internals.createRootElementClass());
+				window.customElements.define(
+					'simple-query-root',
+					__internals.createRootElementClass(__effect)
+				);
 			}
 			var RootElement = __internals.createRootElement(__scope);
 		}\n${code}`;
 		},
 	};
+}
+
+function hasSignalPolyfill(root: URL) {
+	const require = createRequire(root);
+	try {
+		require.resolve("signal-polyfill");
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 async function addSnippets({ root }: { root: URL }) {
@@ -112,7 +130,6 @@ async function addSnippets({ root }: { root: URL }) {
 		JSON.stringify(
 			{
 				"query target": {
-					scope: "typescriptreact,javascriptreact",
 					prefix: "$:target",
 					body: ["data-target={$('$1')}"],
 				},

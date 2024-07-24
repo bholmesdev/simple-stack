@@ -26,8 +26,8 @@ export type MaybePromise<T> = T | Promise<T>;
 export type CleanupCallback = () => MaybePromise<void>;
 
 export function effect(
+	this: { signal?: AbortSignal },
 	callback: () => MaybePromise<undefined | CleanupCallback>,
-	opts?: { signal: AbortSignal },
 ) {
 	let cleanup: undefined | CleanupCallback;
 
@@ -39,7 +39,7 @@ export function effect(
 	w.watch(computed);
 	computed.get();
 
-	opts?.signal?.addEventListener(
+	this.signal?.addEventListener(
 		"abort",
 		() => {
 			w.unwatch(computed);

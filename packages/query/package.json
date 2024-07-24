@@ -10,6 +10,7 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./internal": "./src/internal.ts",
+		"./effect": "./src/effect.ts",
 		"./internal.server": "./src/internal.server.ts"
 	},
 	"keywords": ["withastro", "astro-integration"],
@@ -38,5 +39,10 @@
 	},
 	"peerDependencies": {
 		"signal-polyfill": "^0.1.2"
+	},
+	"peerDependenciesMeta": {
+		"signal-polyfill": {
+			"optional": true
+		}
 	}
 }
