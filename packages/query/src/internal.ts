@@ -4,10 +4,15 @@ import type {
 	CleanupCallback,
 	effect as effectFn,
 } from "./effect.js";
-import {
-	transitionEnabledOnThisPage,
-	getFallback,
-} from "astro/virtual-modules/transitions-router.js";
+import { transitionEnabledOnThisPage } from "astro/virtual-modules/transitions-router.js";
+
+function getFallback(): string {
+	const el = document.querySelector('[name="astro-view-transitions-fallback"]');
+	if (el) {
+		return el.getAttribute("content") as string;
+	}
+	return "animate";
+}
 
 type ReadyCallback = (
 	$: any,
@@ -18,18 +23,36 @@ type ReadyCallback = (
 	},
 ) => MaybePromise<undefined | CleanupCallback>;
 
+/**
+ * It's possible for RootElements to stream in after `ready()` is called.
+ * This is true for in-order streaming and server islands.
+ * Track callbacks in a Map by the RootElement id that function expects.
+ *
+ * Q: Can we every remove from this map for memory optimization?
+ * A: (@bholmesdev) I don't think so.
+ * It's possible for one `ready()` function to belong to multiple instances
+ * of a component, so it's unclear how we could empty this map overtime.
+ */
+const readyCallbacksByRootHash = new Map<string, ReadyCallback>();
+
 export function createRootElement(scope: typeof scopeFn) {
 	function mountReadyCallback(callback: ReadyCallback) {
+		readyCallbacksByRootHash.set(scope(), callback);
 		const roots = document.querySelectorAll(
 			`simple-query-root[data-scope-hash=${JSON.stringify(scope())}]`,
 		);
 		for (const root of roots) {
-			(root as any).ready(callback);
+			// It's possible for a RootElement's `connectedCallback`
+			// to fire before the user's `ready()` function is registered.
+			// Call `connectedCallback` again to retry.
+			if (root.isConnected) {
+				(root as any).connectedCallback();
+			}
 		}
 	}
 	return {
 		ready(callback: ReadyCallback) {
-			if (transitionEnabledOnThisPage() && getFallback() !== "none") {
+			if (transitionEnabledOnThisPage() || getFallback() !== "none") {
 				document.addEventListener("astro:page-load", () => {
 					mountReadyCallback(callback);
 				});
@@ -53,13 +76,11 @@ export function createRootElementClass(
 		#abortController = new AbortController();
 		abortSignal = this.#abortController.signal;
 
-		disconnectedCallback() {
-			this.#cleanupCallback?.();
-			this.#abortController.abort();
-		}
-
-		async ready(callback: ReadyCallback) {
+		async connectedCallback() {
 			const scopeHash = this.getAttribute("data-scope-hash")!;
+			const callback = readyCallbacksByRootHash.get(scopeHash);
+			if (!callback) return;
+
 			const stringifiedData = this.getAttribute("data-stringified")!;
 			const $ = create$(this, (prefix) =>
 				prefix ? `${prefix}-${scopeHash}` : scopeHash,
@@ -71,6 +92,11 @@ export function createRootElementClass(
 				data,
 				abortSignal: this.abortSignal,
 			});
+		}
+
+		disconnectedCallback() {
+			this.#cleanupCallback?.();
+			this.#abortController.abort();
 		}
 	};
 }
