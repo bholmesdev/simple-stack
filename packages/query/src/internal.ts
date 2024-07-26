@@ -4,6 +4,10 @@ import type {
 	CleanupCallback,
 	effect as effectFn,
 } from "./effect.js";
+import {
+	transitionEnabledOnThisPage,
+	getFallback,
+} from "astro/virtual-modules/transitions-router.js";
 
 type ReadyCallback = (
 	$: any,
@@ -15,13 +19,22 @@ type ReadyCallback = (
 ) => MaybePromise<undefined | CleanupCallback>;
 
 export function createRootElement(scope: typeof scopeFn) {
-	const roots = document.querySelectorAll(
-		`simple-query-root[data-scope-hash=${JSON.stringify(scope())}]`,
-	);
+	function mountReadyCallback(callback: ReadyCallback) {
+		const roots = document.querySelectorAll(
+			`simple-query-root[data-scope-hash=${JSON.stringify(scope())}]`,
+		);
+		for (const root of roots) {
+			(root as any).ready(callback);
+		}
+	}
 	return {
 		ready(callback: ReadyCallback) {
-			for (const root of roots) {
-				(root as any).ready(callback);
+			if (transitionEnabledOnThisPage() && getFallback() !== "none") {
+				document.addEventListener("astro:page-load", () => {
+					mountReadyCallback(callback);
+				});
+			} else {
+				mountReadyCallback(callback);
 			}
 		},
 	};
