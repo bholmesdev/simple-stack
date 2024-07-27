@@ -273,3 +273,79 @@ This example will update a button's `textContent` whenever `count` changes:
   })
 </script>
 ```
+
+## Passing server data
+
+You may need to pass information from your Astro component to the client. For boolean values, the simplest method is via data attributes. This example sets the initial state of a dropdown by setting `data-open` from the template:
+
+```astro ins="data-open"
+<RootElement>
+  <button data-target="toggle">Toggle</button>
+  <ul data-open data-target="drawer">
+    <li>Item 1</li>
+  </ul>
+</RootElement>
+
+<script>
+  RootElement.ready(($) => {
+    $('toggle').addEventListener('click', () => {
+      $('drawer').toggleAttribute('data-open');
+    })
+  })
+</script>
+```
+
+Still, you may need to pass other values including numbers, arrays, or objects. This is common [when using Signals](#using-signals-with-signal-polyfill) for state management.
+
+For this, `<RootElement>` accepts a `data` property. This supports any JSON-serializable value:
+
+```astro ins="data={{ initialCount }}"
+---
+const initialCount = 0;
+---
+
+<RootElement data={{ initialCount }}>
+  <button data-target="btn">Click me</button>
+</RootElement>
+```
+
+You can retrieve this value from the client using the `data` object. This is available from the `ctx` object passed as the second argument by `RootElement.ready()`.
+
+```astro ins="ctx.data"
+---
+const initialCount = 0;
+---
+
+<RootElement data={{ initialCount }}>
+  <button data-target="btn">Click me</button>
+</RootElement>
+
+<script>
+  import { Signal } from 'signal-polyfill';
+
+  RootElement.ready(($, ctx) => {
+    const { initialCount } = ctx.data;
+    const count = new Signal.State(count);
+
+    $('btn').addEventListener('click', () => {
+      count.set(count.get() + 1);
+    })
+  })
+</script>
+```
+
+`RootElement` also accepts a type argument to enforce the type of `data`.
+
+:::note
+Defining a type for `data` will _not_ raise a type error for server data you pass in. This is only meant to allow autocompletion from your client scripts.
+:::
+
+```astro ins="<{ initialCount: number }>"
+<script>
+  import { Signal } from 'signal-polyfill';
+
+  RootElement.ready<{ initialCount: number }>(($, ctx) => {
+    // ...
+  })
+</script>
+```
