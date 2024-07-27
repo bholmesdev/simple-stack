@@ -1,5 +1,5 @@
 ---
-title: Simple query 🔎
+title: Simple Query 🔎
 description: A simple library to query the DOM from your Astro components.
 ---
 
@@ -9,7 +9,7 @@ A simple library to query the DOM from your Astro components.
 
 ```astro
 <RootElement>
-  <button data-target={$('btn')}>Click me</button>
+  <button data-target="btn">Click me</button>
 </RootElement>
 
 <script>
@@ -23,7 +23,7 @@ A simple library to query the DOM from your Astro components.
 
 ## Installation
 
-Simple stack query is an Astro integration. You can install using the `astro add` CLI:
+Simple Query is an Astro integration. You can install using the `astro add` CLI:
 
 ```bash
 astro add simple-stack-query
@@ -33,7 +33,7 @@ To install this integration manually, follow the [manual installation instructio
 
 ## Getting started
 
-Simple stack query provides global utilities to make your Astro components interactive. To get started, apply the `<RootElement>` wrapper around your Astro component markup:
+To get started, apply the global `<RootElement>` wrapper around your Astro component markup:
 
 ```astro ins="RootElement"
 <RootElement>
@@ -41,20 +41,20 @@ Simple stack query provides global utilities to make your Astro components inter
 </RootElement>
 ```
 
-Next, apply the `data-target` attribute to the element you want to target. Use the global `$()` function to apply the target value. This will generate a scoped identifier to prevent conflicts with other components in your project:
+Next, apply the `data-target` attribute to the element you want to target. Simple Query will automatically scope the value to prevent conflicts with other components in your project:
 
-```astro ins="data-target={$('btn')}"
+```astro ins="data-target=\"btn\""
 <RootElement>
-  <button data-target={$('btn')}>Click me</button>
+  <button data-target="btn">Click me</button>
   <!--data-target="btn-4SzN_OBB"-->
 </RootElement>
 ```
 
-Now create a `<script>` tag, and use the `RootElement.ready()` wrapper to define your client script. `.ready()` provides the `$()` function to select your `btn` element. This returns a web-standard [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) you can use to, say, add an event listener with `.addEventListener()`:
+Now create a `<script>` tag, and use the `RootElement.ready()` wrapper to define your client script. `.ready()` provides the `$()` function to select elements based on their `data-target` attribute. This returns a web-standard [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) you can use to, say, add an event listener with `.addEventListener()`:
 
 ```astro ins={5-11}
 <RootElement>
-  <button data-target={$('btn')}>Click me</button>
+  <button data-target="btn">Click me</button>
 </RootElement>
 
 <script>
@@ -68,13 +68,13 @@ Now create a `<script>` tag, and use the `RootElement.ready()` wrapper to define
 
 ## Selecting elements
 
-`RootElement.ready()` provides the `$()` function to select elements. This will find the first match based on `data-target`, and throw if no match is found.
+The `$()` function provided by `RootElement.ready()` will find the first match based on `data-target`, and throw if no match is found.
 
 The result will be a standard [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) by default. To narrow this type to a particular element, you can pass a type generic to the `$()` function:
 
 ```ts ins="<HTMLInputElement>"
 <RootElement>
-  <input type="email" data-target={$('email')} />
+  <input type="email" data-target="email" />
 </RootElement>
 
 <script>
@@ -94,7 +94,7 @@ const promoActive = Astro.url.searchParams.has('promo');
 ---
 
 <RootElement>
-  {promoActive && <p data-target={$('banner')}>Buy my thing</p>}
+  {promoActive && <p data-target="banner">Buy my thing</p>}
 </RootElement>
 
 <script>
@@ -117,7 +117,7 @@ const links = ["wtw.dev", "bholmes.dev"];
 
 <RootElement>
   {links.map(link => (
-    <a href={link} data-target={$('link')}>{link}</a>
+    <a href={link} data-target="link">{link}</a>
   ))}
 </RootElement>
 
@@ -134,15 +134,15 @@ When adding client interactivity, you'll often need to track "state." This could
 
 ### Using data attributes
 
-The simplest place to store state values is on an element itself. For example, you may track the `open` state on a dropdown by toggling a data attribute. Call `.toggleAttribute()` when a button is clicked, and adjust the dropdown's `visibility` style from `invisible` to `visible` based on the value:
+The simplest place to store state values is on an element itself. For example, you may track the `open` state on a dropdown by toggling a data attribute. Call `.toggleAttribute()` on the dropdown when a button is clicked, and adjust the dropdown's `visibility` style from `invisible` to `visible` based on the value:
 
 <Tabs syncKey="css">
 <TabItem label="CSS">
 
 ```astro
 <RootElement>
-  <button data-target={$('toggle')}>Toggle</button>
-  <ul data-target={$('drawer')}>
+  <button data-target="toggle">Toggle</button>
+  <ul data-target="drawer">
     <li>Item 1</li>
   </ul>
 </RootElement>
@@ -170,8 +170,8 @@ ul {
 
 ```astro
 <RootElement>
-  <button data-target={$('toggle')}>Toggle</button>
-  <ul class="data-[open]:visible invisible" data-target={$('drawer')}>
+  <button data-target="toggle">Toggle</button>
+  <ul data-target="drawer" class="data-[open]:visible invisible">
     <li>Item 1</li>
   </ul>
 </RootElement>
@@ -193,7 +193,7 @@ ul {
 
 Overtime, you may find it difficult to keep elements on the page in-sync with the state you are tracking. You may need to update multiple elements based on a `count`, an `open` state, etc.
 
-Browsers are considering a new standard to address this problem: [signals](https://github.com/tc39/proposal-signals). Simple query is built to support an early version of this proposal via the `signal-polyfill` package.
+Browsers are considering a new standard to address this problem: [Signals](https://github.com/tc39/proposal-signals). Simple Query is built to support an early version of this proposal via the `signal-polyfill` package.
 
 First install `signal-polyfill` into your project:
 
@@ -230,7 +230,7 @@ You can update this value using `.set()`, and retrieve the current value using `
 
 ```astro ins={11-13}
 <RootElement>
-  <button data-target={$('btn')}>0</button>
+  <button data-target="btn">0</button>
 </RootElement>
 
 <script>
@@ -254,7 +254,7 @@ This example will update a button's `textContent` whenever `count` changes:
 
 ```astro ins="ctx" ins={15-17}
 <RootElement>
-  <button data-target={$('btn')}>0</button>
+  <button data-target="btn">0</button>
 </RootElement>
 
 <script>
