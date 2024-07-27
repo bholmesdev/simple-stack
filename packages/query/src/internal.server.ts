@@ -11,12 +11,11 @@ export const createRootElement = (scope: typeof scopeFn) =>
 			return render`${renderComponent(
 				result,
 				"RootElement",
-				"simple-query-root",
+				`simple-query-root-${scope()}`,
 				{
 					style: props.class ? "" : "display: contents",
 					...props,
 					"data-stringified": JSON.stringify(data),
-					"data-scope-hash": scope(),
 				},
 				slots,
 			)}`;

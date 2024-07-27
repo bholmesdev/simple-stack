@@ -56,16 +56,19 @@ function vitePlugin({ root }: { root: URL }): VitePlugin {
 			if (!baseId?.endsWith(".astro")) return;
 
 			const isAstroFrontmatter = !search;
-			const newCode = code.replace(dataTargetRegex, (str, target) => {
-				return `data-target=\${__scope(${JSON.stringify(target)})}`;
-			});
 
 			if (isAstroFrontmatter) {
+				const codeWithTargetsReplaced = code.replace(
+					dataTargetRegex,
+					(_, target) => {
+						return `data-target=\${__scope(${JSON.stringify(target)})}`;
+					},
+				);
 				return `
       import { scope as __scope } from 'simple:scope';
 			import * as __internals from 'simple-stack-query/internal.server';
 
-			const RootElement = __internals.createRootElement(__scope);\n${newCode}`;
+			const RootElement = __internals.createRootElement(__scope);\n${codeWithTargetsReplaced}`;
 			}
 
 			const searchParams = new URLSearchParams(search);
@@ -76,15 +79,7 @@ function vitePlugin({ root }: { root: URL }): VitePlugin {
     import * as __internals from "simple-stack-query/internal";
 		${hasSignalPolyfill(root) ? `import { effect as __effect } from "simple-stack-query/effect";` : "const __effect = undefined;"}
 
-		if (!import.meta.env.SSR) {
-			if (!customElements.get('simple-query-root')) {
-				window.customElements.define(
-					'simple-query-root',
-					__internals.createRootElementClass(__effect)
-				);
-			}
-			var RootElement = __internals.createRootElement(__scope);
-		}\n${code}`;
+		const RootElement = __internals.createRootElement(__scope, __effect);\n${code}`;
 		},
 	};
 }
