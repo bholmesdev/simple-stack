@@ -365,6 +365,47 @@ Defining a type for `data` will _not_ raise a type error for server data you pas
 </script>
 ```
 
+## Passing `data-target` as a component prop
+
+You can pass a `data-target` value as a prop to nested components as well. This allows you to target elements defined deeper in the component tree that depend on the same client state.
+
+This example defines a `Button` component that accepts a `target` prop applied to the `data-target` attribute:
+
+```astro title="src/components/Button.astro"
+---
+type Props = {
+  target: string;
+}
+
+const { target } = Astro.props;
+---
+
+<button data-target={target}>
+  <slot />
+</button>
+```
+
+To pass a scoped `target` value, you will need to wrap your value using the `scope()` function from the `simple:scope` module. This applies the same scoping Simple Query applies by default to `data-target` attributes:
+
+```astro title="src/pages/index.astro" ins={3} ins="scope(\"btn\")"
+---
+import Button from "../components/Button.astro";
+import { scope } from "simple:scope";
+---
+
+<RootElement>
+  <Button target={scope("btn")}>
+    Click me
+  </Button>
+</RootElement>
+
+<script>
+  RootElement.ready(($) => {
+    $('btn').addEventListener('click', () => { /* ... */ });
+  })
+</script>
+```
+
 ## Handling event cleanup
 
 :::note
@@ -414,47 +455,6 @@ You may listen to events that do not accept an `AbortSignal`. This includes [int
     return () => {
       observer.disconnect();
     }
-  })
-</script>
-```
-
-## Passing `data-target` as a component prop
-
-You can pass a `data-target` value as a prop to nested components as well. This allows you to target elements defined deeper in the component tree that depend on the same client state.
-
-This example defines a `Button` component that accepts a `target` prop applied to the `data-target` attribute:
-
-```astro title="src/components/Button.astro"
----
-type Props = {
-  target: string;
-}
-
-const { target } = Astro.props;
----
-
-<button data-target={target}>
-  <slot />
-</button>
-```
-
-To pass a scoped `target` value, you will need to wrap your value using the `scope()` function from the `simple:scope` module. This applies the same scoping Simple Query applies by default to `data-target` attributes:
-
-```astro title="src/pages/index.astro" ins={3} ins="scope(\"btn\")"
----
-import Button from "../components/Button.astro";
-import { scope } from "simple:scope";
----
-
-<RootElement>
-  <Button target={scope("btn")}>
-    Click me
-  </Button>
-</RootElement>
-
-<script>
-  RootElement.ready(($) => {
-    $('btn').addEventListener('click', () => { /* ... */ });
   })
 </script>
 ```
