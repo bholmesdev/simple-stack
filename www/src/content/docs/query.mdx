@@ -216,7 +216,7 @@ pnpm add signal-polyfill
 
 Then, create your first state variable by importing `Signal` from `signal-polyfill` and calling the `new Signal.State()` constructor:
 
-```astro "const count = new Signal.State(0)"
+```astro ins={2} ins="const count = new Signal.State(0)"
 <script>
   import { Signal } from 'signal-polyfill';
 
