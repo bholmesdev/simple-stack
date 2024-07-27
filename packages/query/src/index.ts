@@ -46,6 +46,8 @@ export default function simpleStackQueryIntegration(
 	};
 }
 
+const dataTargetRegex = /data-target="(.*?)"/g;
+
 function vitePlugin({ root }: { root: URL }): VitePlugin {
 	return {
 		name: "simple-stack-query",
@@ -54,14 +56,16 @@ function vitePlugin({ root }: { root: URL }): VitePlugin {
 			if (!baseId?.endsWith(".astro")) return;
 
 			const isAstroFrontmatter = !search;
+			const newCode = code.replace(dataTargetRegex, (str, target) => {
+				return `data-target=\${__scope(${JSON.stringify(target)})}`;
+			});
 
 			if (isAstroFrontmatter) {
 				return `
       import { scope as __scope } from 'simple:scope';
 			import * as __internals from 'simple-stack-query/internal.server';
 
-			const RootElement = __internals.createRootElement(__scope);
-      const $ = __scope;\n${code}`;
+			const RootElement = __internals.createRootElement(__scope);\n${newCode}`;
 			}
 
 			const searchParams = new URLSearchParams(search);
@@ -71,8 +75,6 @@ function vitePlugin({ root }: { root: URL }): VitePlugin {
     import { scope as __scope } from 'simple:scope';
     import * as __internals from "simple-stack-query/internal";
 		${hasSignalPolyfill(root) ? `import { effect as __effect } from "simple-stack-query/effect";` : "const __effect = undefined;"}
-
-		const $ = __scope;
 
 		if (!import.meta.env.SSR) {
 			if (!customElements.get('simple-query-root')) {

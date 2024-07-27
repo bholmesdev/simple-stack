@@ -1,6 +1,6 @@
 ---
 type Props = {
-	$context: typeof $;
+	$context: typeof import('simple:scope').scope;
 };
 
 const { $context } = Astro.props;

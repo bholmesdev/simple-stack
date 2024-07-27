@@ -1,5 +1,3 @@
-declare function $(selector: string): string;
-
 declare namespace RootElement {
 	function ready<T extends Record<string, any>>(
 		callback: (
