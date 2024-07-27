@@ -23,7 +23,7 @@ A simple library to query the DOM from your Astro components.
 
 ## Installation
 
-Simple Query is an Astro integration. You can install using the `astro add` CLI:
+Simple Query is an Astro integration. We recommend installing with the `astro add` CLI:
 
 ```bash
 astro add simple-stack-query
@@ -70,7 +70,7 @@ Now create a `<script>` tag, and use the `RootElement.ready()` wrapper to define
 
 The `$()` function provided by `RootElement.ready()` will find the first match based on `data-target`, and throw if no match is found.
 
-The result will be a standard [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) by default. To narrow this type to a particular element, you can pass a type generic to the `$()` function:
+The result will be a standard [`HTMLElement`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement) by default. To narrow this type to a particular element, pass a type generic to the `$()` function:
 
 ```ts ins="<HTMLInputElement>"
 <RootElement>
@@ -125,6 +125,21 @@ const links = ["wtw.dev", "bholmes.dev"];
   RootElement.ready(($) => {
     $.all('link').forEach(linkElement => { /* ... */ });
   });
+</script>
+```
+
+### `$.self` selector
+
+To select the `RootElement` itself, use the `$.self` value:
+
+```astro
+<RootElement>
+</RootElement>
+
+<script>
+  RootElement.ready(($) => {
+    $.self.toggleAttribute('data-ready');
+  })
 </script>
 ```
 
@@ -226,7 +241,7 @@ Then, create your first state variable by importing `Signal` from `signal-polyfi
 </script>
 ```
 
-You can update this value using `.set()`, and retrieve the current value using `.get()`. This example increments a counter when the `btn` element is pressed:
+Update this value using `.set()`, and retrieve the current value using `.get()`. This example increments a counter when the `btn` element is pressed:
 
 ```astro ins={11-13}
 <RootElement>
@@ -309,7 +324,7 @@ const initialCount = 0;
 </RootElement>
 ```
 
-You can retrieve this value from the client using the `data` object. This is available from the `ctx` object passed as the second argument by `RootElement.ready()`.
+Then, retrieve this value from the client using the `data` object. This is available from the `ctx` object passed as the second argument by `RootElement.ready()`.
 
 ```astro ins="ctx.data"
 ---
@@ -349,3 +364,56 @@ Defining a type for `data` will _not_ raise a type error for server data you pas
   })
 </script>
 ```
+
+## Handling event cleanup
+
+:::note
+Cleanup is only necessary when using [view transitions](https://docs.astro.build/en/guides/view-transitions/). If you aren't using view transitions, skip this section!
+:::
+
+You may have logic in your `RootElement.ready()` function that should be cleaned up on route change. This includes:
+
+- `fetch()` calls
+- `document` event listeners
+- intersection and mutation observers
+
+### Clean up `fetch` and `document` callbacks
+
+The `fetch()` and `document.addEventListener()` functions accept an  [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) to cancel events. Simple Query provides an `abortSignal` via the `ctx` property, which will trigger whenever the `RootElement` is removed from the page.
+
+Apply `ctx.abortSignal` to any `fetch()` or `document.addEventListener()` calls in your client script using the `signal` property:
+
+```astro ins="signal: ctx.abortSignal"
+<script>
+  RootElement.ready(async ($, ctx) => {
+    const recommendedPosts = await fetch('/api/posts', {
+      signal: ctx.abortSignal,
+    }).then(res => res.json());
+
+    document.addEventListener('scroll', () => {
+      const articleRect = $('article').getBoundingClientRect();
+      const articleHeight = $('article').offsetTop + articleRect.height;
+      $('progress').value = Math.min((window.scrollY + window.innerHeight) / articleHeight, 1);
+    }, { signal: ctx.abortSignal });
+  })
+</script>
+```
+
+### Clean up observers and other events
+
+You may listen to events that do not accept an `AbortSignal`. This includes [intersection](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) and [mutation](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) observers. For these cases, return a callback function from `RootElement.ready()` with any cleanup logic you need to run on navigation:
+
+```astro ins={8-10}
+<script>
+  RootElement.ready(($) => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { /* ... */ },
+    );
+    observer.observe($("element"));
+
+    return () => {
+      observer.disconnect();
+    }
+  })
+</script>
+
