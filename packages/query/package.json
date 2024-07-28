@@ -5,11 +5,14 @@
 	"type": "module",
 	"scripts": {
 		"test": "node --test test",
+		"e2e": "pnpm -r --filter=\"./fixtures/**\" build && pnpm exec playwright test",
 		"test:watch": "node --test --watch test"
 	},
 	"exports": {
 		".": "./src/index.ts",
-		"./internal": "./src/internal.ts"
+		"./internal": "./src/internal.ts",
+		"./effect": "./src/effect.ts",
+		"./internal.server": "./src/internal.server.ts"
 	},
 	"keywords": ["withastro", "astro-integration"],
 	"files": ["src", "ambient.d.ts"],
@@ -29,9 +32,20 @@
 		"node": "^18.17.1 || ^20.3.0 || >=21.0.0"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.45.3",
+		"@types/node": "^20.14.12",
 		"astro": "^4.12.0",
 		"linkedom": "^0.18.4",
+		"signal-polyfill": "^0.1.2",
 		"typescript": "^5.5.3",
 		"vite": "^5.0.10"
+	},
+	"peerDependencies": {
+		"signal-polyfill": "^0.1.2"
+	},
+	"peerDependenciesMeta": {
+		"signal-polyfill": {
+			"optional": true
+		}
 	}
 }

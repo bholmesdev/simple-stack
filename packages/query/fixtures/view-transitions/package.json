@@ -1,5 +1,5 @@
 {
-	"name": "@test/query-basic",
+	"name": "@test/query-view-transitions",
 	"private": true,
 	"scripts": {
 		"dev": "astro dev",

@@ -1,49 +1,87 @@
 import type { scope as scopeFn } from "simple:scope";
-import { transitionEnabledOnThisPage } from "astro/virtual-modules/transitions-router.js";
+import type {
+	CleanupCallback,
+	MaybePromise,
+	effect as effectFn,
+} from "./effect.js";
 
-export function create$(scope: typeof scopeFn) {
-	const anyMatchSelector = `[data-target$=${JSON.stringify(scope())}`;
-	function hasScopeElement() {
-		return Boolean(document.querySelector(anyMatchSelector));
-	}
+type ReadyCallback = (
+	$: any,
+	context: {
+		effect: typeof effectFn;
+		data: any;
+		abortSignal: AbortSignal;
+	},
+) => MaybePromise<undefined | CleanupCallback>;
+
+export function createRootElement(
+	scope: typeof scopeFn,
+	effect: typeof effectFn = () => {
+		throw new Error(
+			"Unable to call `effect()`. To use this function, install the `signal-polyfill` package.",
+		);
+	},
+) {
+	return {
+		ready(callback: ReadyCallback) {
+			window.customElements.define(
+				`simple-query-root-${scope()}`,
+				createRootElementClass(scope, effect, callback),
+			);
+		},
+	};
+}
+
+export function createRootElementClass(
+	scope: typeof scopeFn,
+	effect: typeof effectFn,
+	readyCallback: ReadyCallback,
+) {
+	return class extends HTMLElement {
+		#cleanupCallback?: CleanupCallback;
+
+		#abortController = new AbortController();
+		abortSignal = this.#abortController.signal;
+
+		async connectedCallback() {
+			const stringifiedData = this.getAttribute("data-stringified")!;
+			const $ = create$(this, scope);
+			const data = JSON.parse(stringifiedData);
+
+			this.#cleanupCallback = await readyCallback($, {
+				effect: effect.bind({ signal: this.abortSignal }),
+				data,
+				abortSignal: this.abortSignal,
+			});
+		}
+
+		disconnectedCallback() {
+			this.#cleanupCallback?.();
+			this.#abortController.abort();
+		}
+	};
+}
+
+function create$(self: HTMLElement, scope: typeof scopeFn) {
 	function getSelector(scopeId: string) {
 		return `[data-target=${JSON.stringify(scope(scopeId))}]`;
 	}
 	function $(scopeId: string) {
 		const selector = getSelector(scopeId);
-		const element = document.querySelector(selector);
+		const element = self.querySelector(selector);
 		if (!element) throw new Error(`Element not found: ${selector}`);
 		return element;
 	}
 	Object.assign($, {
+		self,
 		optional(scopeId: string) {
 			const selector = getSelector(scopeId);
-			return document.querySelector(selector) ?? undefined;
+			return self.querySelector(selector) ?? undefined;
 		},
 		all(scopeId: string) {
 			const selector = getSelector(scopeId);
-			return [...document.querySelectorAll(selector)];
-		},
-		ready(callback: () => MaybePromise<undefined | (() => void)>) {
-			const fallback = document
-				.querySelector('meta[name="astro-view-transitions-fallback"]')
-				?.getAttribute("content");
-			if (transitionEnabledOnThisPage() && fallback !== "none") {
-				let cleanup: (() => void) | undefined;
-
-				document.addEventListener("astro:page-load", async () => {
-					if (cleanup) cleanup();
-					if (!hasScopeElement()) return;
-
-					cleanup = await callback();
-				});
-			} else {
-				if (!hasScopeElement()) return;
-				callback();
-			}
+			return [...self.querySelectorAll(selector)];
 		},
 	});
 	return $;
 }
-
-type MaybePromise<T> = T | Promise<T>;

@@ -1,14 +1,9 @@
----
-import Nested from "./Nested.astro";
-import WithContext from "./WithContext.astro";
----
-
-<h1 data-target={$('test')}>Hey</h1>
-<Nested />
-<WithContext $context={$} />
+<RootElement>
+  <h1 data-testid="heading" data-target="heading">Heading JS loading</h1>
+</RootElement>
 
 <script>
-  $.ready(() => {
-    $('test').textContent = 'Hello';
+  RootElement.ready(($) => {
+    $('heading').textContent = `Heading JS loaded`;
   });
 </script>

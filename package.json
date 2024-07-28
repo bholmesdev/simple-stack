@@ -8,6 +8,7 @@
 		"build": "turbo build --filter='./packages/*'",
 		"build:all": "turbo build",
 		"test": "turbo test --filter='./packages/*'",
+		"e2e": "turbo e2e",
 		"check": "biome check packages/",
 		"check:apply": "biome check packages/ --apply",
 		"lint": "biome lint packages/",
@@ -16,13 +17,16 @@
 		"format:write": "biome format --write",
 		"version": "changeset version && pnpm install --no-frozen-lockfile && pnpm run check:apply"
 	},
-	"keywords": ["withastro"],
+	"keywords": [
+		"withastro"
+	],
 	"author": "bholmesdev",
 	"license": "MIT",
 	"devDependencies": {
 		"@biomejs/biome": "^1.8.3",
 		"@changesets/changelog-github": "^0.5.0",
 		"@changesets/cli": "^2.27.1",
+		"@playwright/test": "^1.45.3",
 		"@types/node": "^20.14.11",
 		"turbo": "^1.11.2",
 		"typescript": "^5.5.3"
