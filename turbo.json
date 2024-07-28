@@ -10,7 +10,10 @@
 			"persistent": true
 		},
 		"test": {
-			"dependsOn": ["build"]
+			"dependsOn": ["^build"]
+		},
+		"e2e": {
+			"dependsOn": ["^build"]
 		}
 	}
 }
