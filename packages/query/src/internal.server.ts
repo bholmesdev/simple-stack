@@ -1,9 +1,9 @@
+import { type scope as scopeFn } from "simple:scope";
 import {
 	createComponent,
-	renderComponent,
 	render,
+	renderComponent,
 } from "astro/runtime/server/index.js";
-import { type scope as scopeFn } from "simple:scope";
 
 export const createRootElement = (scope: typeof scopeFn) =>
 	createComponent({

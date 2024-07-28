@@ -1,8 +1,8 @@
 /// <reference path="../ambient.d.ts" />
 
+import { createRequire } from "node:module";
 import type { AstroConfig, AstroIntegration } from "astro";
 import vitePluginSimpleScope from "vite-plugin-simple-scope";
-import { createRequire } from "node:module";
 
 type VitePlugin = Required<AstroConfig["vite"]>["plugins"][number];
 

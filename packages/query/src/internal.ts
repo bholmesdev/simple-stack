@@ -1,7 +1,7 @@
 import type { scope as scopeFn } from "simple:scope";
 import type {
-	MaybePromise,
 	CleanupCallback,
+	MaybePromise,
 	effect as effectFn,
 } from "./effect.js";
 
