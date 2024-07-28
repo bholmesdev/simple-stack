@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { type PreviewServer, preview } from "astro";
-import { generatePort } from "./utils";
+import { getPath, generatePort } from "./utils";
 
 const fixtureRoot = new URL("../fixtures/basic", import.meta.url).pathname;
 let previewServer: PreviewServer;
@@ -16,19 +16,15 @@ test.afterAll(async () => {
 	await previewServer.stop();
 });
 
-function getPath(path = "") {
-	return new URL(path, `http://localhost:${previewServer.port}/`).href;
-}
-
 test("loads client JS for heading", async ({ page }) => {
-	await page.goto(getPath());
+	await page.goto(getPath("", previewServer));
 
 	const h1 = page.getByTestId("heading");
 	await expect(h1).toContainText("Heading JS loaded");
 });
 
 test("reacts to button click", async ({ page }) => {
-	await page.goto(getPath("button"));
+	await page.goto(getPath("button", previewServer));
 
 	const btn = page.getByRole("button");
 
@@ -38,7 +34,7 @@ test("reacts to button click", async ({ page }) => {
 });
 
 test("reacts to button effect", async ({ page }) => {
-	await page.goto(getPath("effect"));
+	await page.goto(getPath("effect", previewServer));
 
 	const btn = page.getByRole("button");
 
@@ -50,14 +46,14 @@ test("reacts to button effect", async ({ page }) => {
 });
 
 test("respects server data", async ({ page }) => {
-	await page.goto(getPath("server-data"));
+	await page.goto(getPath("server-data", previewServer));
 
 	const h1 = page.getByTestId("heading");
 	await expect(h1).toContainText("Server data");
 });
 
 test("reacts to multiple instances of button counter", async ({ page }) => {
-	await page.goto(getPath("multi-counter"));
+	await page.goto(getPath("multi-counter", previewServer));
 
 	for (const testId of ["counter-1", "counter-2"]) {
 		const counter = page.getByTestId(testId);

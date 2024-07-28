@@ -245,6 +245,21 @@ importers:
         specifier: ^5.5.3
         version: 5.5.3
 
+  packages/query/fixtures/view-transitions:
+    dependencies:
+      astro:
+        specifier: ^4.12.0
+        version: 4.12.2(@types/node@20.14.12)(typescript@5.5.3)
+      signal-polyfill:
+        specifier: ^0.1.2
+        version: 0.1.2
+      simple-stack-query:
+        specifier: workspace:*
+        version: link:../..
+      typescript:
+        specifier: ^5.5.3
+        version: 5.5.3
+
   packages/scope:
     dependencies:
       typescript:

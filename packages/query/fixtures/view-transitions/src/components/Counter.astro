@@ -1,0 +1,22 @@
+---
+type Props = {
+  initialCount?: number
+}
+
+const {initialCount = 0} = Astro.props;
+---
+
+<RootElement data={{ initialCount }}>
+  <button data-target="btn">{initialCount}</button>
+</RootElement>
+
+<script>
+  RootElement.ready(($, ctx) => {
+    let count = ctx.data.initialCount;
+    $('btn').addEventListener('click', () => {
+      count += 1;
+      $('btn').textContent = count.toString();
+    })
+    $('btn').toggleAttribute('data-ready');
+  })
+</script>

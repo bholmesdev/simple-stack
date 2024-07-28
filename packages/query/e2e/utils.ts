@@ -1,4 +1,5 @@
 import net from "node:net";
+import { type PreviewServer } from "astro";
 
 export function isPortAvailable(port) {
 	return new Promise((resolve) => {
@@ -24,4 +25,8 @@ export async function generatePort() {
 	if (await isPortAvailable(port)) return port;
 
 	return generatePort();
+}
+
+export function getPath(path: string, previewServer: PreviewServer) {
+	return new URL(path, `http://localhost:${previewServer.port}/`).href;
 }
