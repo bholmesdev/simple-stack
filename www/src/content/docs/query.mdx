@@ -31,6 +31,19 @@ astro add simple-stack-query
 
 To install this integration manually, follow the [manual installation instructions](https://docs.astro.build/en/guides/integrations-guide/#manual-installation)
 
+### Type checking
+
+Simple Query will automatically set up necessary types when the integration is applied. However, you may need to update your `tsconfig.json` to include these types in your project.
+
+If your `tsconfig.json` has an `"include"` array, add your `astro.config.mjs` or `astro.config.ts` file (whichever is applicable). This ensures any types added by the integration are included by type checkers like [`astro check`](https://docs.astro.build/en/guides/typescript/#type-checking):
+
+```json title="tsconfig.json" ins="\"astro.config.mjs\""
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": ["src", "astro.config.mjs"],
+}
+```
+
 ## Getting started
 
 To get started, apply the global `<RootElement>` wrapper around your Astro component markup:
