@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { type PreviewServer, preview } from "astro";
-import { getPath, generatePort } from "./utils";
+import { generatePort, getPath } from "./utils";
 
 const fixtureRoot = new URL("../fixtures/basic", import.meta.url).pathname;
 let previewServer: PreviewServer;
