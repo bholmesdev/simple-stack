@@ -1,0 +1,14 @@
+<RootElement>
+  <button data-target="btn">0</button>
+</RootElement>
+
+<script>
+  RootElement.ready(($) => {
+    let count = 0;
+    $('btn').toggleAttribute('data-ready');
+    $('btn').addEventListener('click', () => {
+      count += 1;
+      $('btn').textContent = count.toString();
+    })
+  })
+</script>

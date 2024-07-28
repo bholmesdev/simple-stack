@@ -1,31 +1,9 @@
----
-import Nested from "./Nested.astro";
-import WithContext from "./WithContext.astro";
-import { scope } from 'simple:scope';
----
-
-<RootElement data={{ count: 30 }}>
-  <h1 data-target="test">Hey</h1>
-  <button data-target="btn">Click</button>
-  <Nested />
-  <Nested />
-  <Nested />
-  <Nested />
-  <WithContext $context={scope} />
+<RootElement>
+  <h1 data-testid="heading" data-target="heading">Heading JS loading</h1>
 </RootElement>
 
 <script>
-  import { Signal } from 'signal-polyfill';
-
-  RootElement.ready<{count: number}>(($, { effect, data }) => {
-    const count = new Signal.State(data.count);
-
-    $('btn').addEventListener('click', () => {
-      count.set(count.get() + 1);
-    });
-
-    effect(() => {
-      $('test').textContent = `Hello there! ${count.get()}`;
-    });
+  RootElement.ready(($) => {
+    $('heading').textContent = `Heading JS loaded`;
   });
 </script>
