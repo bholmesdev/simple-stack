@@ -1,6 +1,6 @@
-# Simple form 🧘‍♂️
+# Simple form
 
-> The simple way to handle forms in your Astro project
+> ⚠️ **This package is no longer maintained.** Simple form was an experiment to see how we could make forms easier in Astro applications. Now, [Astro has Form Actions](https://docs.astro.build/en/guides/actions/#accepting-form-data-from-an-action), which makes validating form data on the server easier than ever. As for client-side validation, you can reference [my YouTube video on building your own client-side validation](https://www.youtube.com/watch?v=DwEkvie79xI&t=97s). If you want to package this up for others to use, feel free to fork the code in this repository and publish something yourself!
 
 ```astro
 ---

@@ -5,6 +5,12 @@ sidebar:
   order: 3
 ---
 
+:::caution
+⚠️ **This package is no longer maintained.** Astro now has [Server Islands](https://docs.astro.build/en/guides/server-islands/), which largely replace the use cases explored by this package. Server Islands also offer a simpler mental model for streaming content that scales to a number of deployment hosts.
+
+That said, if you want to understand how this package works to fork the functionality for your own use, [watch my YouTube walkthrough!](https://www.youtube.com/watch?v=cdOyOgwt9Zc&t=128s)
+:::
+
 simple form helps generate a client-validated form in your framework of choice.
 
 > ⚠️ When using Astro, client validation relies on Astro view transitions. Ensure [view transitions are enabled](https://docs.astro.build/en/guides/view-transitions/#adding-view-transitions-to-a-page) on your page.

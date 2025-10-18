@@ -5,6 +5,12 @@ sidebar:
   order: 2
 ---
 
+:::caution
+⚠️ **This package is no longer maintained.** Astro now has [Server Islands](https://docs.astro.build/en/guides/server-islands/), which largely replace the use cases explored by this package. Server Islands also offer a simpler mental model for streaming content that scales to a number of deployment hosts.
+
+That said, if you want to understand how this package works to fork the functionality for your own use, [watch my YouTube walkthrough!](https://www.youtube.com/watch?v=cdOyOgwt9Zc&t=128s)
+:::
+
 Simple form exposes helpers to parse and validate form requests with generic APIs and the [`Astro.locals.form`](#astrolocalsform) object when using Astro frontmatter.
 
 ## `validateForm()`
