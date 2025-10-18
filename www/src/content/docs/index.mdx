@@ -1,0 +1,35 @@
+---
+title: Simple stack 🌱
+description: A suite of tools built for Astro to simplify your workflow.
+tableOfContents: false
+head:
+  - tag: title
+    content: Simple stack 🌱
+---
+
+A collection of tools I've built to **make web development simpler.**
+
+To be honest, there isn't a "story" connecting these packages together (I'm no TanStack). But they follow a common theme: solve a simple use case without too many features.
+
+import { CardGrid, Card, LinkCard } from '@astrojs/starlight/components';
+
+<CardGrid>
+	<Card href="/store" title="Simple Store" icon="document">
+		A reactive store that combines the simplicity of signals with the power of "selectors" you'd find in Zustand.
+
+		<LinkCard href="/store" title="Documentation" />
+	</Card>
+
+	<Card href="/scope" title="Simple Scope" icon="magnifier">
+		A vite plugin that generates scoped IDs for any file you're in. Perfect for form label IDs and query selectors.
+
+		<LinkCard href="/scope" title="Documentation" />
+	</Card>
+
+	<Card href="/query" title="Simple Query" icon="puzzle">
+		A simple way to add JS scripts to Astro components.
+
+		<LinkCard href="/query" title="Documentation" />
+	</Card>
+
+</CardGrid>
