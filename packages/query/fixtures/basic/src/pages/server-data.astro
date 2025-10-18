@@ -1,9 +1,0 @@
-<RootElement data={{message: "Server data"}}>
-  <h1 data-testid="heading" data-target="heading">Awaiting message</h1>
-</RootElement>
-
-<script>
-  RootElement.ready<{ message: string }>(($, ctx) => {
-    $('heading').textContent = ctx.data.message;
-  })
-</script>
