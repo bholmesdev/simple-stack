@@ -6,5 +6,23 @@ A collection of tools I've built to make JS app development simpler. To be hones
 
 Simple Stack has a few actively maintained packages:
 
-- **[Simple scope](https://simple-stack.dev/scope):** A scoped ID generator for any file you're in. Perfect for form label IDs and query selectors.
-- **[Simple query](https://simple-stack.dev/query):** A simple way to add JS scripts to Astro components.
+## Simple Store
+
+Simple Store is a reactive store that combines the simplicity of signals with the power of "selectors" you'd find in Zustand or Redux.
+
+- Source code: [simplestack-store](https://github.com/bholmesdev/simplestack-store)
+- Documentation: [simple-stack.dev/store](https://simple-stack.dev/store)
+
+## Simple Scope
+
+Simple Scope is a vite plugin that generates scoped IDs for any file you're in. Perfect for form label IDs and query selectors.
+
+- Source code: [simplestack-scope](https://github.com/bholmesdev/simplestack-scope)
+- Documentation: [simple-stack.dev/scope](https://simple-stack.dev/scope)
+
+## Simple Query
+
+Simple Query is a simple way to add JS scripts to Astro components.
+
+- Source code: [simplestack-query](https://github.com/bholmesdev/simplestack-query)
+- Documentation: [simple-stack.dev/query](https://simple-stack.dev/query)
