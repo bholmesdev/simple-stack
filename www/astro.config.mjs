@@ -11,6 +11,10 @@ export default defineConfig({
 			},
 			sidebar: [
 				{
+					label: "💾 Store",
+					link: "/store",
+				},
+				{
 					label: "🔎 Query",
 					link: "/query",
 				},
@@ -18,18 +22,17 @@ export default defineConfig({
 					label: "🔎 Scope",
 					link: "/scope",
 				},
-            
 				{
 					label: "🌊 Stream",
 					link: "/stream",
-                  badge: { text: 'Deprecated', variant: 'caution' },
+					badge: { text: "Deprecated", variant: "caution" },
 				},
 				{
 					label: "🧘‍♂️ Form",
 					autogenerate: { directory: "form" },
-                  collapsed: true,
-                  badge: { text: 'Deprecated', variant: 'caution' },
-				}
+					collapsed: true,
+					badge: { text: "Deprecated", variant: "caution" },
+				},
 			],
 			customCss: [
 				"@fontsource/atkinson-hyperlegible/400.css",
