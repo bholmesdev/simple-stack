@@ -2,10 +2,6 @@
 
 A collection of tools I've built to make JS app development simpler. To be honest, there isn't a "story" connecting these packages together (I'm no TanStack). But they follow a common theme: solve a simple use case without too many features.
 
-## Packages
-
-Simple Stack has a few actively maintained packages:
-
 ## Simple Store
 
 Simple Store is a reactive store that combines the simplicity of signals with the power of "selectors" you'd find in Zustand or Redux.
