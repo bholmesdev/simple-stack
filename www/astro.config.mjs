@@ -15,17 +15,21 @@ export default defineConfig({
 					link: "/query",
 				},
 				{
+					label: "🔎 Scope",
+					link: "/scope",
+				},
+            
+				{
 					label: "🌊 Stream",
 					link: "/stream",
+                  badge: { text: 'Deprecated', variant: 'caution' },
 				},
 				{
 					label: "🧘‍♂️ Form",
 					autogenerate: { directory: "form" },
-				},
-				{
-					label: "🔎 Scope",
-					link: "/scope",
-				},
+                  collapsed: true,
+                  badge: { text: 'Deprecated', variant: 'caution' },
+				}
 			],
 			customCss: [
 				"@fontsource/atkinson-hyperlegible/400.css",
