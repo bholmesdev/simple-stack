@@ -15,12 +15,12 @@ export default defineConfig({
 					link: "/store",
 				},
 				{
-					label: "🔎 Query",
-					link: "/query",
-				},
-				{
 					label: "🔎 Scope",
 					link: "/scope",
+				},
+				{
+					label: "💰 Query",
+					link: "/query",
 				},
 				{
 					label: "🌊 Stream",

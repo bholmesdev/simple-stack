@@ -1,7 +1,11 @@
 ---
-title: Simple store 💾
+title: 💾 Simple store
 description: A reactive store that combines the simplicity of signals with the power of "selectors" you'd find in Zustand or Redux.
 ---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+<LinkCard href="https://github.com/bholmesdev/simplestack-store" title="Source code" />
 
 A reactive store that combines the simplicity of signals with the power of "selectors" you'd find in Zustand or Redux.
 
@@ -127,8 +131,8 @@ These types are exported for TypeScript users.
 
 - StateObject: `Record<string | number | symbol, any>`
 - StatePrimitive: `string | number | boolean | null | undefined`
-- Setter<T>: `T | ((state: T) => T)`
-- Store<T>:
+- Setter: `T | ((state: T) => T)`
+- Store:
   - `get(): T`
   - `set(setter: Setter<T>): void`
   - `subscribe(callback: (state: T) => void): () => void`
