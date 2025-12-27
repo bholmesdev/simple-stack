@@ -5,14 +5,14 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: "Simple Stack 🌱",
-			social: {
-				github: "https://github.com/bholmesdev/simple-stack",
-				discord: "https://wtw.dev/chat",
-			},
+			social: [
+				{ icon: "github", label: "GitHub", href: "https://github.com/bholmesdev/simple-stack" },
+				{ icon: "discord", label: "Discord", href: "https://wtw.dev/chat" },
+			],
 			sidebar: [
 {
 					label: "💾 Store",
-					autogenerate: { directory: "store" },
+					link: "/store",
 				},
 				{
 					label: "🔎 Scope",
