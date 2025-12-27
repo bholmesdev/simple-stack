@@ -8,9 +8,6 @@ importers:
 
   .:
     devDependencies:
-      '@biomejs/biome':
-        specifier: ^1.8.3
-        version: 1.8.3
       '@changesets/changelog-github':
         specifier: ^0.5.0
         version: 0.5.0
@@ -229,6 +226,10 @@ importers:
       typescript:
         specifier: ^5.3.3
         version: 5.5.4
+    devDependencies:
+      '@biomejs/biome':
+        specifier: ^1.8.3
+        version: 1.8.3
 
 packages:
 

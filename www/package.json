@@ -8,7 +8,12 @@
 		"start": "astro dev",
 		"build": "astro check && astro build",
 		"preview": "astro preview",
-		"astro": "astro"
+		"astro": "astro",
+		"check": "biome check .",
+		"check:fix": "biome check . --write"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.8.3"
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.6",

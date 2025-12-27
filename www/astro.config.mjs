@@ -1,16 +1,20 @@
-import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import { defineConfig } from "astro/config";
 
 export default defineConfig({
 	integrations: [
 		starlight({
 			title: "Simple Stack 🌱",
 			social: [
-				{ icon: "github", label: "GitHub", href: "https://github.com/bholmesdev/simple-stack" },
+				{
+					icon: "github",
+					label: "GitHub",
+					href: "https://github.com/bholmesdev/simple-stack",
+				},
 				{ icon: "discord", label: "Discord", href: "https://wtw.dev/chat" },
 			],
 			sidebar: [
-{
+				{
 					label: "💾 Store",
 					link: "/store",
 				},

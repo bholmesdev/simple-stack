@@ -1,0 +1,41 @@
+{
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"linter": {
+		"rules": {
+			"recommended": true,
+			"a11y": {
+				"noSvgWithoutTitle": "warn",
+				"useAltText": "warn",
+				"useButtonType": "warn",
+				"useKeyWithClickEvents": "warn"
+			},
+			"correctness": {
+				"useExhaustiveDependencies": "warn"
+			},
+			"performance": {
+				"noDelete": "warn"
+			},
+			"style": {
+				"all": false
+			},
+			"suspicious": {
+				"noArrayIndexKey": "warn",
+				"noAssignInExpressions": "warn",
+				"noEmptyInterface": "off",
+				"noExplicitAny": "warn",
+				"noConsoleLog": "warn"
+			}
+		}
+	},
+	"organizeImports": {
+		"enabled": true
+	},
+	"vcs": {
+		"clientKind": "git",
+		"enabled": true,
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignore": ["**/.astro/"]
+	}
+}

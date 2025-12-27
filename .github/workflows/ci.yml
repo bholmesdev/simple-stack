@@ -29,7 +29,7 @@ jobs:
         run: pnpm build
 
       - name: Lint check
-        run: pnpm check
+        run: pnpm -C www check
   test:
     runs-on: ubuntu-latest
     strategy:
