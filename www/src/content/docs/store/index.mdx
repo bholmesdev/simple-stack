@@ -1,9 +1,12 @@
 ---
 title: 💾 Simple store
 description: A reactive store that combines the simplicity of signals with the power of "selectors" you'd find in Zustand or Redux.
+sidebar:
+  label: Get started
+  order: 1
 ---
 
-import { LinkCard } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
 <LinkCard href="https://github.com/bholmesdev/simplestack-store" title="Source code" />
 
@@ -80,6 +83,13 @@ function Title() {
   );
 }
 ```
+
+See framework-specific guides:
+
+<CardGrid>
+  <LinkCard href="/store/vite" title="Vite + React" />
+  <LinkCard href="/store/nextjs" title="Next.js" />
+</CardGrid>
 
 ## API
 

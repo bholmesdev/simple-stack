@@ -10,9 +10,9 @@ export default defineConfig({
 				discord: "https://wtw.dev/chat",
 			},
 			sidebar: [
-				{
+{
 					label: "💾 Store",
-					link: "/store",
+					autogenerate: { directory: "store" },
 				},
 				{
 					label: "🔎 Scope",
