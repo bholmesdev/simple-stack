@@ -1,0 +1,323 @@
+---
+title: 💾 Simple store
+description: A reactive store that combines the simplicity of signals with the power of "selectors" you'd find in Zustand or Redux.
+sidebar:
+  label: Get started
+  order: 1
+---
+
+import { LinkCard, Tabs, TabItem } from '@astrojs/starlight/components';
+
+<LinkCard href="https://github.com/bholmesdev/simplestack-store" title="Source code" />
+
+A reactive store that combines the simplicity of signals with the power of "selectors" you'd find in Zustand or Redux.
+
+```tsx
+import { store } from "@simplestack/store";
+
+const documentStore = store({
+    title: "Untitled",
+    description: "Description",
+});
+
+const title = documentStore.select("title");
+const description = documentStore.select("description");
+
+title.set("New title");
+console.log(title.get()); // "New title"
+description.set("New description");
+console.log(description.get()); // "New description"
+```
+
+## Installation
+
+Install the dependency from npm:
+
+```bash
+npm i @simplestack/store
+```
+
+Then, import the store and use it in your component:
+
+```tsx
+import { store } from "@simplestack/store";
+```
+
+## Usage
+
+### 1. Create a store
+
+You can create a store using the `store()` function, passing an initial value as an argument.
+
+We suggest creating stores outside of components so they aren't recreated on each render:
+
+```ts
+import { store } from "@simplestack/store";
+
+export const counterStore = store(0);
+```
+
+### 2. Set the value of a store
+
+You can set the value of a store by calling the `set()` method. This accepts both a value and a function that returns the new value:
+
+```tsx
+counterStore.set(1);
+counterStore.set((n) => n + 1);
+```
+
+This can be called both from within a component and from outside of a component. This allows you to create utility functions that operate on a store:
+
+```tsx ins={5-7}
+import { store } from "@simplestack/store";
+
+export const counterStore = store(0);
+
+export function incrementCounter() {
+  counterStore.set((n) => n + 1);
+}
+```
+
+
+### 3. Use the store in a component
+
+You can subscribe to the value fo a store from your React components using the `useStoreValue` hook. This accepts the store as an argument and returns the current value of the store.
+
+<Tabs syncKey="framework">
+  <TabItem label="Vite">
+    ```tsx "useStoreValue"
+    // src/components/Counter.tsx
+    import { useStoreValue } from "@simplestack/store/react";
+    import { counterStore } from "../stores/counter";
+
+    export function Counter() {
+      const count = useStoreValue(counterStore);
+
+      return (
+        <button onClick={() => counterStore.set((n) => n + 1)}>
+          Count: {count}
+        </button>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Next.js">
+  
+    :::note
+    Any component using `useStoreValue` must be a `"use client"` component.
+    :::
+
+    ```tsx "useStoreValue"
+    // app/components/Counter.tsx
+    "use client";
+
+    import { useStoreValue } from "@simplestack/store/react";
+    import { counterStore } from "@/lib/counter";
+
+    export default function Counter() {
+      const count = useStoreValue(counterStore);
+
+      return (
+        <button onClick={() => counterStore.set((n) => n + 1)}>
+          Count: {count}
+        </button>
+      );
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+### 4. Create sub-stores for fine-grained updates
+
+As your store grows more complex, you may want to operate on specific parts of the store.
+
+In this example, say we have a store to track a user's preferences, including their theme. Naively, you can operate on nested values by calling `.set()` and reconstructing the nested object using spread syntax, like so:
+
+```tsx
+const userStore = store({
+  name: "Guest",
+  preferences: { theme: "dark" },
+});
+
+function setTheme(theme: string) {
+  userStore.set((state) => ({
+    ...state,
+    preferences: { ...state.preferences, theme },
+  }));
+}
+```
+
+However, this is fairly verbose and error-prone. Instead, you can create "sub-stores" by calling `select('key')` on the parent store, where `key` is the object key or array index you want to select. This creates a new store instance that lets you operate on the selected object key.
+
+In this example, we can create a sub-store for the theme preference:
+
+```tsx ins={6}
+const userStore = store({
+  name: "Guest",
+  preferences: { theme: "dark" },
+});
+
+const themeStore = userStore.select("preferences").select("theme");
+```
+
+Then, we can update the user's theme preference by calling `set()` on the sub-store directly:
+
+```tsx ins={6} del={2-5}
+function setTheme(theme: string) {
+  userStore.set((state) => ({
+    ...state,
+    preferences: { ...state.preferences, theme },
+  }));
+  themeStore.set(theme);
+}
+```
+
+Changes to `themeStore` automatically update `userStore`, and vice versa.
+
+You can then subscribe to a sub-store the same way you subscribe to a parent store. Pass the sub-store to the `useStoreValue` hook:
+
+<Tabs syncKey="framework">
+  <TabItem label="Vite">
+    ```tsx ins={6}
+    // src/components/ThemeToggle.tsx
+    import { useStoreValue } from "@simplestack/store/react";
+    import { themeStore } from "../stores/user";
+
+    export function ThemeToggle() {
+      const theme = useStoreValue(themeStore);
+      return (
+        <button onClick={() => themeStore.set(theme === "dark" ? "light" : "dark")}>
+          Theme: {theme}
+        </button>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Next.js">
+    ```tsx ins={8}
+    // app/components/ThemeToggle.tsx
+    "use client";
+
+    import { useStoreValue } from "@simplestack/store/react";
+    import { themeStore } from "@/lib/user";
+
+    export default function ThemeToggle() {
+      const theme = useStoreValue(themeStore);
+      return (
+        <button onClick={() => themeStore.set(theme === "dark" ? "light" : "dark")}>
+          Theme: {theme}
+        </button>
+      );
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## Next.js support
+
+Simple store is compatible with Next.js, and is built to handle server-side rendering and client-side hydration gracefully.
+
+- Stores initialize once per server request, making them safe for App Router usage
+- Client components hydrate with the store's initial value, preventing mismatch issues
+
+### Special considerations for server components
+
+Stores are built to be reactive in client contexts, and should not be manipulated in server components.
+
+To sync a value from a server component to a store, use the `useEffect` hook to update the store from a client component when it mounts:
+
+```tsx {8-10}
+// app/page.tsx
+"use client";
+
+import { useEffect } from "react";
+import { userStore } from "@/lib/user";
+
+export default function UserProvider({ serverUser }: { serverUser: User }) {
+  useEffect(() => {
+    userStore.set(serverUser);
+  }, [serverUser]);
+  return null;
+}
+```
+
+If you need to read the current value of a store in a server component, you can use the `get()` method. This returns the current value of the store when the component is being rendered.
+
+:::note
+You cannot call `useStoreValue()` in a server component, since subscriptions are only available in client components.
+:::
+
+```tsx
+// app/page.tsx
+import { counterStore } from "@/lib/counter";
+
+export default function Page() {
+  const count = counterStore.get(); // OK: read-only on server
+  return <p>Server-rendered count: {count}</p>;
+}
+```
+
+## API
+
+### store(initial)
+
+Creates a store with `get`, `set`, `subscribe`, and (for objects and arrays) `select`.
+
+- Parameters: `initial: number | string | boolean | null | undefined | object`
+- Returns: `Store<T>` where `T` is inferred from `initial` or supplied via generics
+
+```ts
+import { store } from "@simplestack/store";
+
+const counter = store(0);
+counter.set((n) => n + 1);
+console.log(counter.get()); // 1
+
+// Select parts of a store for objects and arrays
+const doc = store({ title: "x" });
+const title = doc.select("title");
+```
+
+### React
+
+#### useStoreValue(store)
+
+React hook to subscribe to a store and get its current value.
+
+- Parameters: `store: Store<T> | undefined`
+- Returns: `T | undefined`
+
+```tsx
+import { store } from "@simplestack/store";
+import { useStoreValue } from "@simplestack/store/react";
+
+const counterStore = store(0);
+
+function Counter() {
+  const counter = useStoreValue(counterStore);
+  return (
+    <button onClick={() => counterStore.set((n) => n + 1)}>{counter}</button>
+  );
+}
+```
+
+## Type Reference
+
+These types are exported for TypeScript users.
+
+- StateObject: `Record<string | number | symbol, any>`
+- StatePrimitive: `string | number | boolean | null | undefined`
+- Setter: `T | ((state: T) => T)`
+- Store:
+  - `get(): T`
+  - `set(setter: Setter<T>): void`
+  - `subscribe(callback: (state: T) => void): () => void`
+  - `select(key: K): Store<SelectValue<T, K>>`: present only when `T` is an object or array
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit an issue or pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
