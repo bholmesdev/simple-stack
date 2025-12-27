@@ -213,6 +213,16 @@ You can then subscribe to a sub-store the same way you subscribe to a parent sto
   </TabItem>
 </Tabs>
 
+:::tip
+`useStoreValue` also accepts a selector function for dynamic keys or computed values:
+
+```tsx
+const title = useStoreValue(documentStore, (s) => s.notes[id]?.title);
+```
+
+[📚 See the API reference to learn more.](#usestorevaluestore-selector)
+:::
+
 ## Next.js support
 
 Simple store is compatible with Next.js, and is built to handle server-side rendering and client-side hydration gracefully.
@@ -280,12 +290,14 @@ const title = doc.select("title");
 
 ### React
 
-#### useStoreValue(store)
+#### useStoreValue(store, selector?)
 
-React hook to subscribe to a store and get its current value.
+React hook to subscribe to a store and get its current value. Optionally pass a selector function to derive a value from the store.
 
-- Parameters: `store: Store<T> | undefined`
-- Returns: `T | undefined`
+- Parameters:
+  - `store: Store<T> | undefined`
+  - `selector?: (state: T) => R` - optional function to select/compute a value
+- Returns: `R | T | undefined`
 
 ```tsx
 import { store } from "@simplestack/store";
@@ -301,6 +313,67 @@ function Counter() {
 }
 ```
 
+With a selector:
+
+```tsx
+const documentStore = store({
+  notes: {
+    "1": { title: "First" },
+    "2": { title: "Second" },
+  },
+});
+
+function NoteTitle({ id }: { id: string }) {
+  // Only re-renders when this specific note's title changes
+  const title = useStoreValue(documentStore, (s) => s.notes[id]?.title);
+  return <h1>{title}</h1>;
+}
+
+function NoteCount() {
+  // Compute derived values inline
+  const count = useStoreValue(documentStore, (s) => Object.keys(s.notes).length);
+  return <span>{count} notes</span>;
+}
+```
+
+#### useShallow(selector)
+
+Wraps a selector with shallow equality comparison. Use this when your selector returns a new array or object reference on each call.
+
+**The problem:** selectors that return new references (like `Object.values()`, array `filter()`, or object spreads) cause infinite re-renders because React sees a "new" value each time.
+
+```tsx
+import { useStoreValue, useShallow } from "@simplestack/store/react";
+
+// ❌ BAD: Creates new array reference each render → infinite loop
+const [title, author] = useStoreValue(noteStore, (s) => [s.title, s.author]);
+
+// ✅ GOOD: useShallow compares array contents, stable reference
+const [title, author] = useStoreValue(noteStore, useShallow((s) => [s.title, s.author]));
+```
+
+More examples:
+
+```tsx
+// Filtering creates new array
+const drafts = useStoreValue(
+  docStore,
+  useShallow((s) => s.notes.filter((n) => n.isDraft))
+);
+
+// Spreading creates new object
+const meta = useStoreValue(
+  docStore,
+  useShallow((s) => ({ title: s.title, author: s.author }))
+);
+
+// Object.keys/values/entries create new arrays
+const ids = useStoreValue(
+  docStore,
+  useShallow((s) => Object.keys(s.notes))
+);
+```
+
 ## Type Reference
 
 These types are exported for TypeScript users.
@@ -309,15 +382,8 @@ These types are exported for TypeScript users.
 - StatePrimitive: `string | number | boolean | null | undefined`
 - Setter: `T | ((state: T) => T)`
 - Store:
-  - `get(): T`
-  - `set(setter: Setter<T>): void`
-  - `subscribe(callback: (state: T) => void): () => void`
-  - `select(key: K): Store<SelectValue<T, K>>`: present only when `T` is an object or array
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit an issue or pull request.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+  - `get(): T` - Get the current value of the store.
+  - `set(setter: Setter<T>): void` - Set the value directly or by using a function that receives the current state.
+  - `subscribe(callback: (state: T) => void): () => void` - Subscribe with a callback. Returns an unsubscribe function.
+  - `select(key: K): Store<SelectValue<T, K>>` (present only when `T` is an object or array) - Select a key or array index of the store. Returns a nested Store.
+  - `getInitial(): T` - Get the initial state the store was created with. Used internally for SSR resume-ability.
