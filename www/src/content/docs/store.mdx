@@ -18,6 +18,7 @@ import { store } from "@simplestack/store";
 const documentStore = store({
     title: "Untitled",
     description: "Description",
+    tags: [{ name: 'cooking' }],
 });
 
 const title = documentStore.select("title");
@@ -27,6 +28,12 @@ title.set("New title");
 console.log(title.get()); // "New title"
 description.set("New description");
 console.log(description.get()); // "New description"
+```
+
+If you need to select a nested value, you can pass the complete object path as arguments to the `select()` function like so. This works for both object keys and array indices:
+
+```tsx
+const tags = documentStore.select("meta", "tags");
 ```
 
 ## Installation
@@ -149,18 +156,27 @@ function setTheme(theme: string) {
 
 However, this is fairly verbose and error-prone. Instead, you can create "sub-stores" by calling `select('key')` on the parent store, where `key` is the object key or array index you want to select. This creates a new store instance that lets you operate on the selected object key.
 
-In this example, we can create a sub-store for the theme preference:
+In this example, we can create a sub-store for the `preference` key, and operate on the `theme` value:
 
-```tsx ins={6}
+```tsx {6-7}
 const userStore = store({
   name: "Guest",
   preferences: { theme: "dark" },
 });
 
-const themeStore = userStore.select("preferences").select("theme");
+const preferencesStore = userStore.select("preferences");
+const themeStore = preferencesStore.select("theme");
 ```
 
-Then, we can update the user's theme preference by calling `set()` on the sub-store directly:
+You can simplify this even further by passing the complete object path (`'preferences', 'theme'`) as arguments to the `select()` function:
+
+```ts del={1-2} ins={3}
+const preferencesStore = userStore.select("preferences");
+const themeStore = preferencesStore.select("theme");
+const themeStore = userStore.select("preferences", "theme");
+```
+
+Then, you can update the user's theme preference by calling `set()` on the sub-store directly:
 
 ```tsx ins={6} del={2-5}
 function setTheme(theme: string) {
@@ -173,6 +189,10 @@ function setTheme(theme: string) {
 ```
 
 Changes to `themeStore` automatically update `userStore`, and vice versa.
+
+:::info
+If a `select()` path crosses a potentially undefined value at runtime (for example, `preferences` is missing), `set()` is discarded for safety and a warning is logged in dev mode.
+:::
 
 You can then subscribe to a sub-store the same way you subscribe to a parent store. Pass the sub-store to the `useStoreValue` hook:
 
@@ -385,5 +405,5 @@ These types are exported for TypeScript users.
   - `get(): T` - Get the current value of the store.
   - `set(setter: Setter<T>): void` - Set the value directly or by using a function that receives the current state.
   - `subscribe(callback: (state: T) => void): () => void` - Subscribe with a callback. Returns an unsubscribe function.
-  - `select(key: K): Store<SelectValue<T, K>>` (present only when `T` is an object or array) - Select a key or array index of the store. Returns a nested Store.
+  - `select(...path: (string | number | symbol)[]): Store<...>` (present only when `T` is an object or array) - Select one or more keys/indices. Returns a nested Store (type inferred from the path).
   - `getInitial(): T` - Get the initial state the store was created with. Used internally for SSR resume-ability.
