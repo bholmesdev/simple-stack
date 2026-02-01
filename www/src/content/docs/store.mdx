@@ -287,13 +287,87 @@ export default function Page() {
 }
 ```
 
+## Middleware
+
+You may need to run some code that's separate from your application lifecycle when a store updates. This includes persisting to local storage or logging updates to the console. You may also need to monitor and manipulate the store's value directly, as in developer tooling or integration with state management solutions like Immer.
+
+For each of these, you can reach for middleware. This lets you hook into the store's lifecycle, meaning whenever a value is set, and whenever the store is initialized.
+
+### Built-in logger middleware
+
+To use the built-in logger middleware, pass `loggerMiddleware` in the `middleware` array when creating the store:
+
+```ts
+import { loggerMiddleware, store } from "@simplestack/store";
+
+const countStore = store(0, { middleware: [loggerMiddleware] });
+```
+
+### Implementing custom middleware
+
+This example shows how to implement a custom middleware that persists to `localStorage`.
+
+You can import the `StoreMiddleware` type from `@simplestack/store` to create your own middleware. For this use case, you can use the `set` property to wrap the `set()` call and persist the store's value:
+
+```ts
+import { store } from "@simplestack/store";
+import type {
+  StateObject,
+  StatePrimitive,
+  Store,
+  StoreMiddleware,
+} from "@simplestack/store";
+
+const localStorageMiddleware = <T extends StateObject | StatePrimitive>(
+  store: Store<T>
+): ReturnType<StoreMiddleware<T>> => ({
+  set: (next) => (setter) => {
+    next(setter);
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("counter", JSON.stringify(store.get()));
+  },
+});
+
+const counterStore = store({ count: 0 }, { middleware: [localStorageMiddleware] });
+```
+
+You will also want to check for existing values in `localStorage` and initialize the store with them if they exist. To do this, you can use the `init` property to run code when the store is initialized:
+
+```ts ins={17-21}
+import { store } from "@simplestack/store";
+import type {
+  StateObject,
+  StatePrimitive,
+  Store,
+  StoreMiddleware,
+} from "@simplestack/store";
+
+const localStorageMiddleware = <T extends StateObject | StatePrimitive>(
+  store: Store<T>
+): ReturnType<StoreMiddleware<T>> => ({
+  set: (next) => (setter) => {
+    next(setter);
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("counter", JSON.stringify(store.get()));
+  },
+  init: () => {
+    if (typeof window === "undefined") return;
+    const raw = window.localStorage.getItem("counter");
+    if (raw) store.set(JSON.parse(raw));
+  },
+});
+
+const counterStore = store({ count: 0 }, { middleware: [localStorageMiddleware] });
+```
+
 ## API
 
-### store(initial)
+### store(initial, options?)
 
 Creates a store with `get`, `set`, `subscribe`, and (for objects and arrays) `select`.
 
 - Parameters: `initial: number | string | boolean | null | undefined | object`
+- Parameters: `options?: StoreOptions<T>`
 - Returns: `Store<T>` where `T` is inferred from `initial` or supplied via generics
 
 ```ts
@@ -307,6 +381,51 @@ console.log(counter.get()); // 1
 const doc = store({ title: "x" });
 const title = doc.select("title");
 ```
+
+With middleware:
+
+```ts ins={1,4}
+import { store, loggerMiddleware } from "@simplestack/store";
+
+const counter = store(0, { middleware: [loggerMiddleware] });
+```
+
+### StoreMiddleware
+
+Middleware can wrap `set()` and/or run initialization logic. This is useful when you need to log updates, persist data, or wire in side effects. Use `set` to wrap updates, and `init` for startup work that can optionally return a cleanup function.
+
+- Signature: `(store: Store<T>) => { set?: (next) => (setter) => void; init?: () => void | (() => void) }`
+
+```ts
+import type { StoreMiddleware } from "@simplestack/store";
+
+const middleware: StoreMiddleware<number> = (store) => ({
+  set: (next) => (setter) => {
+    next(setter);
+    console.log("new value", store.get());
+  },
+});
+```
+
+### StoreOptions
+
+Options you can pass to `store()` or `select()`. This is useful when you want to add middleware to the root store or a selected slice.
+
+- `middleware?: StoreMiddleware<T>[]`
+
+### loggerMiddleware
+
+Built-in middleware that logs previous and next values on each `set()`. Use this for quick debugging without custom middleware.
+
+```ts
+import { loggerMiddleware, store } from "@simplestack/store";
+
+const countStore = store(0, { middleware: [loggerMiddleware] });
+```
+
+### store.destroy()
+
+Runs any cleanup functions returned by middleware `init()` hooks. Use this to dispose subscriptions or external connections created by middleware.
 
 ### React
 
@@ -401,9 +520,12 @@ These types are exported for TypeScript users.
 - StateObject: `Record<string | number | symbol, any>`
 - StatePrimitive: `string | number | boolean | null | undefined`
 - Setter: `T | ((state: T) => T)`
+- StoreMiddleware: `(store: Store<T>) => { set?: (next) => (setter) => void; init?: () => void | (() => void) }`
+- StoreOptions: `{ middleware?: StoreMiddleware<T>[] }`
 - Store:
   - `get(): T` - Get the current value of the store.
   - `set(setter: Setter<T>): void` - Set the value directly or by using a function that receives the current state.
   - `subscribe(callback: (state: T) => void): () => void` - Subscribe with a callback. Returns an unsubscribe function.
   - `select(...path: (string | number | symbol)[]): Store<...>` (present only when `T` is an object or array) - Select one or more keys/indices. Returns a nested Store (type inferred from the path).
   - `getInitial(): T` - Get the initial state the store was created with. Used internally for SSR resume-ability.
+  - `destroy(): void` - Run cleanup from middleware `init()` hooks.
