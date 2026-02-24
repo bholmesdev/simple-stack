@@ -1,6 +1,6 @@
 ---
-title: Simple stream 🌊
-description: Suspend Astro components with fallback content. Like React Server Components, but Just HTML ™️
+title: Simple Stream - Suspense for Astro (Deprecated)
+description: "Suspend Astro components with fallback content and out-of-order streaming. Like React Server Components, but Just HTML. No longer maintained."
 ---
 
 :::caution
@@ -9,7 +9,9 @@ description: Suspend Astro components with fallback content. Like React Server C
 
 Suspend Astro components with fallback content. Like React Server Components, but Just HTML ™️
 
-<video controls width="100%" style="aspect-ratio:1.65/1" src="/assets/simple-stream-intro.mov"></video>
+<video controls width="100%" style="aspect-ratio:1.65/1" src="/assets/simple-stream-intro.mov">
+  <p>Demo of Simple Stream suspending Astro components with fallback content and streaming HTML out of order.</p>
+</video>
 
 ```astro
 ---

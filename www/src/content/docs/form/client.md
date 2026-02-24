@@ -1,6 +1,6 @@
 ---
-title:  Add client validation
-description: Add client validation to your forms
+title: Client-Side Form Validation with Simple Form
+description: "Add client-side validation to your Astro forms using the reward-early, punish-late pattern. Generate validated form components with the simple-form CLI."
 sidebar:
   order: 3
 ---
