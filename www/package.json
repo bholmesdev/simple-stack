@@ -17,9 +17,9 @@
 	},
 	"dependencies": {
 		"@astrojs/check": "^0.9.6",
-		"@astrojs/starlight": "^0.37.1",
+		"@astrojs/starlight": "^0.37.6",
 		"@fontsource/atkinson-hyperlegible": "^5.0.18",
-		"astro": "^5.16.6",
+		"astro": "^5.17.3",
 		"sharp": "^0.32.5",
 		"typescript": "^5.3.3"
 	},
