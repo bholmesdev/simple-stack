@@ -1,6 +1,6 @@
 ---
-title:  Add client validation
-description: Add client validation to your forms
+title: Add Client Validation
+description: Add client-side form validation to your Astro or React app using Simple Form with the reward-early, punish-late UX pattern.
 sidebar:
   order: 3
 ---
