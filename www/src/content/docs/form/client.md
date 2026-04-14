@@ -1,6 +1,6 @@
 ---
-title:  Add client validation
-description: Add client validation to your forms
+title: Add client validation to Simple Form
+description: "Generate client-validated form components using Simple Form's CLI with the reward-early, punish-late pattern for accessible inline validation."
 sidebar:
   order: 3
 ---

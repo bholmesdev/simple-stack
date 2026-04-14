@@ -2,9 +2,34 @@ import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
+	site: "https://simple-stack.dev",
 	integrations: [
 		starlight({
 			title: "Simple Stack 🌱",
+			head: [
+				{
+					tag: "script",
+					attrs: { type: "application/ld+json" },
+					content: JSON.stringify({
+						"@context": "https://schema.org",
+						"@type": "Organization",
+						name: "Simple Stack",
+						url: "https://simple-stack.dev",
+						logo: "https://simple-stack.dev/favicon.svg",
+						sameAs: [
+							"https://github.com/bholmesdev/simple-stack",
+						],
+					}),
+				},
+				{
+					tag: "meta",
+					attrs: { property: "og:type", content: "website" },
+				},
+				{
+					tag: "meta",
+					attrs: { property: "og:site_name", content: "Simple Stack" },
+				},
+			],
 			social: [
 				{
 					icon: "github",

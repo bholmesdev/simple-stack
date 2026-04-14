@@ -1,6 +1,6 @@
 ---
-title: Parse form requests 
-description: Validate forms server-side
+title: Parse and validate form requests server-side
+description: "Use Simple Form's validateForm() and Astro.locals.form helpers to parse and validate form submissions on the server with Zod schemas."
 sidebar:
   order: 2
 ---
