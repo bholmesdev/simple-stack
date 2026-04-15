@@ -2,6 +2,7 @@ import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
+	site: "https://simple-stack.dev",
 	integrations: [
 		starlight({
 			title: "Simple Stack 🌱",
@@ -42,6 +43,39 @@ export default defineConfig({
 				"@fontsource/atkinson-hyperlegible/400.css",
 				"@fontsource/atkinson-hyperlegible/700.css",
 				"./src/styles/custom.css",
+			],
+			head: [
+				{
+					tag: "meta",
+					attrs: {
+						property: "og:site_name",
+						content: "Simple Stack",
+					},
+				},
+				{
+					tag: "meta",
+					attrs: {
+						property: "og:type",
+						content: "website",
+					},
+				},
+				{
+					tag: "script",
+					attrs: { type: "application/ld+json" },
+					content: JSON.stringify({
+						"@context": "https://schema.org",
+						"@type": "WebSite",
+						name: "Simple Stack",
+						url: "https://simple-stack.dev",
+						description:
+							"A collection of lightweight, focused tools for Astro and web development. Includes Simple Store, Simple Scope, and Simple Query.",
+						author: {
+							"@type": "Person",
+							name: "Ben Holmes",
+							url: "https://bholmes.dev",
+						},
+					}),
+				},
 			],
 		}),
 	],
