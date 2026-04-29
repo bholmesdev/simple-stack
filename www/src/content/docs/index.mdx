@@ -1,15 +1,71 @@
 ---
 title: Simple stack 🌱
-description: A suite of tools built for Astro to simplify your workflow.
+description: "Simple Stack is a collection of small, focused tools for Astro: Simple Store for reactive state, Simple Scope for build-time scoped IDs, and Simple Query for DOM scripting."
 tableOfContents: false
 head:
-  - tag: title
-    content: Simple stack 🌱
+  - tag: meta
+    attrs:
+      property: "og:title"
+      content: "Simple Stack — small, focused tools for Astro"
+  - tag: meta
+    attrs:
+      property: "og:description"
+      content: "Simple Store, Simple Scope, and Simple Query: tiny libraries that solve a single use case in Astro and modern web apps."
+  - tag: script
+    attrs:
+      type: "application/ld+json"
+    content: |
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Simple Stack?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Simple Stack is a collection of small, focused libraries for Astro and modern web frameworks. It includes Simple Store for reactive state, Simple Scope for build-time scoped IDs, and Simple Query for DOM scripting in Astro components."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What does Simple Store do?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Simple Store is a reactive store that combines the simplicity of signals with selector-style sub-stores you'd find in Zustand or Redux. It supports React, Next.js, and any framework with a Vite-based toolchain."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What does Simple Scope do?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Simple Scope is a Vite plugin that generates a stable, scoped ID for the current file at build time, with zero client-side JavaScript. It is useful for form label IDs and querying scoped DOM elements."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What does Simple Query do?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Simple Query is an Astro integration that adds a small, jQuery-like API for selecting elements inside an Astro component using data-target attributes, with built-in support for the Signals proposal via signal-polyfill."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which Simple Stack packages are still maintained?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Simple Store, Simple Scope, and Simple Query are actively maintained. Simple Stream and Simple Form are deprecated; Astro's Server Islands and Form Actions cover those use cases natively."
+            }
+          }
+        ]
+      }
 ---
 
-A collection of tools I've built to **make web development simpler.**
+**Simple Stack is a collection of small, focused libraries for [Astro](https://astro.build) and modern web frameworks.** Each package solves one job well: [Simple Store](/store) for reactive state, [Simple Scope](/scope) for build-time scoped IDs, and [Simple Query](/query) for DOM scripting in Astro components.
 
-To be honest, there isn't a "story" connecting these packages together (I'm no TanStack). But they follow a common theme: solve a simple use case without too many features.
+There isn't a "story" connecting these packages together (I'm no TanStack). But they follow a common theme: solve a simple use case without too many features.
 
 import { CardGrid, Card, LinkCard } from '@astrojs/starlight/components';
 

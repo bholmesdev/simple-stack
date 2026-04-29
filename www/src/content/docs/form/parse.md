@@ -1,8 +1,14 @@
 ---
-title: Parse form requests 
+title: Parse form requests
 description: Validate forms server-side
 sidebar:
   order: 2
+head:
+  # Deprecated package: keep the docs accessible but exclude from search engines.
+  - tag: meta
+    attrs:
+      name: robots
+      content: noindex, follow
 ---
 
 :::caution

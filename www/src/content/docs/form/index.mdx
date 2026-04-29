@@ -1,9 +1,15 @@
 ---
 title: Simple form
-description: The simple way to validate forms in your fullstack app. 
+description: The simple way to validate forms in your fullstack app.
 sidebar:
   label: Get started
   order: 1
+head:
+  # Deprecated package: keep the docs accessible but exclude from search engines.
+  - tag: meta
+    attrs:
+      name: robots
+      content: noindex, follow
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';

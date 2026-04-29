@@ -1,6 +1,12 @@
 ---
 title: Simple stream 🌊
 description: Suspend Astro components with fallback content. Like React Server Components, but Just HTML ™️
+head:
+  # Deprecated package: keep the docs accessible but exclude from search engines.
+  - tag: meta
+    attrs:
+      name: robots
+      content: noindex, follow
 ---
 
 :::caution

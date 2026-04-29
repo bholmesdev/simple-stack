@@ -1,8 +1,14 @@
 ---
-title:  Add client validation
+title: Add client validation
 description: Add client validation to your forms
 sidebar:
   order: 3
+head:
+  # Deprecated package: keep the docs accessible but exclude from search engines.
+  - tag: meta
+    attrs:
+      name: robots
+      content: noindex, follow
 ---
 
 :::caution
