@@ -1,0 +1,24 @@
+# https://simple-stack.dev/robots.txt
+User-agent: *
+Allow: /
+
+# AI crawlers — explicitly allowed for AEO / AI citation visibility.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+Sitemap: https://simple-stack.dev/sitemap-index.xml
