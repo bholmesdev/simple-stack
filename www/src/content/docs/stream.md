@@ -1,6 +1,6 @@
 ---
-title: Simple stream 🌊
-description: Suspend Astro components with fallback content. Like React Server Components, but Just HTML ™️
+title: Simple Stream (Deprecated)
+description: "Simple Stream was an Astro integration for suspending components with fallback content, similar to React Server Components but using plain HTML streaming. Now deprecated in favor of Astro Server Islands."
 ---
 
 :::caution

@@ -1,6 +1,6 @@
 ---
-title:  Add client validation
-description: Add client validation to your forms
+title: Add Client Validation
+description: "Add client-side form validation using the reward-early, punish-late UX pattern. Generate accessible form components with the simple-form CLI."
 sidebar:
   order: 3
 ---
