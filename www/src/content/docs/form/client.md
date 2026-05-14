@@ -3,6 +3,11 @@ title:  Add client validation
 description: Add client validation to your forms
 sidebar:
   order: 3
+head:
+  - tag: meta
+    attrs:
+      name: robots
+      content: noindex, follow
 ---
 
 :::caution

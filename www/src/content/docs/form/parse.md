@@ -3,6 +3,11 @@ title: Parse form requests
 description: Validate forms server-side
 sidebar:
   order: 2
+head:
+  - tag: meta
+    attrs:
+      name: robots
+      content: noindex, follow
 ---
 
 :::caution
